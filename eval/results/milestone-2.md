@@ -57,7 +57,7 @@ The dev split, for comparison, scored top-1 0.728 and top-5 0.825, so tuning did
 - **Misspellings that exist in listings.** `luthern church`, `grace chruch`, `grace comunity`, `calvery chapel` and `pentacostal` return listings with the same misspelling instead of correcting, because the word is in the vocabulary. Those results are arguably right, but the common spelling is what a person wants. The fix is to also offer the common spelling when a much more frequent neighbor exists, which would add a vocabulary lookup to more queries.
 - **Abbreviations.** `lds church` returns nothing, and `umc dallas` isn't expanded. One test label was too strict in hindsight: `ame church` is scored a miss though its top results are AME churches. I left it, since I had already seen the test split. Multi-word expansions aren't built.
 - **Translations.** `trinity church munich` and `mormon` miss. Lexical search can't do these, so they're the honest test of semantic search in milestone 3. English place names like Munich aren't mapped to München either.
-- **Typos with no shared listing form.** `Raaen kirkko` isn't corrected, and multi-edit typos in the first letters generally aren't reachable.
+- **Uncorrected typos.** `Raaen kirkko` isn't corrected. Single words under 7 characters only reach one edit by design.
 
 ### Labels changed
 
@@ -91,9 +91,9 @@ Across all 37 spike queries, wall p50 was 29-45 ms. The local model predicted th
 | 100 | 76/s, p95 1,358 ms | 58/s, p95 2,333 ms |
 | 150 | overloaded | 81/s, p95 2,444 ms |
 
-That is about 60-80 batches per second, down from 100-135 at 35k rows. Plan on about 60 uncached keystrokes per second. The Worker returns 503 with `Retry-After` on overload, and repeats are served from the edge cache. This is enough for the hackathon and stretch-goal traffic should be watched against it.
+That is about 60-80 batches per second, down from 100-135 at 35k rows. Plan on about 60 uncached keystrokes per second. The Worker returns 503 with `Retry-After` on overload, which is tested with a stubbed database rather than a real overload through the deployed Worker. Repeats are served from the edge cache. This is enough for the hackathon and stretch-goal traffic should be watched against it.
 
-**Size and load.** 414 MB, against about 285 MB projected, because FTS5 wasn't optimized after loading and I also added vocabulary and places. The load took about 5 minutes and wrote 3.68M rows by D1's count. I didn't run FTS5 `optimize`: speed is already good, and it's a long single statement.
+**Size and load.** 414 MB, against about 285 MB projected. About 27 MB of that is vocabulary and places, which the projection left out, and I didn't isolate the rest. The load took about 5 minutes and wrote 3.68M rows by D1's count. I didn't run FTS5 `optimize`, so how much space it would recover is unmeasured.
 
 ## Latency outside the US
 
@@ -112,7 +112,7 @@ Probed with check-host.net: six queries, each twice per node. The first pass rea
 | Singapore | 388 ms | 484 ms |
 | India | 649 ms | no sample |
 
-Europe sees about 210-340 ms on a miss, and about 65 ms on nodes with a clean cache hit. Europe holds about 58% of the corpus, so this matters. The Worker already uses D1 sessions, so turning on read replication needs no code change, but it's an account setting I couldn't change from Wrangler and it hasn't been measured.
+Europe sees about 210-340 ms on a miss, and about 65 ms on nodes with a clean cache hit. Europe holds about 60% of the corpus, so this matters. The Worker already uses D1 sessions, so turning on read replication needs no code change, but it's an account setting I couldn't change from Wrangler and it hasn't been measured.
 
 ## Data reconciliation
 
