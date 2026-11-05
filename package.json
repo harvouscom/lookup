@@ -2,12 +2,15 @@
   "name": "lookup",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.18" },
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
-    "test": "vitest run --config worker/vitest.config.ts",
+    "test": "vitest run --config worker/vitest.config.ts && pnpm --filter @heresmychurch/lookup test",
     "typecheck": "tsc -p worker/tsconfig.json --noEmit",
-    "deploy": "wrangler deploy --config worker/wrangler.jsonc",
-    "eval": "node eval/run.mjs"
+    "deploy": "pnpm run build:sdk && wrangler deploy --config worker/wrangler.jsonc",
+    "eval": "node eval/run.mjs",
+    "build:sdk": "pnpm --filter @heresmychurch/lookup build && node scripts/copy-assets.mjs"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.8.0",

@@ -1,0 +1,194 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ChurchLookup, fieldValue, setNativeValue } from "../src/element.ts";
+import { createLookup } from "../src/client.ts";
+
+const result = (id: string, name: string) => ({ id, name, label: `${name}, Dallas, Texas`, locationLabel: "Dallas, Texas", street: null, city: "Dallas", nearestPlace: null, region: "TX", regionName: "Texas", country: "US", countryName: "United States", latitude: 1, longitude: 2, denomination: null, completeness: 50, distanceKm: null, band: 1, source: "lexical" as const });
+const record = {
+  id: "R-1", completeness: 60, missing: ["phone"], hints: { nearestPlace: null }, attribution: "",
+  fields: { name: "Grace Church", street: "1 Main", city: "Dallas", region: "TX", postalCode: "75201", phone: null, website: "https://grace.example", serviceTimes: { raw: "Sun 10:30 AM", slots: [], parsed: true }, languages: ["English", "Spanish"], ministries: [] },
+};
+
+let searches: { q: string; settled: boolean }[] = [];
+let responses: Record<string, ReturnType<typeof result>[]> = {};
+function mount(html = "") {
+  document.body.innerHTML = `<form id="f"><church-lookup label="Your church"></church-lookup>${html}</form>`;
+  const el = document.querySelector("church-lookup") as ChurchLookup;
+  el.lookup = createLookup({
+    fetch: (async (url: string) => {
+      const u = new URL(url);
+      if (u.pathname.startsWith("/v1/churches/")) return Response.json(record);
+      const q = u.searchParams.get("q")!;
+      searches.push({ q, settled: u.searchParams.get("settled") === "1" });
+      const key = u.searchParams.get("settled") === "1" ? `${q}|settled` : q;
+      return Response.json({ query: q, results: responses[key] ?? responses[q] ?? [], corrected: null, degraded: false, attribution: "" });
+    }) as typeof fetch,
+  });
+  const root = el.shadowRoot!;
+  const input = root.querySelector("input")!;
+  return { el, root, input };
+}
+const type = (input: HTMLInputElement, v: string) => { input.value = v; input.dispatchEvent(new Event("input")); };
+const key = (input: HTMLInputElement, k: string, extra: KeyboardEventInit = {}) => input.dispatchEvent(new KeyboardEvent("keydown", { key: k, cancelable: true, ...extra }));
+const flush = async (ms = 200) => { await vi.advanceTimersByTimeAsync(ms); };
+
+beforeEach(() => { vi.useFakeTimers(); searches = []; responses = {}; });
+afterEach(() => { vi.useRealTimers(); });
+
+describe("combobox semantics", () => {
+  it("renders an ARIA 1.2 combobox with a label", () => {
+    const { root, input } = mount();
+    expect(input.getAttribute("role")).toBe("combobox");
+    expect(input.getAttribute("aria-expanded")).toBe("false");
+    expect(input.getAttribute("aria-autocomplete")).toBe("list");
+    const list = root.getElementById(input.getAttribute("aria-controls")!)!;
+    expect(list.getAttribute("role")).toBe("listbox");
+    expect(root.querySelector(`label[for="${input.id}"]`)!.textContent).toBe("Your church");
+  });
+  it("debounces, shows options and announces the count", async () => {
+    responses.grac = [result("R-1", "Grace Church"), result("R-2", "Grace Chapel")];
+    const { root, input } = mount();
+    type(input, "g"); type(input, "gr"); type(input, "gra"); type(input, "grac");
+    await flush(160);
+    expect(searches.filter((s) => !s.settled).map((s) => s.q)).toEqual(["grac"]);
+    expect(input.getAttribute("aria-expanded")).toBe("true");
+    const opts = root.querySelectorAll("[role=option]");
+    expect(opts).toHaveLength(2);
+    expect(opts[0]!.textContent).toContain("Dallas, Texas");
+    await flush(100);
+    expect(root.querySelector("[role=status]")!.textContent).toBe("2 churches found. Use up and down arrows to choose.");
+  });
+  it("sends a settled query after a pause", async () => {
+    const { input } = mount();
+    type(input, "grace comm");
+    await flush(800);
+    expect(searches).toEqual([{ q: "grace comm", settled: false }, { q: "grace comm", settled: true }]);
+  });
+  it("waits for IME composition to end", async () => {
+    const { input } = mount();
+    input.dispatchEvent(new Event("compositionstart"));
+    type(input, "教会");
+    await flush(300);
+    expect(searches).toEqual([]);
+    input.dispatchEvent(new Event("compositionend"));
+    await flush(200);
+    expect(searches[0]!.q).toBe("教会");
+  });
+  it("moves the active option with arrows and wraps", async () => {
+    responses.grac = [result("R-1", "Grace Church"), result("R-2", "Grace Chapel")];
+    const { root, input } = mount();
+    type(input, "grac"); await flush();
+    key(input, "ArrowDown");
+    expect(input.getAttribute("aria-activedescendant")).toBe(root.querySelectorAll("[role=option]")[0]!.id);
+    expect(root.querySelectorAll("[role=option]")[0]!.getAttribute("aria-selected")).toBe("true");
+    key(input, "ArrowDown"); key(input, "ArrowDown");
+    expect(input.getAttribute("aria-activedescendant")).toBe(root.querySelectorAll("[role=option]")[0]!.id);
+    key(input, "ArrowUp");
+    expect(input.getAttribute("aria-activedescendant")).toBe(root.querySelectorAll("[role=option]")[1]!.id);
+  });
+  it("closes on Escape", async () => {
+    responses.grac = [result("R-1", "Grace Church")];
+    const { input } = mount();
+    type(input, "grac"); await flush();
+    key(input, "Escape");
+    expect(input.getAttribute("aria-expanded")).toBe("false");
+  });
+  it("keeps the highlighted church in place when settled results arrive", async () => {
+    responses["grace comm"] = [result("R-1", "Grace Community"), result("R-2", "Grace Comm Chapel")];
+    responses["grace comm|settled"] = [result("R-9", "Grace Fellowship"), result("R-1", "Grace Community"), result("R-2", "Grace Comm Chapel")];
+    const { root, input } = mount();
+    type(input, "grace comm"); await flush();
+    key(input, "ArrowDown"); key(input, "ArrowDown");
+    await flush(700);
+    const opts = [...root.querySelectorAll("[role=option]")];
+    expect(opts.findIndex((o) => o.getAttribute("aria-selected") === "true")).toBe(1);
+    expect(opts[1]!.textContent).toContain("Grace Comm Chapel");
+    expect(opts.length).toBe(3);
+  });
+  it("offers to add a church when nothing matches, keeping the text", async () => {
+    const { root, input } = mount();
+    type(input, "zzqx church"); await flush();
+    expect(root.querySelector(".note")!.textContent).toContain("No matching church");
+    expect(root.querySelector<HTMLAnchorElement>(".note a")!.href).toContain("heresmychurch.com");
+    expect(input.value).toBe("zzqx church");
+  });
+});
+
+describe("fill", () => {
+  const form = `<input data-hmc-field="street"><input data-hmc-field="city" value="Plano"><input data-hmc-field="phone"><textarea data-hmc-field="serviceTimes"></textarea><input data-hmc-field="languages"><select data-hmc-field="region"><option value="">-</option><option value="TX">Texas</option></select>`;
+  const pick = async (input: HTMLInputElement) => {
+    responses.grac = [result("R-1", "Grace Church")];
+    type(input, "grac"); await flush();
+    key(input, "ArrowDown"); key(input, "Enter");
+    await flush(100);
+  };
+  it("fills empty fields with input and change events and announces what's missing", async () => {
+    const { root, input } = mount(form);
+    const events: string[] = [];
+    document.querySelector("[data-hmc-field=street]")!.addEventListener("input", () => events.push("input"));
+    document.querySelector("[data-hmc-field=street]")!.addEventListener("change", () => events.push("change"));
+    await pick(input);
+    const v = (f: string) => document.querySelector<HTMLInputElement>(`[data-hmc-field=${f}]`)!.value;
+    expect(v("street")).toBe("1 Main");
+    expect(v("city")).toBe("Plano");
+    expect(v("serviceTimes")).toBe("Sun 10:30 AM");
+    expect(v("languages")).toBe("English, Spanish");
+    expect(v("region")).toBe("TX");
+    expect(v("phone")).toBe("");
+    expect(events).toEqual(["input", "change"]);
+    expect(input.value).toBe("Grace Church");
+    expect(root.querySelector("[role=status]")!.textContent).toBe("Filled 4 fields. Not available: phone.");
+  });
+  it("starts the next search with nothing highlighted", async () => {
+    const { root, input } = mount(form);
+    await pick(input);
+    responses.grace = [result("R-1", "Grace Church"), result("R-2", "Grace Chapel")];
+    type(input, "grace"); await flush();
+    expect(input.getAttribute("aria-activedescendant")).toBeNull();
+    expect(root.querySelectorAll("[aria-selected=true]")).toHaveLength(0);
+  });
+  it("overwrites only with the overwrite attribute", async () => {
+    const { el, input } = mount(form);
+    el.setAttribute("overwrite", "");
+    await pick(input);
+    expect(document.querySelector<HTMLInputElement>("[data-hmc-field=city]")!.value).toBe("Dallas");
+  });
+  it("lets church-select and church-fill be cancelled", async () => {
+    const a = mount(form);
+    a.el.addEventListener("church-select", (e) => e.preventDefault());
+    await pick(a.input);
+    expect(document.querySelector<HTMLInputElement>("[data-hmc-field=street]")!.value).toBe("");
+    const b = mount(form);
+    let changes: unknown[] = [];
+    b.el.addEventListener("church-fill", (e) => { changes = (e as CustomEvent).detail.changes; e.preventDefault(); });
+    await pick(b.input);
+    expect(changes.length).toBe(4);
+    expect(document.querySelector<HTMLInputElement>("[data-hmc-field=street]")!.value).toBe("");
+  });
+  it("supports fieldMap with selectors outside the form", async () => {
+    document.body.insertAdjacentHTML("beforeend", "");
+    const { el, input } = mount();
+    document.body.insertAdjacentHTML("beforeend", `<input id="outside">`);
+    el.fieldMap = { website: "#outside" };
+    await pick(input);
+    expect(document.querySelector<HTMLInputElement>("#outside")!.value).toBe("https://grace.example");
+  });
+});
+
+describe("helpers", () => {
+  it("setNativeValue bypasses an instance setter, as React's value tracking needs", () => {
+    const el = document.createElement("input");
+    let tracked = "";
+    Object.defineProperty(el, "value", { configurable: true, get: () => tracked, set: (v) => { tracked = `instance:${v}`; } });
+    const seen: string[] = [];
+    el.addEventListener("input", () => seen.push("input"));
+    setNativeValue(el, "x");
+    expect(tracked).toBe("");
+    expect(seen).toEqual(["input"]);
+  });
+  it("fieldValue flattens lists and service times", () => {
+    expect(fieldValue(record as never, "languages")).toBe("English, Spanish");
+    expect(fieldValue(record as never, "ministries")).toBeNull();
+    expect(fieldValue(record as never, "serviceTimes")).toBe("Sun 10:30 AM");
+    expect(fieldValue(record as never, "id")).toBe("R-1");
+  });
+});

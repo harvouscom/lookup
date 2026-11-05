@@ -5,3 +5,5 @@ DROP TABLE IF EXISTS vocab_del;
 DROP TABLE IF EXISTS vocab;
 DROP TABLE IF EXISTS moved;
 DROP TABLE IF EXISTS lookup_meta;
+DROP TABLE IF EXISTS sync_state;
+DROP TABLE IF EXISTS embed_pending;

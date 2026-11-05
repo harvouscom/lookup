@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Church autofill</title>
+<!-- Sensible UI by Cam Pak (MIT): https://sensibleui.com. Pinned to a release that is at least two weeks old. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@faith-tools/sensible-ui@1.7.0/dist/sensible-ui.min.css">
+<!-- Sensible UI prefers Geist but doesn't load it. Load every weight the page uses, so bold text is really bold. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&display=swap">
+<style>
+  /* Sensible UI tokens, tuned to Here's My Church violet. The widget reads the same tokens. */
+  :root {
+    --primary: oklch(0.49 0.22 293);
+    --primary-foreground: oklch(0.99 0 0);
+    --ring: oklch(0.52 0.22 293);
+    --accent: oklch(0.96 0.03 293);
+    --accent-foreground: oklch(0.32 0.14 293);
+    --foreground: oklch(0.2 0.02 285);
+    --muted-foreground: oklch(0.47 0.02 285);
+    --border: oklch(0.9 0.01 285);
+    --input: oklch(0.78 0.02 285);
+    --radius: 0.75rem;
+  }
+  body {
+    margin: 0;
+    padding: 56px 16px 64px;
+    font-size: 1rem;
+    color: var(--foreground);
+    background:
+      radial-gradient(60rem 28rem at 50% -8rem, oklch(0.9 0.07 293 / 0.7), transparent 70%),
+      oklch(0.985 0.005 293);
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+  main { max-width: 42rem; margin: 0 auto; }
+  .hero { text-align: center; margin-bottom: 32px; }
+  .eyebrow {
+    display: inline-block; margin-bottom: 14px; padding: 4px 12px; border-radius: 999px;
+    font-size: .8125rem; font-weight: 600; letter-spacing: .02em;
+    color: var(--accent-foreground); background: var(--accent); border: 1px solid oklch(0.88 0.06 293);
+  }
+  .hero h1 { margin: 0 0 12px; font-size: clamp(2rem, 5vw, 2.75rem); line-height: 1.1; letter-spacing: -0.025em; font-weight: 750; }
+  .hero p { margin: 0 auto; max-width: 32rem; font-size: 1.0625rem; line-height: 1.6; color: var(--muted-foreground); }
+  .panel {
+    background: var(--background, #fff);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: clamp(20px, 5vw, 36px);
+    box-shadow: 0 1px 2px oklch(0.2 0.02 285 / 0.06), 0 24px 48px -24px oklch(0.3 0.1 293 / 0.28);
+  }
+  .group + .group { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--border); }
+  .group h2 { margin: 0 0 16px; font-size: .8125rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
+  .fields { display: grid; gap: 18px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+  label { display: block; margin-bottom: 8px; font-weight: 600; font-size: .9375rem; }
+  input, textarea { min-height: 48px; font-size: 1rem; }
+  .actions { margin-top: 32px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .actions button { min-height: 48px; padding: 0 24px; font-size: 1rem; font-weight: 600; }
+  .actions small { color: var(--muted-foreground); }
+  footer { margin-top: 28px; font-size: .875rem; line-height: 1.6; color: var(--muted-foreground); text-align: center; }
+  footer a { color: var(--accent-foreground); font-weight: 500; }
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <span class="eyebrow">Lookup demo</span>
+    <h1>Where do you go to church?</h1>
+    <p>Type a few letters and pick your church. We'll fill in what Here's My Church knows, and leave anything you've typed alone.</p>
+  </header>
+
+  <form id="signup" class="panel" onsubmit="event.preventDefault()">
+    <section class="group" aria-labelledby="g-church">
+      <h2 id="g-church">Your church</h2>
+      <church-lookup label="Church name" placeholder="Try “grace comm” or “first bapt”"></church-lookup>
+    </section>
+
+    <section class="group" aria-labelledby="g-address">
+      <h2 id="g-address">Address</h2>
+      <div class="fields">
+        <div><label for="street">Street</label><input id="street" name="street" data-hmc-field="street" autocomplete="off"></div>
+        <div class="row">
+          <div><label for="city">City</label><input id="city" name="city" data-hmc-field="city" autocomplete="off"></div>
+          <div><label for="region">State or region</label><input id="region" name="region" data-hmc-field="regionName" autocomplete="off"></div>
+        </div>
+        <div class="row">
+          <div><label for="postal">Postal code</label><input id="postal" name="postal" data-hmc-field="postalCode" autocomplete="off"></div>
+          <div><label for="country">Country</label><input id="country" name="country" data-hmc-field="countryName" autocomplete="off"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="group" aria-labelledby="g-contact">
+      <h2 id="g-contact">Contact</h2>
+      <div class="row">
+        <div><label for="website">Website</label><input id="website" name="website" data-hmc-field="website" autocomplete="off"></div>
+        <div><label for="phone">Phone</label><input id="phone" name="phone" data-hmc-field="phone" autocomplete="off"></div>
+      </div>
+    </section>
+
+    <section class="group" aria-labelledby="g-times">
+      <h2 id="g-times">Service times</h2>
+      <church-service-times label="Service times"><textarea id="times" name="times" data-hmc-field="serviceTimes" rows="2" aria-label="Service times"></textarea></church-service-times>
+    </section>
+
+    <input type="hidden" name="hmcId" data-hmc-field="id">
+    <div class="actions">
+      <button type="submit">Continue</button>
+      <small>This demo doesn't send anything.</small>
+    </div>
+  </form>
+
+  <footer>
+    Styled with <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://github.com/cameronapak">Cam Pak</a>.<br>
+    Church data from OpenStreetMap contributors and <a href="https://heresmychurch.com">Here's My Church</a>.
+  </footer>
+</main>
+<script type="module" src="/element.js"></script>
+<script type="module" src="/service-times.js"></script>
+</body>
+</html>

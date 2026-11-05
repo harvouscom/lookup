@@ -1,0 +1,9 @@
+/element.js
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300
+/lookup.js
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300
+/service-times.js
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300

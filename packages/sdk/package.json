@@ -1,0 +1,23 @@
+{
+  "name": "@heresmychurch/lookup",
+  "version": "0.1.0",
+  "description": "Church typeahead and autofill from the Here's My Church directory: a small client and a <church-lookup> element.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": ["./dist/element.js", "./dist/service-times.js"],
+  "exports": {
+    ".": { "types": "./src/client.ts", "default": "./dist/index.js" },
+    "./element": { "types": "./src/element.ts", "default": "./dist/element.js" },
+    "./service-times": { "types": "./src/service-times.ts", "default": "./dist/service-times.js" }
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/build.mjs && vitest run"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "happy-dom": "^18.0.0",
+    "vitest": "~3.2.0"
+  }
+}
