@@ -1,0 +1,201 @@
+{"id":"gen-full-0","class":"full-name","split":"test","status":200,"ms":1606,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Catholic Church","Catholic Church","Catholic Church"]}
+{"id":"gen-full-1","class":"full-name","split":"dev","status":200,"ms":20375,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["St. Petrus und Paulus","St-Petrus' Banden","St. Marcelinus und St. Petrus"]}
+{"id":"gen-full-2","class":"full-name","split":"dev","status":200,"ms":1565,"cache":null,"count":10,"firstRelevant":3,"corrected":null,"top":["St Augustine's Anglican Church","St Augustine's Anglican Church","St. Augustine's Anglican Church"]}
+{"id":"gen-full-3","class":"full-name","split":"dev","status":200,"ms":18137,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Heavenlight International Church","Heavenlight International Church","Heavenlight International Church"]}
+{"id":"gen-full-4","class":"full-name","split":"test","status":200,"ms":21228,"cache":null,"count":10,"firstRelevant":4,"corrected":null,"top":["Kappeli","Kappeli","Kappeli"]}
+{"id":"gen-full-5","class":"full-name","split":"test","status":200,"ms":21088,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Vuoksenniskan ruokoushuone"]}
+{"id":"gen-full-6","class":"full-name","split":"test","status":200,"ms":365,"cache":null,"count":1,"firstRelevant":null,"corrected":null,"top":["La Senda Antigua Iglesia de Restauración"]}
+{"id":"gen-full-7","class":"full-name","split":"dev","status":200,"ms":22944,"cache":null,"count":10,"firstRelevant":4,"corrected":null,"top":["Vor Frue Kirke","Vor Frue Kirke","Vor Frue Kirke"]}
+{"id":"gen-full-8","class":"full-name","split":"dev","status":200,"ms":22486,"cache":null,"count":10,"firstRelevant":2,"corrected":null,"top":["Santuario della Beata Vergine del Soccorso","Santuario della Beata Vergine del Soccorso","Santuario della Beata Vergine del Soccorso"]}
+{"id":"gen-full-9","class":"full-name","split":"dev","status":200,"ms":16421,"cache":null,"count":10,"firstRelevant":10,"corrected":null,"top":["Nieuwe kerk","Nieuwe Kerk","Nieuwe Kerk"]}
+{"id":"gen-full-10","class":"full-name","split":"dev","status":200,"ms":251,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-full-11","class":"full-name","split":"dev","status":200,"ms":19930,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Sankt Laurentius Kirche","Sankt Laurentius-Kirche","Sankt-Laurentius-Kirche"]}
+{"id":"gen-full-12","class":"full-name","split":"dev","status":500,"ms":7462,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-full-13","class":"full-name","split":"test","status":200,"ms":1835,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Church of the Transfiguration","Church of the Transfiguration","Church of the Transfiguration"]}
+{"id":"gen-full-14","class":"full-name","split":"dev","status":200,"ms":19743,"cache":null,"count":2,"firstRelevant":1,"corrected":null,"top":["Puits Sainte-Renelde","Église Sainte-Renelde"]}
+{"id":"gen-full-15","class":"full-name","split":"dev","status":200,"ms":22519,"cache":null,"count":10,"firstRelevant":9,"corrected":null,"top":["Totenkapelle","Totenkapelle","Totenkapelle"]}
+{"id":"gen-full-16","class":"full-name","split":"test","status":200,"ms":18406,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Kościół pw. Najświętszego Serca Jezusa","Kościół pw. Najświętszego Serca Jezusa Chrystusa","Kościół filialny pw. Najświętszego Serca Pana Jezusa"]}
+{"id":"gen-full-17","class":"full-name","split":"test","status":200,"ms":20344,"cache":null,"count":10,"firstRelevant":9,"corrected":null,"top":["Temple Protestant","Temple protestant - Église unie de Bourdic","Temple protestant de Chamonix"]}
+{"id":"gen-full-18","class":"full-name","split":"dev","status":200,"ms":16089,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Chiesa del Santissimo Salvatore","Chiesa della Beate Vergine del Carmine","Chiesa della Madonna del Castello"]}
+{"id":"gen-full-19","class":"full-name","split":"test","status":200,"ms":359,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-full-20","class":"full-name","split":"dev","status":200,"ms":28423,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Kirkecenteret Vejle"]}
+{"id":"gen-full-21","class":"full-name","split":"test","status":200,"ms":21681,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Mount Evelyn Presbyterian Church","Mount Evelyn Christian Reformed Church","Mount Pisgah Presbyterian Church"]}
+{"id":"gen-full-22","class":"full-name","split":"dev","status":200,"ms":16849,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Kaplica cmentarna","Kaplica cmentarna","Kaplica cmentarna"]}
+{"id":"gen-full-23","class":"full-name","split":"dev","status":200,"ms":22331,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Kappeli","Kappeli","Kappeli"]}
+{"id":"gen-full-24","class":"full-name","split":"test","status":200,"ms":1601,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Saint Michael's Catholic Church","Saint Alban's Anglican Church","Saint Andrew's United Church"]}
+{"id":"gen-full-25","class":"full-name","split":"dev","status":200,"ms":19789,"cache":null,"count":5,"firstRelevant":null,"corrected":null,"top":["Allhelgonakyrkan","Allhelgonakyrkan","Allhelgonakyrkan"]}
+{"id":"gen-full-26","class":"full-name","split":"dev","status":200,"ms":1919,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Faith City Church","Faith City Church","Faith Baptist Church"]}
+{"id":"gen-full-27","class":"full-name","split":"test","status":200,"ms":23913,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Kaplica pw. Miłosierdzia Bożego","kaplica pw. Miłosierdzia Bożego","Kaplica pw. Miłosierdzia Bożego"]}
+{"id":"gen-full-28","class":"full-name","split":"dev","status":200,"ms":11442,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Neuapostolische Kirche","Neuapostolische Kirche","Neuapostolische Kirche"]}
+{"id":"gen-full-29","class":"full-name","split":"dev","status":200,"ms":19424,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Katholische Kirche St. Martinus, Hörste","Katholische Kirche","Katholische Kirche"]}
+{"id":"gen-prefix-0","class":"typeahead","split":"dev","status":200,"ms":656,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-1","class":"typeahead","split":"test","status":200,"ms":17283,"cache":null,"count":10,"firstRelevant":9,"corrected":null,"top":["Paul-Gerhardt-Gemeindehaus","Paul-Gerhardt-Kirche","Paul-Gerhardt-Kirche"]}
+{"id":"gen-prefix-2","class":"typeahead","split":"test","status":200,"ms":20587,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-3","class":"typeahead","split":"dev","status":200,"ms":7950,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Église Saint-Jérôme de Matane","Église Saint-Jérome-de-l'Auvergne","Église Saint-Jacques-le-Majeur"]}
+{"id":"gen-prefix-4","class":"typeahead","split":"test","status":200,"ms":4746,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Saint John's Anglican church","Saint John's Anglican Church","Saint John's Anglican Church"]}
+{"id":"gen-prefix-5","class":"typeahead","split":"test","status":200,"ms":103,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-6","class":"typeahead","split":"dev","status":200,"ms":16858,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Kościół pw. Narodzenia Najświętszej Maryi Panny","Kościół pw. Narodzenia Najświętszej Maryi Panny","Kościół pw. Narodzenia Najświętszej Maryi Panny"]}
+{"id":"gen-prefix-7","class":"typeahead","split":"dev","status":200,"ms":20835,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-8","class":"typeahead","split":"dev","status":200,"ms":19213,"cache":null,"count":7,"firstRelevant":4,"corrected":null,"top":["Tober Altan","Tober Caelainn","Tober Patrick"]}
+{"id":"gen-prefix-9","class":"typeahead","split":"dev","status":200,"ms":21775,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-10","class":"typeahead","split":"dev","status":200,"ms":21003,"cache":null,"count":9,"firstRelevant":null,"corrected":null,"top":["Årsta kyrka","Ørsta Frikyrkje","Ørsta kyrkje"]}
+{"id":"gen-prefix-11","class":"typeahead","split":"dev","status":200,"ms":14566,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Chiesa della Purificazione di Maria","Chiesa della purificazione di Maria Vergine","Chiesa della Purificazione di Maria Vergine"]}
+{"id":"gen-prefix-12","class":"typeahead","split":"test","status":200,"ms":17132,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Kościół pw. Matki Boskiej Częstochowskiej","Kościół pw. Matki Boskiej Fatimskiej","Kościół pw. Matki Boskiej Różańcowej"]}
+{"id":"gen-prefix-13","class":"typeahead","split":"dev","status":200,"ms":231,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-14","class":"typeahead","split":"dev","status":200,"ms":23821,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Blære Kirke"]}
+{"id":"gen-prefix-15","class":"typeahead","split":"test","status":200,"ms":20193,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Hampton First Baptist Church","Hampton First Baptist Church & Academy","First Baptist Church of Hampton Falls"]}
+{"id":"gen-prefix-16","class":"typeahead","split":"dev","status":200,"ms":21470,"cache":null,"count":10,"firstRelevant":3,"corrected":null,"top":["Kaplica Parafii pw. Najświętszej Maryi Panny Królowej Polski","Kaplica Parafii pw. Najświętszej Maryi Panny Królowej Polski","Kaplica parafii pw. Najświętszego Serca Jezusowego"]}
+{"id":"gen-prefix-17","class":"typeahead","split":"dev","status":200,"ms":22815,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-18","class":"typeahead","split":"test","status":200,"ms":24970,"cache":null,"count":1,"firstRelevant":null,"corrected":null,"top":["Morrison City Christian Churc"]}
+{"id":"gen-prefix-19","class":"typeahead","split":"test","status":200,"ms":20287,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-20","class":"typeahead","split":"test","status":200,"ms":3270,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Mountain Avenue Baptist Church","mountain city methodist church","Mountain Park First Baptist Church"]}
+{"id":"gen-prefix-21","class":"typeahead","split":"dev","status":200,"ms":18097,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-22","class":"typeahead","split":"dev","status":200,"ms":188,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-23","class":"typeahead","split":"dev","status":200,"ms":22232,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Sankt Johann und Paul","Sankt Johann","Sankt Johann"]}
+{"id":"gen-prefix-24","class":"typeahead","split":"dev","status":200,"ms":420,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-25","class":"typeahead","split":"dev","status":200,"ms":108,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-26","class":"typeahead","split":"dev","status":200,"ms":21,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-prefix-27","class":"typeahead","split":"test","status":200,"ms":21643,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Kościół pw. Przemienienia Pańskiego w Końskiem","kościół pw. Przemienienia Pańskiego","kościół pw. Przemienienia Pańskiego"]}
+{"id":"gen-prefix-28","class":"typeahead","split":"dev","status":200,"ms":9033,"cache":null,"count":10,"firstRelevant":3,"corrected":null,"top":["Parroquia San Francisco","Parroquia San Francisco de Asís","Parroquia San Francisco de Asís"]}
+{"id":"gen-prefix-29","class":"typeahead","split":"dev","status":200,"ms":19493,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Stellinger Kirche"]}
+{"id":"gen-typo-0","class":"typo","split":"dev","status":200,"ms":107,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-1","class":"typo","split":"dev","status":200,"ms":21184,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-2","class":"typo","split":"test","status":200,"ms":21782,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-3","class":"typo","split":"test","status":200,"ms":968,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Blountsville United Methodist Church Fellowship Hall","Madison United Methodist Church","Acipco United Methodist Church"]}
+{"id":"gen-typo-4","class":"typo","split":"dev","status":200,"ms":139,"cache":null,"count":1,"firstRelevant":null,"corrected":null,"top":["Saint Paul's United Methodist Church of Odessa"]}
+{"id":"gen-typo-5","class":"typo","split":"dev","status":200,"ms":20792,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-6","class":"typo","split":"test","status":200,"ms":21392,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-7","class":"typo","split":"dev","status":200,"ms":1519,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Saint Michael's Catholic Church","Saint Alban's Anglican Church","Saint Andrew's Roman Catholic Church"]}
+{"id":"gen-typo-8","class":"typo","split":"dev","status":200,"ms":18447,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-9","class":"typo","split":"test","status":200,"ms":17120,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-10","class":"typo","split":"dev","status":200,"ms":72,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-11","class":"typo","split":"dev","status":200,"ms":1396,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["WellSpring Community Church","Dresden Community Church","2nd Christian Community Church"]}
+{"id":"gen-typo-12","class":"typo","split":"test","status":200,"ms":23,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-13","class":"typo","split":"test","status":200,"ms":15104,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-14","class":"typo","split":"dev","status":200,"ms":754,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["St. Jude's Anglecan Church","St. Paul's Roman Catholic Church","St. Peter's Anglican Church"]}
+{"id":"gen-typo-15","class":"typo","split":"dev","status":200,"ms":16046,"cache":null,"count":10,"firstRelevant":3,"corrected":null,"top":["Christus Victor Lutheran Church","Christus Victor Lutheran Church","Christus Victor Lutheran Church"]}
+{"id":"gen-typo-16","class":"typo","split":"dev","status":200,"ms":19774,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Chiesa di San Rocco","Chiesa di San Rocco di Molassana","Chiesa di San Rocco"]}
+{"id":"gen-typo-17","class":"typo","split":"test","status":200,"ms":17927,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-18","class":"typo","split":"test","status":200,"ms":206,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-19","class":"typo","split":"test","status":200,"ms":19863,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-20","class":"typo","split":"test","status":200,"ms":20183,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-21","class":"typo","split":"test","status":200,"ms":220,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-22","class":"typo","split":"dev","status":200,"ms":17384,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-23","class":"typo","split":"dev","status":200,"ms":285,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["St. Peters Church","St. Peters Catholic Church","St. Peters Lutheran Church"]}
+{"id":"gen-typo-24","class":"typo","split":"dev","status":200,"ms":112,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-25","class":"typo","split":"dev","status":200,"ms":19360,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-26","class":"typo","split":"test","status":200,"ms":21261,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-27","class":"typo","split":"test","status":200,"ms":21698,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-28","class":"typo","split":"dev","status":200,"ms":21412,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-typo-29","class":"typo","split":"dev","status":200,"ms":21511,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Pyhän Annan Kirkko","Pyhän ristin kirkko","Pyhännän kirkko"]}
+{"id":"gen-city-0","class":"name-and-place","split":"test","status":200,"ms":21887,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Christ Episcopal Church","Christ Episcopal Church","Christ Episcopal Church"]}
+{"id":"gen-city-1","class":"name-and-place","split":"dev","status":200,"ms":443,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-city-2","class":"name-and-place","split":"dev","status":200,"ms":13464,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["St. Hilda's Anglican Church","St. Mary's Anglican Church","St. Peter's Anglican Church"]}
+{"id":"gen-city-3","class":"name-and-place","split":"test","status":200,"ms":20814,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["The Salvation Army - East Peckham","The Salvation Army - Gosport","The Salvation Army - Gravesend"]}
+{"id":"gen-city-4","class":"name-and-place","split":"dev","status":200,"ms":20982,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Rumänische Baptistengemeinde Linz"]}
+{"id":"gen-city-5","class":"name-and-place","split":"dev","status":200,"ms":20467,"cache":null,"count":3,"firstRelevant":1,"corrected":null,"top":["Oratorio di San Francesco Saverio","Oratorio di San Francesco Saverio","Oratorio di San Francesco Saverio"]}
+{"id":"gen-city-6","class":"name-and-place","split":"test","status":200,"ms":21182,"cache":null,"count":7,"firstRelevant":1,"corrected":null,"top":["Alla Helgons kyrka","S:t Gabriels kyrka","S:t Tomas kyrka"]}
+{"id":"gen-city-7","class":"name-and-place","split":"test","status":200,"ms":19910,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Korskyrkan","Adventkyrkan","Amsbergs kapell"]}
+{"id":"gen-city-8","class":"name-and-place","split":"dev","status":200,"ms":20385,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Santuario di Nostra Signora della Vittoria","Santuario di Nostra Signora della Bastia","Santuario di Nostra Signora della Brughiera"]}
+{"id":"gen-city-9","class":"name-and-place","split":"dev","status":200,"ms":275,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-city-10","class":"name-and-place","split":"dev","status":200,"ms":21088,"cache":null,"count":10,"firstRelevant":4,"corrected":null,"top":["All Saints Church","All Saints' Episcopal Church","All Saints (Little Staughton Parish Church)"]}
+{"id":"gen-city-11","class":"name-and-place","split":"test","status":200,"ms":20293,"cache":null,"count":10,"firstRelevant":4,"corrected":null,"top":["Solid Rock Baptist Church","Solid Rock Bible Church","Solid Rock Christian Church"]}
+{"id":"gen-city-12","class":"name-and-place","split":"dev","status":200,"ms":20826,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["St. Fachtna’s Cathedral","St Paul's Cathedral","St Paul's Cathedral"]}
+{"id":"gen-city-13","class":"name-and-place","split":"dev","status":200,"ms":176,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-city-14","class":"name-and-place","split":"dev","status":200,"ms":845,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["St. Mary's Road United Church","St. Jude's Anglecan Church","St. Paul's Roman Catholic Church"]}
+{"id":"gen-city-15","class":"name-and-place","split":"dev","status":200,"ms":12214,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["St. Peter's Anglican Church","St. Mary's Anglican Church","St Peter's Anglican Church"]}
+{"id":"gen-city-16","class":"name-and-place","split":"test","status":200,"ms":21284,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Église Protestante Évangélique","Église évangélique et protestante","Église évangélique protestante"]}
+{"id":"gen-city-17","class":"name-and-place","split":"dev","status":200,"ms":20575,"cache":null,"count":6,"firstRelevant":1,"corrected":null,"top":["Pfarrkirche Schwarzach","Pfarrkirche Altenmarkt","Pfarrkirche St. Johann"]}
+{"id":"gen-city-18","class":"name-and-place","split":"test","status":200,"ms":19956,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Église Adventiste"]}
+{"id":"gen-city-19","class":"name-and-place","split":"dev","status":200,"ms":19788,"cache":null,"count":2,"firstRelevant":1,"corrected":null,"top":["Juvan kirkko","Juvan helluntaiseurakunta"]}
+{"id":"gen-city-20","class":"name-and-place","split":"dev","status":200,"ms":19714,"cache":null,"count":9,"firstRelevant":1,"corrected":null,"top":["Evangelisch Freikirchliche Gemeinde Unna-Königsborn","Evangelisch-Freikirchliche Gemeinde Köln-Süd","Evangelisch-Freikirchliche Gemeinde Unna e.V"]}
+{"id":"gen-city-21","class":"name-and-place","split":"test","status":200,"ms":24244,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Freie Evangelische Gemeinde","Freie Evangelische Baptisten-Gemeinde Bickenbach e.V.","Freie evangelische Bibel-Baptisten-Gemeinde"]}
+{"id":"gen-city-22","class":"name-and-place","split":"test","status":200,"ms":1096,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Middle Sackville Baptist Church","Pleasantville Baptist Church","Solid Rock Baptist Church"]}
+{"id":"gen-city-23","class":"name-and-place","split":"dev","status":200,"ms":22259,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Santuario di Maria Santissima del Carmelo","Santuario Maria Santissima del Carmelo","Santuario di Maria Santissima del Ponte"]}
+{"id":"gen-city-24","class":"name-and-place","split":"test","status":200,"ms":232,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-city-25","class":"name-and-place","split":"test","status":200,"ms":20698,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Oratori Santa Maria d'Ocata"]}
+{"id":"gen-city-26","class":"name-and-place","split":"dev","status":200,"ms":115,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"gen-city-27","class":"name-and-place","split":"dev","status":200,"ms":19588,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Evangelische Kirche A.B."]}
+{"id":"gen-city-28","class":"name-and-place","split":"dev","status":200,"ms":20644,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Klasztor Ojców Dominikanów","Klasztor Ojców Dominikanów","Klasztor Ojców Dominikanów"]}
+{"id":"gen-city-29","class":"name-and-place","split":"dev","status":200,"ms":21790,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Chiesa di Poggio D'Acera"]}
+{"id":"must-grac","class":"must-work","split":"gate","status":200,"ms":21058,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"must-gracee","class":"must-work","split":"gate","status":200,"ms":19967,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"must-grace-comm","class":"must-work","split":"gate","status":200,"ms":19655,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"must-first-bapt","class":"must-work","split":"gate","status":200,"ms":19330,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"must-church-dallas","class":"must-work","split":"gate","status":200,"ms":245,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"must-grac-nogeo","class":"must-work","split":"gate","status":200,"ms":20171,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"must-gracee-nogeo","class":"must-work","split":"gate","status":200,"ms":20031,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"must-grace-comm-nogeo","class":"must-work","split":"gate","status":200,"ms":19669,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"must-first-bapt-nogeo","class":"must-work","split":"gate","status":200,"ms":20103,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"place-baptist-houston","class":"place","split":"dev","status":200,"ms":19483,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Baptist Temple","Airway Baptist Church of Houston","Houston Fellowship Baptist Church"]}
+{"id":"place-catholic-austin","class":"place","split":"test","status":200,"ms":508,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Saint Austin Catholic Church","Catholic Church","Austin Ridge Bible Church"]}
+{"id":"place-grace-comma","class":"place","split":"dev","status":200,"ms":19225,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Grace and Glory Gospel Chapel","Grace Apostolic Church","Grace Community Church"]}
+{"id":"place-comma-state","class":"place","split":"test","status":200,"ms":483,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["First Baptist Azle","First Baptist Blue Ridge","First Baptist Church"]}
+{"id":"place-upper-code","class":"place","split":"dev","status":200,"ms":398,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Grace AME Zion Church","Grace and Truth Fellowship Baptist Church","Grace Apostolic Pentecostal Church"]}
+{"id":"place-lower-in-not-indiana","class":"place","split":"dev","status":200,"ms":127,"cache":null,"count":1,"firstRelevant":null,"corrected":null,"top":["Denver Baptist Church"]}
+{"id":"place-state-name","class":"place","split":"test","status":200,"ms":426,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Calvary Chapel","Calvary Chapel","Calvary Chapel"]}
+{"id":"place-state-two-word","class":"place","split":"dev","status":200,"ms":335,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Lutheran Church In America","Lutheran Church of Christ","Lutheran Church of Our Redeemer"]}
+{"id":"place-munich","class":"place","split":"test","status":200,"ms":91,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"place-munchen-ascii","class":"place","split":"dev","status":200,"ms":98,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"place-paris","class":"place","split":"dev","status":200,"ms":30906,"cache":null,"count":1,"firstRelevant":1,"corrected":null,"top":["Eglise Evangelique Baptiste Chinoise De Paris Est"]}
+{"id":"place-london","class":"place","split":"test","status":200,"ms":518,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"place-near-param","class":"place","split":"test","status":200,"ms":23003,"cache":null,"count":4,"firstRelevant":1,"corrected":null,"top":["Seattle Grace Presbyterian Church","Grace Church","Grace United Methodist Church"]}
+{"id":"place-st-louis","class":"place","split":"dev","status":200,"ms":280,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Greater St John Missionary Baptist Church","Saint Louis Crossing Baptist Church","St Paul Baptist Church"]}
+{"id":"place-fort-worth","class":"place","split":"test","status":200,"ms":53,"cache":null,"count":3,"firstRelevant":null,"corrected":null,"top":["Grace Presbyterian Church","Grace St John's United Church Of Chirst","The Redeemed Christian Church Of God, Grace Sanctuary"]}
+{"id":"place-germany","class":"place","split":"dev","status":200,"ms":20368,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"saint-st-mary","class":"saint","split":"test","status":200,"ms":16829,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["St. Mary Catholic Church","St. Mary-of-the-Woods Village Church","St. Mary's"]}
+{"id":"saint-saint-mary","class":"saint","split":"dev","status":200,"ms":3574,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Saint Mary Catholic Church","Saint Mary Catholic Church","Saint Mary Church"]}
+{"id":"saint-st-marys","class":"saint","split":"dev","status":200,"ms":20587,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["St. Marys First Church of the Nazarene","St Marys","St Marys"]}
+{"id":"saint-apostrophe","class":"saint","split":"test","status":200,"ms":77,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["St. Mary's Road United Church","St Mary's Anglican Church","St Mary's Church"]}
+{"id":"saint-st-john","class":"saint","split":"dev","status":200,"ms":473,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["St John Lutheran Church","St John Lutheran Church","St. John Lutheran Church"]}
+{"id":"saint-ste-anne","class":"saint","split":"dev","status":500,"ms":1792,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"saint-sankt-josef","class":"saint","split":"test","status":500,"ms":1356,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"saint-st-josef-de","class":"saint","split":"test","status":500,"ms":1442,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"saint-mt-zion","class":"abbreviation","split":"dev","status":200,"ms":44,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"saint-mount-zion","class":"abbreviation","split":"dev","status":200,"ms":2066,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Mount Zion Baptist Church","Mount Zion Baptist Church","Mount Zion Baptist Church"]}
+{"id":"abbr-umc","class":"abbreviation","split":"test","status":200,"ms":25069,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"abbr-sda","class":"abbreviation","split":"dev","status":200,"ms":23461,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["SDA Church","SDA Church","Allentown Hispanic SDA Church"]}
+{"id":"abbr-lds","class":"abbreviation","split":"test","status":200,"ms":17921,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"abbr-ame","class":"abbreviation","split":"test","status":200,"ms":21944,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Ame Church","AME Church","Little Mountain AME Church"]}
+{"id":"abbr-cogic","class":"abbreviation","split":"dev","status":500,"ms":81,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"abbr-hl-geist","class":"abbreviation","split":"test","status":500,"ms":194,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"abbr-sw-jana","class":"abbreviation","split":"test","status":500,"ms":12684,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"dia-kosciol","class":"diacritics","split":"test","status":200,"ms":20517,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"dia-koscioł","class":"diacritics","split":"test","status":200,"ms":25121,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Kościół pw. Nawiedzenia Najświętszej Maryi","Kościół Matki Boskiej Bolesnej","Kościół Matki Bożej Różańcowej"]}
+{"id":"dia-wroclaw","class":"diacritics","split":"dev","status":200,"ms":40645,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"dia-eglise","class":"diacritics","split":"dev","status":200,"ms":37215,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Eglise Saint Bernard-de-Menthon","Eglise Saint-Denis","Eglise Saint-Jean-Baptiste"]}
+{"id":"dia-muenchen","class":"diacritics","split":"test","status":200,"ms":22370,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"dia-strasse","class":"diacritics","split":"test","status":200,"ms":21986,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Kirche Heilige Dreifaltigkeit","Kirche Maria Krönung","Kirche St. Karl"]}
+{"id":"dia-sao","class":"diacritics","split":"dev","status":200,"ms":21381,"cache":null,"count":2,"firstRelevant":1,"corrected":null,"top":["Igreja Matriz de Sao Pedro","Capela de São Bento"]}
+{"id":"dia-nino","class":"diacritics","split":"dev","status":200,"ms":25089,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"common-church","class":"common-word","split":"test","status":200,"ms":509,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Church In The Vine","Church of God","Church of God New Hope"]}
+{"id":"common-the-church","class":"common-word","split":"dev","status":200,"ms":1101,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["The Anglican Parish of the Church of the Epiphany","The Church At South Edmonton","The Church in Adelaide-Metcalfe"]}
+{"id":"common-church-of-christ","class":"common-word","split":"dev","status":200,"ms":118,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Church of Christ","Church of Christ","Church of Christ"]}
+{"id":"common-christ-church","class":"common-word","split":"dev","status":200,"ms":190,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Christ Church","Christ Church Cathedral","Christ Church Royal Chapel"]}
+{"id":"common-new-life","class":"common-word","split":"test","status":200,"ms":5025,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["New Life Lutheran Church","New Life Worship Center","New Life Christian Fellowship"]}
+{"id":"common-first","class":"common-word","split":"test","status":200,"ms":280,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["First Advent Christian Church","First African Baptist Church","First Alliance Church"]}
+{"id":"common-saint","class":"common-word","split":"dev","status":200,"ms":95,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Saint Alban the Martyr Anglican Church","Saint Alban's Anglican Church","Saint Andrew and Saint David"]}
+{"id":"common-de","class":"common-word","split":"dev","status":200,"ms":111,"cache":null,"count":10,"firstRelevant":7,"corrected":null,"top":["All Saints Episcopal Churxh","Asbury Methodist Church","Asbury United Methodist Church"]}
+{"id":"common-baptist","class":"common-word","split":"dev","status":200,"ms":87,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Baptist Church","Baptist Meeting House","100 Mile House Baptist Church"]}
+{"id":"common-holy-trinity","class":"common-word","split":"dev","status":200,"ms":4966,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Holy Trinity Greek Orthodox Church","Holy Trinity Orthodox Church","Holy Trinity Evangelical Lutheran Church"]}
+{"id":"common-grace-church","class":"common-word","split":"test","status":200,"ms":504,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Grace Church","Grace Church","Grace Church"]}
+{"id":"common-church-of-god","class":"common-word","split":"test","status":200,"ms":73,"cache":null,"count":10,"firstRelevant":1,"corrected":null,"top":["Church of God","Church of God","Church of God"]}
+{"id":"typo-baptst","class":"typo-hand","split":"test","status":200,"ms":19736,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"typo-presbyterain","class":"typo-hand","split":"test","status":200,"ms":22605,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"typo-methodst","class":"typo-hand","split":"dev","status":200,"ms":21457,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"typo-luthern","class":"typo-hand","split":"test","status":200,"ms":23751,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Luthern Church","Luthern Church of the Covenant","Luthern Church of the Holy Trinity"]}
+{"id":"typo-catholc","class":"typo-hand","split":"dev","status":200,"ms":27021,"cache":null,"count":2,"firstRelevant":null,"corrected":null,"top":["Blessed Sacrament Catholc Church","Sacred Heart Catholc Churchq"]}
+{"id":"typo-comunity","class":"typo-hand","split":"test","status":200,"ms":25357,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"typo-calvery","class":"typo-hand","split":"dev","status":200,"ms":20926,"cache":null,"count":2,"firstRelevant":null,"corrected":null,"top":["Calvery Chapel Cherry Creek","Calvery Chapel"]}
+{"id":"typo-episcopel","class":"typo-hand","split":"dev","status":200,"ms":22868,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"typo-pentacostal","class":"typo-hand","split":"dev","status":200,"ms":22520,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Pentacostal Assembly of Nevada","Pentacostal Church","Pentacostal Church"]}
+{"id":"typo-adventist","class":"typo-hand","split":"test","status":200,"ms":21337,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"typo-chruch","class":"typo-hand","split":"test","status":200,"ms":21437,"cache":null,"count":2,"firstRelevant":null,"corrected":null,"top":["Grace Chruch","Grace Baptist Chruch"]}
+{"id":"typo-dallas","class":"typo-hand","split":"dev","status":200,"ms":1465,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["First African Baptist Church","First American Baptist Church","First American Baptist Church"]}
+{"id":"typo-kirhe","class":"typo-hand","split":"dev","status":200,"ms":23685,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"typo-dreifaltigkiet","class":"typo-hand","split":"test","status":200,"ms":20998,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"trans-trinity-de","class":"translation","split":"dev","status":200,"ms":2218,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Trinity Anglican Church","Trinity Anglican Church","Trinity Baptist Church"]}
+{"id":"trans-saint-peter-de","class":"translation","split":"test","status":200,"ms":7088,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Saint Peter Catholic Church","Saint Peter Catholic Church","Saint Peter Catholic Church"]}
+{"id":"trans-church-pl","class":"translation","split":"dev","status":200,"ms":22792,"cache":null,"count":0,"firstRelevant":null,"corrected":null,"top":[]}
+{"id":"trans-church-fr","class":"translation","split":"dev","status":200,"ms":27570,"cache":null,"count":10,"firstRelevant":null,"corrected":null,"top":["Paris Plains Church","East Paris Baptist Church","First Baptist Church of Paris"]}
+{"id":"trans-mormon","class":"translation","split":"dev","status":200,"ms":23631,"cache":null,"count":2,"firstRelevant":null,"corrected":null,"top":["Fellowship Baptist Church","LifeFamily"]}

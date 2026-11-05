@@ -1,0 +1,142 @@
+[
+ {
+  "q": "methodist",
+  "wallP50": 46,
+  "wallP95": 115,
+  "sqlP50": [
+   5.39,
+   4.13,
+   3.76
+  ]
+ },
+ {
+  "q": "christian",
+  "wallP50": 47,
+  "wallP95": 64,
+  "sqlP50": [
+   4.16,
+   3.61,
+   1.74
+  ]
+ },
+ {
+  "q": "community",
+  "wallP50": 39,
+  "wallP95": 40,
+  "sqlP50": [
+   3.24,
+   2.92,
+   1.42
+  ]
+ },
+ {
+  "q": "presbyterian",
+  "wallP50": 33,
+  "wallP95": 40,
+  "sqlP50": [
+   3.1,
+   2.39,
+   1.5
+  ]
+ },
+ {
+  "q": "pentecostal",
+  "wallP50": 39,
+  "wallP95": 84,
+  "sqlP50": [
+   2.4,
+   1.91,
+   1.29
+  ]
+ },
+ {
+  "q": "missionary",
+  "wallP50": 32,
+  "wallP95": 37,
+  "sqlP50": [
+   2.35,
+   1.82,
+   1.31
+  ]
+ },
+ {
+  "q": "evangelische",
+  "wallP50": 34,
+  "wallP95": 52,
+  "sqlP50": [
+   3.05,
+   1.88,
+   1.18
+  ]
+ },
+ {
+  "q": "lutheran",
+  "wallP50": 53,
+  "wallP95": 101,
+  "sqlP50": [
+   3.44,
+   2.49,
+   0.89
+  ]
+ },
+ {
+  "q": "community church",
+  "wallP50": 46,
+  "wallP95": 66,
+  "sqlP50": [
+   5.93,
+   3.66,
+   1.05
+  ]
+ },
+ {
+  "q": "methodist church",
+  "wallP50": 50,
+  "wallP95": 65,
+  "sqlP50": [
+   3.97,
+   2.2,
+   1.45
+  ]
+ },
+ {
+  "q": "christian church",
+  "wallP50": 36,
+  "wallP95": 92,
+  "sqlP50": [
+   3.37,
+   2.59,
+   1.15
+  ]
+ },
+ {
+  "q": "church christian",
+  "wallP50": 36,
+  "wallP95": 53,
+  "sqlP50": [
+   4.05,
+   3.38,
+   1.8
+  ]
+ },
+ {
+  "q": "missionary baptist",
+  "wallP50": 33,
+  "wallP95": 40,
+  "sqlP50": [
+   3.13,
+   1.77,
+   1.01
+  ]
+ },
+ {
+  "q": "first united methodist",
+  "wallP50": 45,
+  "wallP95": 56,
+  "sqlP50": [
+   6.5,
+   5.7,
+   3.86
+  ]
+ }
+]

@@ -1,0 +1,120 @@
+{"id":"gen-full-0","q":"Catholic Church","class":"full-name","country":"AU","region":"AUNSW","completeness":"mid","nameCommonness":"common","loc":{"lat":-35.38,"lng":148.18},"accept":["AU-AUNSW-930619149"]}
+{"id":"gen-full-1","q":"St. Petrus","class":"full-name","country":"DE","region":"DEST","completeness":"mid","nameCommonness":"common","accept":["DE-DEST-391906331"]}
+{"id":"gen-full-2","q":"St. Augustine's Anglican Church","class":"full-name","country":"CA","region":"AB","completeness":"high","nameCommonness":"rare","loc":{"lat":53.63,"lng":-113.51},"accept":["CA-AB-1385418580"]}
+{"id":"gen-full-3","q":"Heavenlight International Church","class":"full-name","country":"GB","region":"EAST","completeness":"high","nameCommonness":"rare","accept":["GB-EAST-685453148","GB-GREATERLONDON-685453148","GB-SOUTHEAST-685453148"]}
+{"id":"gen-full-4","q":"Kappeli","class":"full-name","country":"FI","region":"FI09","completeness":"low","nameCommonness":"common","loc":{"lat":60.57,"lng":26.93},"accept":["FI-FI09-424101920"]}
+{"id":"gen-full-5","q":"Vuoksenniskan ruokoushuone","class":"full-name","country":"FI","region":"FI02","completeness":"mid","nameCommonness":"rare","accept":["FI-FI02-374314668"]}
+{"id":"gen-full-6","q":"Iglesia de la Asunción","class":"full-name","country":"ES","region":"ESBU","completeness":"high","nameCommonness":"common","loc":{"lat":42.41,"lng":-4.16},"accept":["ES-ESBU-141638899"]}
+{"id":"gen-full-7","q":"Vor Frue Kirke","class":"full-name","country":"DK","region":"DK84","completeness":"mid","nameCommonness":"common","accept":["DK-DK84-25451190"]}
+{"id":"gen-full-8","q":"Santuario della Beata Vergine del Soccorso","class":"full-name","country":"IT","region":"ITCO","completeness":"high","nameCommonness":"rare","loc":{"lat":46.07,"lng":9.12},"accept":["IT-ITCO-53657829"]}
+{"id":"gen-full-9","q":"Nieuwe Kerk","class":"full-name","country":"NL","region":"NLZH","completeness":"high","nameCommonness":"common","accept":["NL-NLZH-227924236"]}
+{"id":"gen-full-10","q":"Chiesa di Santa Caterina in Biancanigo","class":"full-name","country":"IT","region":"ITRA","completeness":"high","nameCommonness":"rare","loc":{"lat":44.41,"lng":11.91},"accept":["IT-ITRA-4749143868"]}
+{"id":"gen-full-11","q":"Sankt Laurentius Kirche","class":"full-name","country":"BE","region":"BEWLG","completeness":"low","nameCommonness":"rare","accept":["BE-BEWLG-136612929"]}
+{"id":"gen-full-12","q":"St Saviour's, Pimlico","class":"full-name","country":"GB","region":"GREATERLONDON","completeness":"high","nameCommonness":"rare","loc":{"lat":51.55,"lng":-0.22},"accept":["GB-EAST-242282602","GB-GREATERLONDON-242282602","GB-SOUTHEAST-242282602"]}
+{"id":"gen-full-13","q":"Church of the Transfiguration","class":"full-name","country":"GB","region":"SOUTHEAST","completeness":"high","nameCommonness":"common","accept":["GB-SOUTHEAST-881701225","GB-SOUTHWEST-881701225"]}
+{"id":"gen-full-14","q":"Puits Sainte-Renelde","class":"full-name","country":"BE","region":"BEWBR","completeness":"mid","nameCommonness":"rare","loc":{"lat":50.82,"lng":4.13},"accept":["BE-BEWBR-272255141"]}
+{"id":"gen-full-15","q":"Totenkapelle","class":"full-name","country":"AT","region":"AT8","completeness":"mid","nameCommonness":"common","accept":["AT-AT8-78255563"]}
+{"id":"gen-full-16","q":"Kościół pw. Najświętszego Serca Jezusa","class":"full-name","country":"PL","region":"PLSK","completeness":"high","nameCommonness":"common","loc":{"lat":51.23,"lng":20.77},"accept":["PL-PLMZ-254249592","PL-PLSK-254249592"]}
+{"id":"gen-full-17","q":"Temple protestant","class":"full-name","country":"CH","region":"CHGE","completeness":"mid","nameCommonness":"common","accept":["CH-CHGE-79650770","CH-CHGE-84697836"]}
+{"id":"gen-full-18","q":"Chiesa del Lazzaretto","class":"full-name","country":"IT","region":"ITCO","completeness":"high","nameCommonness":"common","loc":{"lat":45.65,"lng":8.93},"accept":["IT-ITCO-87242040"]}
+{"id":"gen-full-19","q":"Kapelle in Kienegg","class":"full-name","country":"AT","region":"AT3","completeness":"low","nameCommonness":"rare","accept":["AT-AT3-335112472"]}
+{"id":"gen-full-20","q":"Kirkecenteret Vejle","class":"full-name","country":"DK","region":"DK83","completeness":"high","nameCommonness":"rare","loc":{"lat":55.76,"lng":9.39},"accept":["DK-DK83-350154023"]}
+{"id":"gen-full-21","q":"Mount Evelyn Presbyterian Church","class":"full-name","country":"AU","region":"AUVIC","completeness":"high","nameCommonness":"rare","accept":["AU-AUVIC-908041675"]}
+{"id":"gen-full-22","q":"Kaplica cmentarna","class":"full-name","country":"PL","region":"PLDS","completeness":"mid","nameCommonness":"common","loc":{"lat":51.02,"lng":16.24},"accept":["PL-PLDS-397126053"]}
+{"id":"gen-full-23","q":"Kappeli","class":"full-name","country":"FI","region":"FI02","completeness":"low","nameCommonness":"common","accept":["FI-FI02-32991004"]}
+{"id":"gen-full-24","q":"Saint Lazerian's","class":"full-name","country":"IE","region":"IELS","completeness":"low","nameCommonness":"rare","loc":{"lat":52.79,"lng":-7.1},"accept":["IE-IELS-859473195"]}
+{"id":"gen-full-25","q":"Allhelgonakyrkan","class":"full-name","country":"SE","region":"SEM","completeness":"low","nameCommonness":"common","accept":["SE-SEM-104244135"]}
+{"id":"gen-full-26","q":"Faith City Church","class":"full-name","country":"CA","region":"NS","completeness":"high","nameCommonness":"common","loc":{"lat":44.63,"lng":-63.61},"accept":["CA-NS-82660194"]}
+{"id":"gen-full-27","q":"Kaplica pw. Miłosierdzia Bożego","class":"full-name","country":"PL","region":"PLDS","completeness":"low","nameCommonness":"common","accept":["PL-PLDS-13843826761","PL-PLWP-13843826761"]}
+{"id":"gen-full-28","q":"Neuapostolische Kirche","class":"full-name","country":"DE","region":"DERP","completeness":"high","nameCommonness":"common","loc":{"lat":50.86,"lng":7.86},"accept":["DE-DERP-5252171199"]}
+{"id":"gen-full-29","q":"Katholische Kirche","class":"full-name","country":"CH","region":"CHTG","completeness":"low","nameCommonness":"common","accept":["CH-CHTG-234922592"]}
+{"id":"gen-prefix-0","q":"Igreja de Santo António dos","class":"typeahead","country":"PT","region":"PT13","completeness":"high","nameCommonness":"rare","loc":{"lat":41.03,"lng":-8.64},"accept":["PT-PT13-395125611"]}
+{"id":"gen-prefix-1","q":"Paul-Gerhardt","class":"typeahead","country":"DE","region":"DENW","completeness":"high","nameCommonness":"common","accept":["DE-DENW-270937634"]}
+{"id":"gen-prefix-2","q":"Svilan","class":"typeahead","country":"NO","region":"NO11","completeness":"mid","nameCommonness":"rare","loc":{"lat":58.91,"lng":5.95},"accept":["NO-NO11-337697805"]}
+{"id":"gen-prefix-3","q":"Église Saint-J","class":"typeahead","country":"FR","region":"FR38","completeness":"low","nameCommonness":"common","accept":["FR-FR38-57943062"]}
+{"id":"gen-prefix-4","q":"Saint John's Anglican","class":"typeahead","country":"US","region":"MO","completeness":"low","nameCommonness":"common","loc":{"lat":39.2,"lng":-94.62},"accept":["MO-498698770"]}
+{"id":"gen-prefix-5","q":"Alminha da Ca","class":"typeahead","country":"PT","region":"PT03","completeness":"low","nameCommonness":"rare","accept":["PT-PT03-8440719352"]}
+{"id":"gen-prefix-6","q":"Kościół pw. Narodzenia Najświ","class":"typeahead","country":"PL","region":"PLMA","completeness":"high","nameCommonness":"common","loc":{"lat":49.96,"lng":19.86},"accept":["PL-PLMA-203948783","PL-PLSL-203948783"]}
+{"id":"gen-prefix-7","q":"Christelijke G","class":"typeahead","country":"NL","region":"NLZE","completeness":"mid","nameCommonness":"common","accept":["NL-NLZE-277111392"]}
+{"id":"gen-prefix-8","q":"Tober","class":"typeahead","country":"IE","region":"IEMH","completeness":"low","nameCommonness":"common","loc":{"lat":53.6,"lng":-6.51},"accept":["IE-IEMH-11036305276"]}
+{"id":"gen-prefix-9","q":"Korsky","class":"typeahead","country":"SE","region":"SEO","completeness":"high","nameCommonness":"common","accept":["SE-SEO-336984591"]}
+{"id":"gen-prefix-10","q":"Årsta","class":"typeahead","country":"SE","region":"SEC","completeness":"high","nameCommonness":"rare","loc":{"lat":59.94,"lng":17.79},"accept":["SE-SEC-88523292"]}
+{"id":"gen-prefix-11","q":"Chiesa della Purificazione di","class":"typeahead","country":"IT","region":"ITVA","completeness":"low","nameCommonness":"common","accept":["IT-ITVA-267665019"]}
+{"id":"gen-prefix-12","q":"Kościoł pw. Matki Boskiej","class":"typeahead","country":"PL","region":"PLLU","completeness":"high","nameCommonness":"common","loc":{"lat":52.36,"lng":22.18},"accept":["PL-PLLU-445385991","PL-PLMZ-445385991","PL-PLPD-445385991"]}
+{"id":"gen-prefix-13","q":"Ermita de Nuestra","class":"typeahead","country":"ES","region":"ESSO","completeness":"low","nameCommonness":"rare","accept":["ES-ESSO-1024866590"]}
+{"id":"gen-prefix-14","q":"Blære","class":"typeahead","country":"DK","region":"DK81","completeness":"low","nameCommonness":"rare","loc":{"lat":56.77,"lng":9.36},"accept":["DK-DK81-127677547"]}
+{"id":"gen-prefix-15","q":"Hampton First Ba","class":"typeahead","country":"US","region":"TN","completeness":"mid","nameCommonness":"rare","accept":["TN-356891420"]}
+{"id":"gen-prefix-16","q":"Kaplica parafii pw. Najświętsze","class":"typeahead","country":"PL","region":"PLLU","completeness":"low","nameCommonness":"rare","loc":{"lat":51.65,"lng":23.61},"accept":["PL-PLLU-845628727"]}
+{"id":"gen-prefix-17","q":"Filadelf","class":"typeahead","country":"SE","region":"SEX","completeness":"low","nameCommonness":"common","accept":["SE-SEX-131336585"]}
+{"id":"gen-prefix-18","q":"City Churc","class":"typeahead","country":"DE","region":"DEBY","completeness":"high","nameCommonness":"rare","loc":{"lat":48.83,"lng":11.41},"accept":["DE-DEBY-3044393420"]}
+{"id":"gen-prefix-19","q":"Trinity Bapti","class":"typeahead","country":"CA","region":"MB","completeness":"high","nameCommonness":"common","accept":["CA-MB-772030700"]}
+{"id":"gen-prefix-20","q":"Mountain","class":"typeahead","country":"US","region":"NJ","completeness":"mid","nameCommonness":"common","loc":{"lat":40.87,"lng":-74.68},"accept":["NJ-69346426"]}
+{"id":"gen-prefix-21","q":"Serbisch O","class":"typeahead","country":"DE","region":"DENW","completeness":"mid","nameCommonness":"rare","accept":["DE-DENW-305335513"]}
+{"id":"gen-prefix-22","q":"De Gren","class":"typeahead","country":"NL","region":"NLNH","completeness":"low","nameCommonness":"rare","loc":{"lat":52.54,"lng":4.56},"accept":["NL-NLNH-287295329"]}
+{"id":"gen-prefix-23","q":"Sankt Johann und","class":"typeahead","country":"AT","region":"AT6","completeness":"high","nameCommonness":"rare","accept":["AT-AT6-148220589"]}
+{"id":"gen-prefix-24","q":"Maria Ma","class":"typeahead","country":"NL","region":"NLNB","completeness":"mid","nameCommonness":"common","loc":{"lat":51.56,"lng":4.93},"accept":["NL-NLNB-281764642"]}
+{"id":"gen-prefix-25","q":"Igreja Matriz de Tropeço -","class":"typeahead","country":"PT","region":"PT01","completeness":"mid","nameCommonness":"rare","accept":["PT-PT01-543125058"]}
+{"id":"gen-prefix-26","q":"Igreja de Santa Eu","class":"typeahead","country":"PT","region":"PT18","completeness":"low","nameCommonness":"common","loc":{"lat":41.23,"lng":-7.78},"accept":["PT-PT18-1449274321"]}
+{"id":"gen-prefix-27","q":"Kościół pw. Przemienienia Pańskieg","class":"typeahead","country":"PL","region":"PLMZ","completeness":"mid","nameCommonness":"rare","accept":["PL-PLLD-167559473","PL-PLMZ-167559473","PL-PLSK-167559473"]}
+{"id":"gen-prefix-28","q":"Parroquia San Francisco","class":"typeahead","country":"ES","region":"ESM","completeness":"high","nameCommonness":"common","loc":{"lat":40.38,"lng":-3.59},"accept":["ES-ESM-308902958"]}
+{"id":"gen-prefix-29","q":"Stellinger","class":"typeahead","country":"DE","region":"DEHH","completeness":"high","nameCommonness":"rare","accept":["DE-DEHH-70463522"]}
+{"id":"gen-typo-0","q":"Capeea de Vegide","class":"typo","country":"PT","region":"PT01","completeness":"mid","nameCommonness":"rare","loc":{"lat":41.18,"lng":-8.17},"accept":["PT-PT01-1462117326"]}
+{"id":"gen-typo-1","q":"Baptistkyrkn Tabernaklet","class":"typo","country":"SE","region":"SEO","completeness":"high","nameCommonness":"rare","accept":["SE-SEO-2638431206"]}
+{"id":"gen-typo-2","q":"Engelbrektskykran","class":"typo","country":"SE","region":"SEAB","completeness":"high","nameCommonness":"rare","loc":{"lat":59.38,"lng":18.07},"accept":["SE-SEAB-21572801"]}
+{"id":"gen-typo-3","q":"Nerthview United Methodist Church","class":"typo","country":"US","region":"GA","completeness":"low","nameCommonness":"rare","accept":["GA-358775342"]}
+{"id":"gen-typo-4","q":"Saint Vincent de Paul Catholc Church","class":"typo","country":"US","region":"KY","completeness":"high","nameCommonness":"common","loc":{"lat":37.7,"lng":-85.49},"accept":["KY-1096862370"]}
+{"id":"gen-typo-5","q":"Saint Jaues'","class":"typo","country":"IE","region":"IEMO","completeness":"mid","nameCommonness":"common","accept":["IE-IEMO-301819674"]}
+{"id":"gen-typo-6","q":"Kongsberrg kirke","class":"typo","country":"NO","region":"NO08","completeness":"mid","nameCommonness":"rare","loc":{"lat":59.65,"lng":9.57},"accept":["NO-NO06-14884037","NO-NO08-14884037"]}
+{"id":"gen-typo-7","q":"Saint Bigid's Church","class":"typo","country":"IE","region":"IECN","completeness":"low","nameCommonness":"common","accept":["IE-IECN-314355617"]}
+{"id":"gen-typo-8","q":"Dorfkiche Barenthin","class":"typo","country":"DE","region":"DEBB","completeness":"mid","nameCommonness":"rare","loc":{"lat":52.9,"lng":12.39},"accept":["DE-DEBB-873056177"]}
+{"id":"gen-typo-9","q":"Église SaintR-emacle","class":"typo","country":"BE","region":"BEWLG","completeness":"high","nameCommonness":"common","accept":["BE-BEWLG-163859758"]}
+{"id":"gen-typo-10","q":"Caela de São Brás","class":"typo","country":"PT","region":"PT11","completeness":"low","nameCommonness":"common","loc":{"lat":38.73,"lng":-9.46},"accept":["PT-PT11-1527092368"]}
+{"id":"gen-typo-11","q":"WeilSpring Community Church","class":"typo","country":"CA","region":"ON","completeness":"low","nameCommonness":"common","accept":["CA-ON-662699438"]}
+{"id":"gen-typo-12","q":"Évêcché de Nice","class":"typo","country":"FR","region":"FR06","completeness":"mid","nameCommonness":"rare","loc":{"lat":43.62,"lng":7.14},"accept":["FR-FR06-141276024"]}
+{"id":"gen-typo-13","q":"Raaen kirkko","class":"typo","country":"FI","region":"FI14","completeness":"low","nameCommonness":"rare","accept":["FI-FI14-344545656"]}
+{"id":"gen-typo-14","q":"St Patrik's Church","class":"typo","country":"IE","region":"IEMO","completeness":"low","nameCommonness":"common","loc":{"lat":53.94,"lng":-9.65},"accept":["IE-IEMO-326419630"]}
+{"id":"gen-typo-15","q":"Chrisstus Victor Lutheran Church","class":"typo","country":"US","region":"SC","completeness":"high","nameCommonness":"common","accept":["SC-531863322"]}
+{"id":"gen-typo-16","q":"Cuiesa di San Rocco","class":"typo","country":"IT","region":"ITVR","completeness":"mid","nameCommonness":"common","loc":{"lat":45.31,"lng":11.17},"accept":["IT-ITVR-4492643292"]}
+{"id":"gen-typo-17","q":"Urban Courch","class":"typo","country":"GB","region":"NORTHWEST","completeness":"high","nameCommonness":"rare","accept":["GB-NORTHWEST-975325987"]}
+{"id":"gen-typo-18","q":"Errmita de Sant Antoni","class":"typo","country":"ES","region":"ESL","completeness":"mid","nameCommonness":"common","loc":{"lat":41.87,"lng":0.59},"accept":["ES-ESL-13564489593"]}
+{"id":"gen-typo-19","q":"Dreialtigkeitskirche","class":"typo","country":"CH","region":"CHSG","completeness":"high","nameCommonness":"common","accept":["CH-CHSG-308416914"]}
+{"id":"gen-typo-20","q":"Batpistkirken","class":"typo","country":"DK","region":"DK83","completeness":"low","nameCommonness":"common","loc":{"lat":55.24,"lng":10.76},"accept":["DK-DK83-263658708"]}
+{"id":"gen-typo-21","q":"Caplea de San Cidre","class":"typo","country":"ES","region":"ESC","completeness":"high","nameCommonness":"rare","accept":["ES-ESC-651238382"]}
+{"id":"gen-typo-22","q":"Saalemkirken","class":"typo","country":"NO","region":"NO03","completeness":"mid","nameCommonness":"rare","loc":{"lat":59.86,"lng":10.68},"accept":["NO-NO02-87655214","NO-NO03-87655214","NO-NO04-87655214"]}
+{"id":"gen-typo-23","q":"St Peters' Church","class":"typo","country":"GB","region":"EASTMIDLANDS","completeness":"high","nameCommonness":"common","accept":["GB-EASTMIDLANDS-337375813","GB-WESTMIDLANDS-337375813"]}
+{"id":"gen-typo-24","q":"Mison de Prière - Centre Grâce Foi","class":"typo","country":"FR","region":"FR49","completeness":"high","nameCommonness":"rare","loc":{"lat":47.54,"lng":-0.4},"accept":["FR-FR49-13065249135"]}
+{"id":"gen-typo-25","q":"Ivalon Helluntaiseurikunta","class":"typo","country":"NO","region":"NO20","completeness":"high","nameCommonness":"rare","accept":["FI-FI10-219893019","NO-NO20-219893019"]}
+{"id":"gen-typo-26","q":"St. Geeorg","class":"typo","country":"DE","region":"DEBY","completeness":"mid","nameCommonness":"common","loc":{"lat":49.79,"lng":10.98},"accept":["DE-DEBY-295937810"]}
+{"id":"gen-typo-27","q":"Petauskirche","class":"typo","country":"CH","region":"CHBE","completeness":"high","nameCommonness":"common","accept":["CH-CHBE-451800240"]}
+{"id":"gen-typo-28","q":"Pingsttkyrkan","class":"typo","country":"SE","region":"SEF","completeness":"high","nameCommonness":"common","loc":{"lat":57.52,"lng":14.85},"accept":["SE-SEF-257749762"]}
+{"id":"gen-typo-29","q":"Pyhän Ritsin kirkko","class":"typo","country":"FI","region":"FI14","completeness":"mid","nameCommonness":"common","accept":["FI-FI14-167238059"]}
+{"id":"gen-city-0","q":"Christ Episcopal Church Mena","class":"name-and-place","country":"US","region":"AR","completeness":"mid","nameCommonness":"common","accept":["AR-358996620"]}
+{"id":"gen-city-1","q":"Parroquia de Nuestra Señora de las Angustias, Ayamonte","class":"name-and-place","country":"ES","region":"ESH","completeness":"mid","nameCommonness":"rare","accept":["ES-ESH-185319764"]}
+{"id":"gen-city-2","q":"St. Hilda's Anglican Church York","class":"name-and-place","country":"CA","region":"ON","completeness":"mid","nameCommonness":"rare","accept":["CA-ON-2567219360"]}
+{"id":"gen-city-3","q":"The Salvation Army - Somercotes, Alfreton","class":"name-and-place","country":"GB","region":"EASTMIDLANDS","completeness":"high","nameCommonness":"rare","accept":["GB-EASTMIDLANDS-548218515","GB-WESTMIDLANDS-548218515"]}
+{"id":"gen-city-4","q":"Rumänische Baptistengemeinde Linz Marchtrenk","class":"name-and-place","country":"AT","region":"AT4","completeness":"mid","nameCommonness":"rare","accept":["AT-AT4-157911996"]}
+{"id":"gen-city-5","q":"Oratorio di San Francesco Saverio, Ponto Valentino","class":"name-and-place","country":"CH","region":"CHTI","completeness":"mid","nameCommonness":"rare","accept":["CH-CHTI-988431305"]}
+{"id":"gen-city-6","q":"Alla Helgons kyrka Södertälje","class":"name-and-place","country":"SE","region":"SEAB","completeness":"high","nameCommonness":"rare","accept":["SE-SEAB-234443583"]}
+{"id":"gen-city-7","q":"Korskyrkan, Borlänge","class":"name-and-place","country":"SE","region":"SEW","completeness":"high","nameCommonness":"common","accept":["SE-SEW-163024772"]}
+{"id":"gen-city-8","q":"Santuario di Nostra Signora della Vittoria Lecco","class":"name-and-place","country":"IT","region":"ITLC","completeness":"high","nameCommonness":"rare","accept":["IT-ITLC-169408196"]}
+{"id":"gen-city-9","q":"Baselgia San Andrea, La Punt Chamues-ch","class":"name-and-place","country":"CH","region":"CHGR","completeness":"high","nameCommonness":"rare","accept":["CH-CHGR-258848403"]}
+{"id":"gen-city-10","q":"All Saints Church Dublin","class":"name-and-place","country":"IE","region":"IED","completeness":"mid","nameCommonness":"common","accept":["IE-IED-307799379"]}
+{"id":"gen-city-11","q":"Solid Rock Church, Brogheda","class":"name-and-place","country":"IE","region":"IELH","completeness":"mid","nameCommonness":"common","accept":["IE-IELH-796241500"]}
+{"id":"gen-city-12","q":"St. Fachtna’s Cathedral Rosscarbery","class":"name-and-place","country":"IE","region":"IECO","completeness":"mid","nameCommonness":"rare","accept":["IE-IECO-436325733"]}
+{"id":"gen-city-13","q":"Iglesia de San Miguel, Cabanillas del Monte","class":"name-and-place","country":"ES","region":"ESSG","completeness":"high","nameCommonness":"common","accept":["ES-ESSG-15401747"]}
+{"id":"gen-city-14","q":"St. Mary's Church Nottingham","class":"name-and-place","country":"GB","region":"EASTMIDLANDS","completeness":"high","nameCommonness":"common","accept":["GB-EASTMIDLANDS-205979254","GB-WESTMIDLANDS-205979254"]}
+{"id":"gen-city-15","q":"St. Peter's Anglican Church, Leeton","class":"name-and-place","country":"AU","region":"AUNSW","completeness":"high","nameCommonness":"common","accept":["AU-AUNSW-472924162"]}
+{"id":"gen-city-16","q":"Église Protestante Évangélique Liège","class":"name-and-place","country":"BE","region":"BEWLG","completeness":"high","nameCommonness":"common","accept":["BE-BEWLG-5830272985"]}
+{"id":"gen-city-17","q":"Pfarrkirche Schwarzach, Schwarzach im Pongau","class":"name-and-place","country":"AT","region":"AT5","completeness":"mid","nameCommonness":"rare","accept":["AT-AT5-108735041"]}
+{"id":"gen-city-18","q":"Église Adventiste Renens (VD)","class":"name-and-place","country":"CH","region":"CHVD","completeness":"high","nameCommonness":"common","accept":["CH-CHVD-283907489"]}
+{"id":"gen-city-19","q":"Juvan kirkko, Juva","class":"name-and-place","country":"FI","region":"FI04","completeness":"high","nameCommonness":"rare","accept":["FI-FI04-48861486"]}
+{"id":"gen-city-20","q":"Evangelisch Freikirchliche Gemeinde Unna-Königsborn Unna","class":"name-and-place","country":"DE","region":"DENW","completeness":"mid","nameCommonness":"rare","accept":["DE-DENW-104400973"]}
+{"id":"gen-city-21","q":"Freie Evangelische Gemeinde, Buchs SG","class":"name-and-place","country":"CH","region":"CHSG","completeness":"mid","nameCommonness":"common","accept":["CH-CHSG-4369607490"]}
+{"id":"gen-city-22","q":"Westoning Baptist Church Westoning","class":"name-and-place","country":"GB","region":"SOUTHEAST","completeness":"mid","nameCommonness":"rare","accept":["GB-EAST-765132753","GB-EASTMIDLANDS-765132753","GB-SOUTHEAST-765132753"]}
+{"id":"gen-city-23","q":"Santuario di Maria Santissima del Carmelo, Palmi","class":"name-and-place","country":"IT","region":"ITRC","completeness":"high","nameCommonness":"rare","accept":["IT-ITRC-156785064"]}
+{"id":"gen-city-24","q":"Ermita de Sant Urbà Foradada","class":"name-and-place","country":"ES","region":"ESL","completeness":"mid","nameCommonness":"rare","accept":["ES-ESL-1429023901"]}
+{"id":"gen-city-25","q":"Oratori Santa Maria d'Ocata, El Masnou","class":"name-and-place","country":"ES","region":"ESB","completeness":"mid","nameCommonness":"rare","accept":["ES-ESB-1163875456"]}
+{"id":"gen-city-26","q":"Igreja Paroquial de Nogueira da Regedoura - São Cristóvao Nogueira da Regedoura","class":"name-and-place","country":"PT","region":"PT01","completeness":"mid","nameCommonness":"rare","accept":["PT-PT01-766124930"]}
+{"id":"gen-city-27","q":"Evangelische Kirche A.B., Neusiedl am See","class":"name-and-place","country":"AT","region":"AT1","completeness":"high","nameCommonness":"rare","accept":["AT-AT1-318995143"]}
+{"id":"gen-city-28","q":"Klasztor Ojców Dominikanów Tarnobrzeg","class":"name-and-place","country":"PL","region":"PLPK","completeness":"mid","nameCommonness":"rare","accept":["PL-PLLU-3161494","PL-PLPK-3161494","PL-PLSK-3161494"]}
+{"id":"gen-city-29","q":"Chiesa di Poggio D'Acera, San Ginesio","class":"name-and-place","country":"IT","region":"ITMC","completeness":"mid","nameCommonness":"rare","accept":["IT-ITMC-545706537"]}

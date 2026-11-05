@@ -1,0 +1,146 @@
+{
+ "system": "lookup",
+ "split": "dev",
+ "overall": {
+  "n": 114,
+  "top1": 0.728,
+  "top5": 0.825,
+  "mrr": 0.772,
+  "zero": 0,
+  "errors": 0,
+  "p50": 128,
+  "p95": 436
+ },
+ "resolvable": {
+  "n": 96,
+  "top1": 0.844,
+  "top5": 0.906,
+  "mrr": 0.877,
+  "zero": 0,
+  "errors": 0,
+  "p50": 132,
+  "p95": 436
+ },
+ "commonNameNoLocation": {
+  "n": 18,
+  "top1": 0.111,
+  "top5": 0.389,
+  "mrr": 0.212,
+  "zero": 0,
+  "errors": 0,
+  "p50": 86,
+  "p95": 447
+ },
+ "byClass": {
+  "full-name": {
+   "n": 19,
+   "top1": 0.579,
+   "top5": 0.737,
+   "mrr": 0.645,
+   "zero": 0,
+   "errors": 0,
+   "p50": 102,
+   "p95": 447
+  },
+  "typeahead": {
+   "n": 20,
+   "top1": 0.55,
+   "top5": 0.6,
+   "mrr": 0.605,
+   "zero": 0,
+   "errors": 0,
+   "p50": 90,
+   "p95": 307
+  },
+  "typo": {
+   "n": 17,
+   "top1": 0.529,
+   "top5": 0.824,
+   "mrr": 0.644,
+   "zero": 0,
+   "errors": 0,
+   "p50": 225,
+   "p95": 442
+  },
+  "name-and-place": {
+   "n": 19,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 259,
+   "p95": 660
+  },
+  "place": {
+   "n": 9,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 116,
+   "p95": 204
+  },
+  "saint": {
+   "n": 4,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 74,
+   "p95": 75
+  },
+  "abbreviation": {
+   "n": 4,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 100,
+   "p95": 117
+  },
+  "diacritics": {
+   "n": 4,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 116,
+   "p95": 132
+  },
+  "common-word": {
+   "n": 7,
+   "top1": 0.857,
+   "top5": 1,
+   "mrr": 0.886,
+   "zero": 0,
+   "errors": 0,
+   "p50": 72,
+   "p95": 101
+  },
+  "typo-hand": {
+   "n": 7,
+   "top1": 0.571,
+   "top5": 0.714,
+   "mrr": 0.643,
+   "zero": 0,
+   "errors": 0,
+   "p50": 166,
+   "p95": 222
+  },
+  "translation": {
+   "n": 4,
+   "top1": 0.5,
+   "top5": 0.5,
+   "mrr": 0.5,
+   "zero": 0,
+   "errors": 0,
+   "p50": 140,
+   "p95": 169
+  }
+ }
+}

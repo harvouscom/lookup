@@ -1,0 +1,111 @@
+[
+ {
+  "q": "grace",
+  "c": 1,
+  "batchesPerSec": 32,
+  "p50": 31,
+  "p95": 32,
+  "max": 32
+ },
+ {
+  "q": "grace",
+  "c": 10,
+  "batchesPerSec": 60,
+  "p50": 146,
+  "p95": 192,
+  "max": 192
+ },
+ {
+  "q": "grace",
+  "c": 25,
+  "batchesPerSec": 73,
+  "p50": 340,
+  "p95": 344,
+  "max": 348
+ },
+ {
+  "q": "grace",
+  "c": 50,
+  "batchesPerSec": 66,
+  "p50": 744,
+  "p95": 757,
+  "max": 768
+ },
+ {
+  "q": "grace",
+  "c": 75,
+  "batchesPerSec": 65,
+  "p50": 1101,
+  "p95": 1184,
+  "max": 1184
+ },
+ {
+  "q": "grace",
+  "c": 100,
+  "batchesPerSec": 76,
+  "p50": 1321,
+  "p95": 1358,
+  "max": 1358
+ },
+ {
+  "q": "grace",
+  "c": 150,
+  "error": "D1_ERROR: D1 DB is overloaded. Too many resources consumed within a 10 second window"
+ },
+ {
+  "q": "grace c",
+  "c": 1,
+  "batchesPerSec": 13,
+  "p50": 78,
+  "p95": 85,
+  "max": 85
+ },
+ {
+  "q": "grace c",
+  "c": 10,
+  "batchesPerSec": 48,
+  "p50": 189,
+  "p95": 213,
+  "max": 222
+ },
+ {
+  "q": "grace c",
+  "c": 25,
+  "batchesPerSec": 59,
+  "p50": 427,
+  "p95": 501,
+  "max": 501
+ },
+ {
+  "q": "grace c",
+  "c": 50,
+  "batchesPerSec": 54,
+  "p50": 928,
+  "p95": 964,
+  "max": 964
+ },
+ {
+  "q": "grace c",
+  "c": 75,
+  "batchesPerSec": 62,
+  "p50": 1198,
+  "p95": 1232,
+  "max": 1232
+ },
+ {
+  "q": "grace c",
+  "c": 100,
+  "batchesPerSec": 58,
+  "p50": 1695,
+  "p95": 2333,
+  "max": 2333
+ },
+ {
+  "q": "grace c",
+  "c": 150,
+  "batchesPerSec": 81,
+  "p50": 1844,
+  "p95": 2444,
+  "max": 2444
+ }
+]
