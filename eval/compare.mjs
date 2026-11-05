@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 const golden = readFileSync("eval/golden.jsonl", "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
 const load = (s) => new Map(readFileSync(`eval/results/runs/${s}.jsonl`, "utf8").split("\n").filter(Boolean).map((l) => { const o = JSON.parse(l); return [o.id, o]; }));
-const runs = { today: load("today"), "today-state": load("today-state"), lookup: load("lookup") };
+const runs = { today: load("today"), "today-state": load("today-state"), lookup: load("lookup"), "lookup-hybrid": load("lookup-hybrid") };
 const pct = (a, p) => { if (!a.length) return "-"; const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
 const sum = (run, qs) => {
   const r = qs.map((g) => run.get(g.id)).filter(Boolean);

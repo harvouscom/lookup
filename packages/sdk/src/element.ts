@@ -127,6 +127,8 @@ export class ChurchLookup extends HTMLElement {
       });
       if (seq !== this.seq || this.input.value.trim() !== q) return;
       this.show(res.results);
+      // For hosts that want to show results elsewhere too, such as pins on a map.
+      this.dispatchEvent(new CustomEvent("church-results", { detail: { query: q, results: this.results, settled }, bubbles: true, composed: true }));
     } catch (e) {
       if ((e as Error).name === "AbortError" || seq !== this.seq) return;
       this.show([], "Search isn't available right now. You can keep typing your church's details.");

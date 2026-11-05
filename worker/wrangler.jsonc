@@ -6,7 +6,7 @@
   "observability": { "enabled": false },
   "workers_dev": true,
   // /element.js, /lookup.js and /examples come from here; everything else runs the Worker.
-  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "assets": { "directory": "../site", "binding": "ASSETS" },
   "routes": [{ "pattern": "lookup.heresmychurch.com", "custom_domain": true }],
   "d1_databases": [{ "binding": "DB", "database_name": "hmc-lookup", "database_id": "8728a664-c1df-4003-89a7-679693ac9adb" }],
   "version_metadata": { "binding": "CF_VERSION_METADATA" },
@@ -16,7 +16,7 @@
   "triggers": { "crons": ["*/5 * * * *"] },
   "limits": { "cpu_ms": 120000 },
   // Kill switches: set either to "false" and redeploy to turn the feature off.
-  "vars": { "SEMANTIC_ENABLED": "false", "SYNC_ENABLED": "true" },
+  "vars": { "SEMANTIC_ENABLED": "true", "SYNC_ENABLED": "true" },
   "ratelimits": [
     { "name": "RL_SEARCH", "namespace_id": "4101", "simple": { "limit": 120, "period": 60 } },
     { "name": "RL_SEMANTIC", "namespace_id": "4102", "simple": { "limit": 30, "period": 60 } }

@@ -85,6 +85,14 @@ describe("combobox semantics", () => {
     key(input, "ArrowUp");
     expect(input.getAttribute("aria-activedescendant")).toBe(root.querySelectorAll("[role=option]")[1]!.id);
   });
+  it("emits church-results with the shown results", async () => {
+    responses.grac = [result("R-1", "Grace Church")];
+    const { el, input } = mount();
+    const seen: any[] = [];
+    el.addEventListener("church-results", (e) => seen.push((e as CustomEvent).detail));
+    type(input, "grac"); await flush();
+    expect(seen).toEqual([{ query: "grac", results: [expect.objectContaining({ id: "R-1" })], settled: false }]);
+  });
   it("closes on Escape", async () => {
     responses.grac = [result("R-1", "Grace Church")];
     const { input } = mount();

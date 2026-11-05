@@ -28,8 +28,9 @@ describe("hybrid", () => {
   it("only runs on settled queries", async () => {
     expect((await call("baptist zzqx", {}, "")).body.semantic).toBe("off");
   });
-  it("skips when lexical is strong", async () => {
+  it("skips when every word already matched", async () => {
     expect((await call("church")).body.semantic).toBe("skipped");
+    expect((await call("first baptist")).body.semantic).toBe("skipped");
   });
   it("skips short queries", async () => {
     expect((await call("abc")).body.semantic).toBe("skipped");
@@ -52,7 +53,7 @@ describe("hybrid", () => {
   });
   it("filters Vectorize by a named place's cells", async () => {
     const seen: any[] = [];
-    await call("chapel in dallas", { VEC: vec(["R-1"], seen) });
+    await call("chapel zzqx in dallas", { VEC: vec(["R-1"], seen) });
     expect(seen[0].filter.g3.$in).toHaveLength(9);
   });
   it("respects the semantic rate limit", async () => {

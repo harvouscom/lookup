@@ -58,12 +58,13 @@ export function parse(value: string): ServiceEntry[] | null {
 }
 
 const CSS = `
-:host{display:block;--_line:var(--hmc-border,var(--border,#d4d4d8));--_input:var(--hmc-input-border,var(--input,#a1a1aa));--_bg:var(--hmc-bg,var(--background,#fff));
+:host{display:block;container-type:inline-size;--_line:var(--hmc-border,var(--border,#d4d4d8));--_input:var(--hmc-input-border,var(--input,#a1a1aa));--_bg:var(--hmc-bg,var(--background,#fff));
 --_muted:var(--hmc-muted,var(--muted-foreground,#52525b));--_ring:var(--hmc-accent,var(--ring,#6d28d9));--_r:var(--hmc-radius,var(--radius,10px))}
 .row{display:grid;grid-template-columns:repeat(4,auto) 1fr 44px;gap:8px;align-items:center;padding:10px;margin-bottom:10px;background:color-mix(in oklab,var(--_ring) 4%,var(--_bg));border:1px solid var(--_line);border-radius:var(--_r)}
-@media (max-width:560px){.row{grid-template-columns:1fr 1fr 1fr 1fr 44px}.row input{grid-column:1/-2;grid-row:2}}
+@container (max-width:560px){.row{grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr)) 44px}.row input{grid-column:1/-2;grid-row:2}}
+@container (max-width:340px){.row{grid-template-columns:repeat(3,minmax(0,1fr)) 44px}.row [data-k=day]{grid-column:1/-2}.row input{grid-column:1/-1;grid-row:3}}
 select,input,button{font:inherit;font-size:1rem;color:inherit;min-height:44px;box-sizing:border-box;border:1px solid var(--_input);border-radius:calc(var(--_r) - 2px);background:var(--_bg);padding:0 10px}
-input{min-width:0}
+input,select{min-width:0;width:100%}
 select:focus-visible,input:focus-visible,button:focus-visible{outline:none;border-color:var(--_ring);box-shadow:0 0 0 4px color-mix(in oklab,var(--_ring) 22%,transparent)}
 button{cursor:pointer;font-weight:500}
 .x{border-color:transparent;background:none;color:var(--_muted);font-size:1.375rem;line-height:1;padding:0}

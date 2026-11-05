@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lookup",
+      "runtimeExecutable": "node_modules/.bin/wrangler",
+      "runtimeArgs": ["dev", "--config", "worker/wrangler.jsonc", "--remote", "--port", "8787"],
+      "port": 8787
+    }
+  ]
+}

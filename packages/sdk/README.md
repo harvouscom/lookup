@@ -15,7 +15,7 @@ Selecting a church fills empty fields marked with `data-hmc-field`. Values go th
 
 Fields: `name, street, city, region, regionName, postalCode, country, countryName, latitude, longitude, phone, email, website, denomination, serviceTimes, languages, ministries, pastorName, id`.
 
-Events, all cancelable: `church-select` (`detail.result`) and `church-fill` (`detail.record`, `detail.changes`).
+Events: `church-select` (`detail.result`) and `church-fill` (`detail.record`, `detail.changes`) are cancelable. `church-results` (`detail.query`, `detail.results`, `detail.settled`) fires each time results are shown, for hosts that want to show them elsewhere, such as pins on a map.
 
 Theming: on a page styled with [Sensible UI](https://sensibleui.com) by [Cam Pak](https://github.com/cameronapak), or anything else using shadcn/ui-style tokens (`--background`, `--foreground`, `--popover`, `--border`, `--input`, `--ring`, `--accent`, `--muted-foreground`, `--radius`), the element picks up the theme automatically. To set it directly, use `--hmc-text`, `--hmc-bg`, `--hmc-popover`, `--hmc-popover-text`, `--hmc-border`, `--hmc-input-border`, `--hmc-accent`, `--hmc-active-bg`, `--hmc-active-text`, `--hmc-muted`, `--hmc-radius` and `--hmc-z`, or the parts `label`, `input`, `popup`, `listbox`, `option`, `note` and `footer`.
 

@@ -3,7 +3,7 @@
 import { allTokens, anyToken, combine, geoAny, rungs, RUNG_SQL, type Scope } from "./match.ts";
 import { parseQuery, placeKeys, requiredTokens, STOPWORDS } from "./parse.ts";
 import { tokenize } from "./project.ts";
-import { km, rank, type Candidate } from "./rank.ts";
+import { BAND, km, rank, type Candidate } from "./rank.ts";
 import { COUNTRIES, REGIONS } from "./regions.generated.ts";
 import { lookupKeys, MIN_TYPO_LENGTH, pickCorrection, type Candidate as VocabCandidate } from "./vocab.ts";
 import { COMMON_TOKENS } from "./common.generated.ts";
@@ -21,8 +21,6 @@ const MAX_CORRECTED = 3;
 const PLACE_KM = 75;
 /** Semantic search runs only on settled queries at least this long. */
 export const SEMANTIC_MIN_LENGTH = 4;
-/** With this many results in the top two bands, lexical is strong enough that AI can't add much. */
-const STRONG_LEXICAL = 3;
 
 export interface SearchInput {
   q: string;
@@ -50,7 +48,7 @@ export interface SearchResult {
   place: { name: string; region: string; country: string } | null;
   corrected: string | null;
   degraded: boolean;
-  /** Whether semantic search ran: "used", "skipped" (lexical was strong or the query too short), "off", or "failed". */
+  /** Whether semantic search ran: "used", "skipped" (every word matched, or the query was too short), "off", or "failed". */
   semantic: "used" | "skipped" | "off" | "failed";
   timing: { statements: number; d1Ms: number; aiMs: number };
 }
@@ -253,8 +251,10 @@ export async function search(db: Db, input: SearchInput): Promise<SearchResult> 
 
   let semantic: SearchResult["semantic"] = input.semantic ? "skipped" : "off";
   let aiMs = 0;
-  const strong = ranked.filter((r) => r.band <= 1).length >= STRONG_LEXICAL;
-  if (input.semantic && input.settled && input.q.trim().length >= SEMANTIC_MIN_LENGTH && !strong) {
+  // Semantic search runs only when no word result matches every word. In the milestone 3 eval it never
+  // changed a query that lexical search had fully matched, so elsewhere it was cost and latency for nothing.
+  const weak = !ranked.length || ranked[0]!.band >= BAND.partial;
+  if (input.semantic && input.settled && input.q.trim().length >= SEMANTIC_MIN_LENGTH && weak) {
     const t0 = Date.now();
     try {
       // Place words are already a filter, so embed only what's left.
