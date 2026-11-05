@@ -1,77 +1,177 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="hmc">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Church autofill</title>
-<!-- Sensible UI by Cam Pak (MIT): https://sensibleui.com. Pinned to a release that is at least two weeks old. -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@faith-tools/sensible-ui@1.7.0/dist/sensible-ui.min.css">
-<!-- Sensible UI prefers Geist but doesn't load it. Load every weight the page uses, so bold text is really bold. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Google+Sans+Flex:opsz,wght,ROND@6..144,400..800,0..100&display=swap">
+<!-- Sensible UI by Cam Pak (MIT): https://sensibleui.com. Used only by the "Your design system" look, so it starts
+     switched off. Pinned to a release that is at least two weeks old. -->
+<link id="sensible-ui" rel="stylesheet" media="not all" href="https://cdn.jsdelivr.net/npm/@faith-tools/sensible-ui@1.7.0/dist/sensible-ui.min.css">
+<script>
+  // Apply the saved look before first paint, so the page doesn't flash another theme.
+  (function () {
+    var t = "hmc";
+    try { t = localStorage.getItem("lookup-demo-theme") || t; } catch (e) {}
+    if (!/^(hmc|plain|custom)$/.test(t)) t = "hmc";
+    document.documentElement.dataset.theme = t;
+    if (t === "custom") document.getElementById("sensible-ui").media = "all";
+  })();
+</script>
 <style>
-  /* Sensible UI tokens, tuned to Here's My Church violet. The widget reads the same tokens. */
-  :root {
-    --primary: oklch(0.49 0.22 293);
-    --primary-foreground: oklch(0.99 0 0);
-    --ring: oklch(0.52 0.22 293);
-    --accent: oklch(0.96 0.03 293);
-    --accent-foreground: oklch(0.32 0.14 293);
-    --foreground: oklch(0.2 0.02 285);
-    --muted-foreground: oklch(0.47 0.02 285);
-    --border: oklch(0.9 0.01 285);
-    --input: oklch(0.78 0.02 285);
-    --radius: 0.75rem;
-  }
-  body {
-    margin: 0;
-    padding: 56px 16px 64px;
-    font-size: 1rem;
-    color: var(--foreground);
-    background:
-      radial-gradient(60rem 28rem at 50% -8rem, oklch(0.9 0.07 293 / 0.7), transparent 70%),
-      oklch(0.985 0.005 293);
-    min-height: 100vh;
-    box-sizing: border-box;
-  }
-  main { max-width: 42rem; margin: 0 auto; }
-  .hero { text-align: center; margin-bottom: 32px; }
-  .eyebrow {
-    display: inline-block; margin-bottom: 14px; padding: 4px 12px; border-radius: 999px;
-    font-size: .8125rem; font-weight: 600; letter-spacing: .02em;
-    color: var(--accent-foreground); background: var(--accent); border: 1px solid oklch(0.88 0.06 293);
-  }
-  .hero h1 { margin: 0 0 12px; font-size: clamp(2rem, 5vw, 2.75rem); line-height: 1.1; letter-spacing: -0.025em; font-weight: 750; }
-  .hero p { margin: 0 auto; max-width: 32rem; font-size: 1.0625rem; line-height: 1.6; color: var(--muted-foreground); }
-  .panel {
-    background: var(--background, #fff);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: clamp(20px, 5vw, 36px);
-    box-shadow: 0 1px 2px oklch(0.2 0.02 285 / 0.06), 0 24px 48px -24px oklch(0.3 0.1 293 / 0.28);
-  }
-  .group + .group { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--border); }
-  .group h2 { margin: 0 0 16px; font-size: .8125rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
+  /* ── Layout shared by every look ─────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; padding: 40px 16px 64px; min-height: 100vh; font-size: 1rem; line-height: 1.5; }
+  main { max-width: 44rem; margin: 0 auto; }
+  .hero { text-align: center; margin-bottom: 28px; }
+  .hero h1 { margin: 0 0 12px; font-size: clamp(2rem, 5vw, 2.75rem); line-height: 1.1; letter-spacing: -0.02em; font-weight: 700; }
+  .hero p { margin: 0 auto; max-width: 32rem; font-size: 1.0625rem; line-height: 1.6; }
+  .switcher { display: flex; justify-content: center; margin: 0 0 12px; padding: 0; border: 0; }
+  .switcher legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .seg { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px; border-radius: 999px; }
+  .seg label { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; font-size: .9375rem; font-weight: 600; cursor: pointer; margin: 0; }
+  .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .seg label:has(input:focus-visible) { outline: 2px solid currentColor; outline-offset: 2px; }
+  .about { text-align: center; font-size: .9375rem; margin: 0 auto 28px; max-width: 34rem; min-height: 3em; }
+  .panel { border-radius: 20px; padding: clamp(20px, 5vw, 36px); }
+  .group + .group { margin-top: 28px; padding-top: 28px; border-top: 1px solid; }
+  .group h2 { margin: 0 0 16px; font-size: .8125rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
   .fields { display: grid; gap: 18px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
-  label { display: block; margin-bottom: 8px; font-weight: 600; font-size: .9375rem; }
-  input, textarea { min-height: 48px; font-size: 1rem; }
+  .panel label { display: block; margin-bottom: 8px; font-weight: 600; font-size: .9375rem; }
+  .panel input:not([type=hidden], [type=checkbox], [type=color], [type=range]), .panel textarea { display: block; width: 100%; min-height: 48px; padding: 10px 14px; font: inherit; color: inherit; }
   .actions { margin-top: 32px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  .actions button { min-height: 48px; padding: 0 24px; font-size: 1rem; font-weight: 600; }
-  .actions small { color: var(--muted-foreground); }
-  footer { margin-top: 28px; font-size: .875rem; line-height: 1.6; color: var(--muted-foreground); text-align: center; }
-  footer a { color: var(--accent-foreground); font-weight: 500; }
+  .actions button { min-height: 48px; padding: 0 24px; font: inherit; font-weight: 600; cursor: pointer; }
+  footer { margin-top: 28px; font-size: .875rem; line-height: 1.6; text-align: center; }
+  .tune { display: none; }
+
+  /* ── Look 1: Here's My Church, using the app's own tokens ────────── */
+  html[data-theme=hmc] {
+    color-scheme: dark;
+    --brand: #6B21A8; --brand-soft: #A855F7; --surface: #1E1040; --surface-sunken: #1A0E38; --surface-raised: #231450;
+    --text-muted: rgba(233, 213, 255, 0.78); --text-subtle: rgba(216, 180, 254, 0.62);
+    --line: rgba(255, 255, 255, 0.08); --line-strong: rgba(255, 255, 255, 0.16);
+    /* The widget reads these. */
+    --hmc-text: #fff; --hmc-bg: var(--surface-sunken); --hmc-popover: var(--surface-raised); --hmc-popover-text: #fff;
+    --hmc-border: var(--line-strong); --hmc-input-border: var(--line-strong); --hmc-accent: var(--brand-soft);
+    --hmc-active-bg: rgba(168, 85, 247, 0.18); --hmc-active-text: #fff; --hmc-muted: var(--text-muted); --hmc-radius: 10px;
+  }
+  html[data-theme=hmc] body {
+    font-family: "Google Sans Flex", system-ui, sans-serif; color: #fff;
+    background: radial-gradient(50rem 30rem at 15% -10%, rgba(107, 33, 168, 0.55), transparent 65%),
+                radial-gradient(40rem 26rem at 95% 0%, rgba(168, 85, 247, 0.22), transparent 60%), #120A29;
+  }
+  html[data-theme=hmc] .hero h1 { font-variation-settings: "ROND" 100; font-weight: 750; }
+  html[data-theme=hmc] .hero p, html[data-theme=hmc] .about, html[data-theme=hmc] footer { color: var(--text-muted); }
+  html[data-theme=hmc] .seg { background: rgba(30, 16, 64, 0.92); border: 1px solid var(--line-strong); box-shadow: 0 1px 2px rgba(17, 8, 40, .25), 0 6px 16px -4px rgba(17, 8, 40, .35); }
+  html[data-theme=hmc] .seg label { color: var(--text-muted); }
+  html[data-theme=hmc] .seg label:has(:checked) { background: var(--brand); color: #fff; }
+  html[data-theme=hmc] .panel { background: var(--surface); border: 1px solid var(--line); box-shadow: 0 2px 6px rgba(17, 8, 40, .18), 0 18px 40px -12px rgba(17, 8, 40, .45); }
+  html[data-theme=hmc] .group + .group { border-color: var(--line); }
+  html[data-theme=hmc] .group h2 { color: var(--text-subtle); }
+  html[data-theme=hmc] .panel input:not([type=hidden], [type=checkbox], [type=color], [type=range]), html[data-theme=hmc] .panel textarea { background: var(--surface-sunken); border: 1px solid var(--line-strong); border-radius: 10px; }
+  html[data-theme=hmc] .panel input:focus-visible { outline: none; border-color: var(--brand-soft); box-shadow: 0 0 0 4px rgba(168, 85, 247, .25); }
+  html[data-theme=hmc] .actions button { background: var(--brand); color: #fff; border: 0; border-radius: 10px; }
+  html[data-theme=hmc] .actions button:hover { background: #7E22CE; }
+  html[data-theme=hmc] .actions small { color: var(--text-subtle); }
+  html[data-theme=hmc] a { color: #D8B4FE; }
+
+  /* ── Look 2: out of the box. No tokens at all, so the widget uses its own defaults. ── */
+  html[data-theme=plain] body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #18181b; background: #fafafa; }
+  html[data-theme=plain] .hero p, html[data-theme=plain] .about, html[data-theme=plain] footer, html[data-theme=plain] .actions small { color: #52525b; }
+  html[data-theme=plain] .seg { background: #fff; border: 1px solid #d4d4d8; }
+  html[data-theme=plain] .seg label { color: #52525b; }
+  html[data-theme=plain] .seg label:has(:checked) { background: #18181b; color: #fff; }
+  html[data-theme=plain] .panel { background: #fff; border: 1px solid #e4e4e7; }
+  html[data-theme=plain] .group + .group { border-color: #e4e4e7; }
+  html[data-theme=plain] .group h2 { color: #52525b; }
+  html[data-theme=plain] .panel input:not([type=hidden], [type=checkbox], [type=color], [type=range]), html[data-theme=plain] .panel textarea { background: #fff; border: 1px solid #a1a1aa; border-radius: 8px; }
+  html[data-theme=plain] .actions button { background: #18181b; color: #fff; border: 0; border-radius: 8px; }
+  html[data-theme=plain] a { color: #18181b; }
+
+  /* ── Look 3: your design system. Sensible UI plus a brand color, radius and font you pick. ── */
+  html[data-theme=custom] {
+    --brand: #2563eb;
+    --primary: var(--brand); --ring: var(--brand);
+    --accent: color-mix(in oklab, var(--brand) 12%, var(--background));
+    --accent-foreground: color-mix(in oklab, var(--brand) 70%, var(--foreground));
+  }
+  html[data-theme=custom] body { font-family: var(--font-sans); background: var(--muted); color: var(--foreground); }
+  html[data-theme=custom] .hero p, html[data-theme=custom] .about, html[data-theme=custom] footer { color: var(--muted-foreground); }
+  html[data-theme=custom] .seg { background: var(--background); border: 1px solid var(--border); }
+  html[data-theme=custom] .seg label { color: var(--muted-foreground); }
+  html[data-theme=custom] .seg label:has(:checked) { background: var(--primary); color: var(--primary-foreground); }
+  html[data-theme=custom] .panel { background: var(--card); border: 1px solid var(--border); border-radius: calc(var(--radius) + 8px); box-shadow: 0 1px 2px rgb(0 0 0 / .05), 0 16px 40px -20px rgb(0 0 0 / .2); }
+  html[data-theme=custom] .group + .group { border-color: var(--border); }
+  html[data-theme=custom] .group h2 { color: var(--muted-foreground); }
+  html[data-theme=custom] .tune { display: block; margin-bottom: 20px; }
+  .tune .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 16px; align-items: end; }
+  .swatches { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .swatches legend { font-weight: 600; font-size: .9375rem; margin-bottom: 8px; padding: 0; }
+  .swatches > div { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .swatches label { position: relative; display: grid; place-items: center; width: 44px; height: 44px; margin: 0; cursor: pointer; }
+  .swatches input[type=radio] { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .swatches span:not(.sr) { width: 28px; height: 28px; border-radius: 999px; background: var(--c); box-shadow: inset 0 0 0 1px rgb(0 0 0 / .15); }
+  .swatches label:has(:checked) span:not(.sr) { box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--c); }
+  .swatches label:has(:focus-visible) { outline: 2px solid var(--foreground); outline-offset: 1px; border-radius: 999px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .tune .check { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 0; }
+  .tune .check input { width: 20px; height: 20px; margin: 0; }
+  .tune input[type=range] { width: 100%; }
+  .tune pre { margin: 16px 0 0; font-size: .8125rem; white-space: pre-wrap; }
+  .tune .copy { margin-top: 8px; }
 </style>
 </head>
 <body>
 <main>
   <header class="hero">
-    <span class="eyebrow">Lookup demo</span>
     <h1>Where do you go to church?</h1>
     <p>Type a few letters and pick your church. We'll fill in what Here's My Church knows, and leave anything you've typed alone.</p>
   </header>
+
+  <fieldset class="switcher">
+    <legend>Look</legend>
+    <div class="seg">
+      <label><input type="radio" name="theme" value="hmc"> Here's My Church</label>
+      <label><input type="radio" name="theme" value="plain"> Out of the box</label>
+      <label><input type="radio" name="theme" value="custom"> Your design system</label>
+    </div>
+  </fieldset>
+  <p class="about" id="about" aria-live="polite"></p>
+
+  <section class="tune panel" aria-labelledby="tune-h">
+    <h2 id="tune-h" style="margin-top:0">Match your design system</h2>
+    <p style="margin-top:0;color:var(--muted-foreground)">This look uses <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://github.com/cameronapak">Cam Pak</a>. The widget reads its shadcn/ui-style tokens, so it follows whatever you pick here with no extra setup.</p>
+    <div class="grid">
+      <fieldset class="swatches">
+        <legend>Brand color</legend>
+        <div>
+          <label title="Blue"><input type="radio" name="t-swatch" value="#2563eb" checked><span style="--c:#2563eb"></span><span class="sr">Blue</span></label>
+          <label title="Teal"><input type="radio" name="t-swatch" value="#0f766e"><span style="--c:#0f766e"></span><span class="sr">Teal</span></label>
+          <label title="Rose"><input type="radio" name="t-swatch" value="#e11d48"><span style="--c:#e11d48"></span><span class="sr">Rose</span></label>
+          <label title="Amber"><input type="radio" name="t-swatch" value="#b45309"><span style="--c:#b45309"></span><span class="sr">Amber</span></label>
+          <label title="Violet"><input type="radio" name="t-swatch" value="#6d28d9"><span style="--c:#6d28d9"></span><span class="sr">Violet</span></label>
+          <label title="Custom color"><input id="t-brand" type="color" value="#2563eb" aria-label="Custom color"></label>
+        </div>
+      </fieldset>
+      <div><label for="t-radius">Corner radius: <output id="t-radius-out">10</output>px</label><input id="t-radius" type="range" min="0" max="24" value="10"></div>
+      <div>
+        <label for="t-font">Font</label>
+        <select id="t-font">
+          <option value='"Geist", ui-sans-serif, system-ui, sans-serif'>Geist</option>
+          <option value='system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'>System</option>
+          <option value='"Google Sans Flex", system-ui, sans-serif'>Google Sans Flex</option>
+          <option value='Georgia, "Times New Roman", serif'>Serif</option>
+        </select>
+      </div>
+      <div><label class="check"><input id="t-dark" type="checkbox"> Dark mode</label></div>
+    </div>
+    <pre><code id="snippet"></code></pre>
+    <button type="button" class="copy" data-variant="outline" id="copy">Copy CSS</button>
+  </section>
 
   <form id="signup" class="panel" onsubmit="event.preventDefault()">
     <section class="group" aria-labelledby="g-church">
@@ -115,11 +215,63 @@
   </form>
 
   <footer>
-    Styled with <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://github.com/cameronapak">Cam Pak</a>.<br>
+    Built with <a href="https://github.com/harvouscom/lookup">Lookup</a>. "Your design system" uses <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://github.com/cameronapak">Cam Pak</a>.<br>
     Church data from OpenStreetMap contributors and <a href="https://heresmychurch.com">Here's My Church</a>.
   </footer>
 </main>
 <script type="module" src="/element.js"></script>
 <script type="module" src="/service-times.js"></script>
+<script>
+  const root = document.documentElement;
+  const sui = document.getElementById("sensible-ui");
+  const about = document.getElementById("about");
+  const ABOUT = {
+    hmc: "Here's My Church's own palette and font, set through the widget's --hmc-* variables.",
+    plain: "No styling from the page at all. This is what you get by adding the script tag.",
+    custom: "Pick a brand color, radius and font below. The widget follows your design tokens.",
+  };
+  const brand = document.getElementById("t-brand"), radius = document.getElementById("t-radius"), radiusOut = document.getElementById("t-radius-out");
+  const font = document.getElementById("t-font"), dark = document.getElementById("t-dark"), snippet = document.getElementById("snippet");
+
+  function tune() {
+    root.style.setProperty("--brand", brand.value);
+    root.style.setProperty("--radius", radius.value + "px");
+    root.style.setProperty("--font-sans", font.value);
+    radiusOut.textContent = radius.value;
+    root.classList.toggle("dark", dark.checked);
+    snippet.textContent =
+`/* Any page: set the widget's own variables. */
+church-lookup, church-service-times {
+  --hmc-accent: ${brand.value};
+  --hmc-radius: ${radius.value}px;
+  font-family: ${font.value};
+}
+
+/* On a Sensible UI or shadcn/ui page, the widget already reads
+   --ring, --accent, --border, --popover and --radius. */`;
+  }
+
+  function apply(theme) {
+    root.dataset.theme = theme;
+    sui.media = theme === "custom" ? "all" : "not all";
+    // Only the design-system look sets inline tokens and dark mode.
+    if (theme === "custom") tune();
+    else { ["--brand", "--radius", "--font-sans"].forEach((p) => root.style.removeProperty(p)); root.classList.remove("dark"); }
+    about.textContent = ABOUT[theme];
+    document.querySelector(`input[name=theme][value=${theme}]`).checked = true;
+    try { localStorage.setItem("lookup-demo-theme", theme); } catch (e) {}
+  }
+
+  document.querySelectorAll("input[name=theme]").forEach((r) => r.addEventListener("change", () => apply(r.value)));
+  [brand, radius, font, dark].forEach((el) => el.addEventListener("input", tune));
+  document.querySelectorAll("input[name=t-swatch]").forEach((r) => r.addEventListener("change", () => { brand.value = r.value; tune(); }));
+  brand.addEventListener("input", () => document.querySelectorAll("input[name=t-swatch]").forEach((r) => (r.checked = false)));
+  document.getElementById("copy").addEventListener("click", async (e) => {
+    try { await navigator.clipboard.writeText(snippet.textContent); e.target.textContent = "Copied"; }
+    catch { e.target.textContent = "Select the text above to copy"; }
+    setTimeout(() => (e.target.textContent = "Copy CSS"), 2000);
+  });
+  apply(root.dataset.theme);
+</script>
 </body>
 </html>
