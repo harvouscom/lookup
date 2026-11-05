@@ -5,3 +5,7 @@ node_modules/
 scripts/spike/wrangler.jsonc
 # Spike inputs come from public R2 files with unmoderated overlays. Never commit them.
 spike-data/
+site/element.js
+site/lookup.js
+packages/sdk/dist/
+site/service-times.js

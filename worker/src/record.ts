@@ -55,14 +55,21 @@ export function toRecord(r: ChurchRow) {
   };
 }
 
+/**
+ * What a person can update through Lookup, and how it's reviewed. "live" goes live on one vote;
+ * "moderated" waits for a Here's My Church moderator. Email and pastor name are left out on
+ * purpose: they would go live on one vote, and a host form can hold someone's personal details.
+ * `name` needs the matching change in the Here's My Church API before contributions accept it.
+ */
 export const CONTRIBUTABLE_FIELDS = {
-  serviceTimes: { countries: "all" },
-  denomination: { countries: "all" },
-  languages: { countries: "all" },
-  ministries: { countries: "all" },
-  website: { countries: "all" },
-  address: { countries: ["US"] },
-  phone: { countries: ["US", "CA"] },
+  name: { countries: "all", review: "moderated" },
+  serviceTimes: { countries: "all", review: "live" },
+  denomination: { countries: "all", review: "live" },
+  languages: { countries: "all", review: "live" },
+  ministries: { countries: "all", review: "live" },
+  website: { countries: "all", review: "moderated" },
+  address: { countries: ["US"], review: "moderated" },
+  phone: { countries: ["US", "CA"], review: "live" },
 } as const;
 
 export const RECORD_FIELDS = ["name", "street", "city", "region", "regionName", "postalCode", "country", "countryName", "latitude", "longitude", "phone", "email", "website", "denomination", "serviceTimes", "languages", "ministries", "pastorName"];

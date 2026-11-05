@@ -1,0 +1,17 @@
+/element.js
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300
+/lookup.js
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300
+/service-times.js
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300
+/data/globe.json
+  Cache-Control: public, max-age=3600
+/site.css
+  Cache-Control: public, max-age=300
+/site.js
+  Cache-Control: public, max-age=300
+/globe.js
+  Cache-Control: public, max-age=300

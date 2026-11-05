@@ -1,0 +1,146 @@
+{
+ "system": "lookup-hybrid",
+ "split": "test",
+ "overall": {
+  "n": 78,
+  "top1": 0.782,
+  "top5": 0.872,
+  "mrr": 0.82,
+  "zero": 0,
+  "errors": 0,
+  "p50": 168,
+  "p95": 734
+ },
+ "resolvable": {
+  "n": 70,
+  "top1": 0.843,
+  "top5": 0.9,
+  "mrr": 0.873,
+  "zero": 0,
+  "errors": 0,
+  "p50": 169,
+  "p95": 734
+ },
+ "commonNameNoLocation": {
+  "n": 8,
+  "top1": 0.25,
+  "top5": 0.625,
+  "mrr": 0.355,
+  "zero": 0,
+  "errors": 0,
+  "p50": 148,
+  "p95": 446
+ },
+ "byClass": {
+  "full-name": {
+   "n": 11,
+   "top1": 0.727,
+   "top5": 0.818,
+   "mrr": 0.756,
+   "zero": 0,
+   "errors": 0,
+   "p50": 172,
+   "p95": 782
+  },
+  "typeahead": {
+   "n": 10,
+   "top1": 0.6,
+   "top5": 0.9,
+   "mrr": 0.725,
+   "zero": 0,
+   "errors": 0,
+   "p50": 134,
+   "p95": 210
+  },
+  "typo": {
+   "n": 13,
+   "top1": 0.692,
+   "top5": 0.846,
+   "mrr": 0.761,
+   "zero": 0,
+   "errors": 0,
+   "p50": 273,
+   "p95": 762
+  },
+  "name-and-place": {
+   "n": 11,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 189,
+   "p95": 734
+  },
+  "place": {
+   "n": 7,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 123,
+   "p95": 219
+  },
+  "saint": {
+   "n": 4,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 107,
+   "p95": 168
+  },
+  "abbreviation": {
+   "n": 5,
+   "top1": 0.4,
+   "top5": 0.4,
+   "mrr": 0.4,
+   "zero": 0,
+   "errors": 0,
+   "p50": 142,
+   "p95": 522
+  },
+  "diacritics": {
+   "n": 4,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 112,
+   "p95": 639
+  },
+  "common-word": {
+   "n": 5,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 85,
+   "p95": 142
+  },
+  "typo-hand": {
+   "n": 7,
+   "top1": 0.571,
+   "top5": 0.714,
+   "mrr": 0.643,
+   "zero": 0,
+   "errors": 0,
+   "p50": 213,
+   "p95": 795
+  },
+  "translation": {
+   "n": 1,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 85,
+   "p95": 85
+  }
+ }
+}

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Score a search system on eval/golden.jsonl.
 //   node eval/run.mjs lookup [--split dev|test|gate|all] [--verbose]
+//   node eval/run.mjs lookup-hybrid  (settled queries, so semantic search may run)
 //   node eval/run.mjs today        (production search without state)
 //   node eval/run.mjs today-state  (production search, told the right state: an oracle it wouldn't normally have)
 // Results go to eval/results/runs/<system>.jsonl. `today` runs resume from that file, since they can take 30 s per query.
@@ -41,8 +42,9 @@ function relevant(g, r) {
 }
 
 function request(g) {
-  if (system === "lookup") {
+  if (system.startsWith("lookup")) {
     const u = new URL(`${LOOKUP}/v1/search`);
+    if (system === "lookup-hybrid") u.searchParams.set("settled", "1");
     u.searchParams.set("q", g.q);
     u.searchParams.set("limit", "20");
     if (g.near) u.searchParams.set("near", g.near);
@@ -60,8 +62,9 @@ function request(g) {
 }
 
 const prior = new Map();
-if (system !== "lookup" && existsSync(outFile)) for (const l of readFileSync(outFile, "utf8").split("\n").filter(Boolean)) { const o = JSON.parse(l); prior.set(o.id, o); }
-if (system === "lookup") writeFileSync(outFile, "");
+const isLookup = system.startsWith("lookup");
+if (!isLookup && existsSync(outFile)) for (const l of readFileSync(outFile, "utf8").split("\n").filter(Boolean)) { const o = JSON.parse(l); prior.set(o.id, o); }
+if (isLookup) writeFileSync(outFile, "");
 
 const rows = [];
 for (const g of golden) {
@@ -71,13 +74,13 @@ for (const g of golden) {
     const url = request(g);
     if (!url) { rows.push({ id: g.id, skipped: true }); continue; }
     const t0 = performance.now();
-    let status = 0, results = [], cache = null, corrected = null, tries = 0;
+    let status = 0, results = [], cache = null, corrected = null, semantic = null, tries = 0;
     for (;;) {
       try {
         const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
         status = res.status; cache = res.headers.get("x-lookup-cache");
         const body = await res.json().catch(() => ({}));
-        results = body.results ?? []; corrected = body.corrected ?? null;
+        results = body.results ?? []; corrected = body.corrected ?? null; semantic = body.semantic ?? null;
       } catch {
         status = 0; results = []; // Timed out: counted as an error, not retried.
         break;
@@ -87,10 +90,10 @@ for (const g of golden) {
     }
     const ms = Math.round(performance.now() - t0);
     const ranks = results.map((r, i) => (relevant(g, r) ? i + 1 : 0)).filter(Boolean);
-    row = { id: g.id, class: g.class, split: g.split, status, ms, cache, count: results.length, firstRelevant: ranks[0] ?? null, corrected, top: results.slice(0, 3).map((r) => r.name) };
-    if (system !== "lookup") appendFileSync(outFile, JSON.stringify(row) + "\n");
-    else appendFileSync(outFile, JSON.stringify(row) + "\n");
-    await new Promise((r) => setTimeout(r, system === "lookup" ? 550 : 500));
+    row = { id: g.id, class: g.class, split: g.split, status, ms, cache, count: results.length, firstRelevant: ranks[0] ?? null, corrected, semantic, semanticHits: results.filter((r) => r.source === "semantic").length, firstRelevantSource: results.find((r) => relevant(g, r))?.source ?? null, top: results.slice(0, 3).map((r) => r.name) };
+    appendFileSync(outFile, JSON.stringify(row) + "\n");
+    // The hybrid run stays under the per-IP semantic limit of 30 a minute, so it measures semantic search rather than the limiter.
+    await new Promise((r) => setTimeout(r, system === "lookup-hybrid" ? 2100 : isLookup ? 550 : 500));
   }
   row = { ...row, hasLocation: Boolean(g.loc), nameCommonness: g.nameCommonness ?? null };
   rows.push(row);

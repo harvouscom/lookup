@@ -12,6 +12,8 @@ Early work. Lexical search is live at `https://lookup.heresmychurch.com/v1/searc
 | `scripts/` | Index build and measurement tools |
 | `eval/` | Baselines and results |
 
-See [`eval/results/spike.md`](eval/results/spike.md) for the measurements behind the search design, and [`eval/results/milestone-2.md`](eval/results/milestone-2.md) for full-scale results and the eval.
+See [`eval/results/spike.md`](eval/results/spike.md) for the measurements behind the search design, [`eval/results/milestone-2.md`](eval/results/milestone-2.md) for full-scale results and the eval, and [`eval/results/milestone-3.md`](eval/results/milestone-3.md) for semantic search, sync and the SDK.
 
 Directory data includes OpenStreetMap contributors' data (ODbL) and contributions from Here's My Church users. Code is MIT.
+
+The widget's look follows [Sensible UI](https://sensibleui.com) by [Cam Pak](https://github.com/cameronapak) (MIT): it inherits Sensible UI and shadcn/ui theme tokens, and the example page is styled with it.

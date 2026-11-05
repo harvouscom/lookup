@@ -20,7 +20,14 @@ export interface Candidate {
   corrected?: boolean;
   /** Found by the any-token fallback. */
   partial?: boolean;
+  /** 1-based rank from semantic search, if it found this listing. */
+  semanticRank?: number;
+  /** Found only by semantic search. */
+  semanticOnly?: boolean;
 }
+
+/** Reciprocal rank fusion constant. Larger values flatten the difference between ranks. */
+export const RRF_K = 60;
 
 export const km = (aLat: number, aLng: number, bLat: number, bLng: number): number => {
   const x = (bLng - aLng) * Math.cos(((aLat + bLat) / 2) * Math.PI / 180), y = bLat - aLat;
@@ -70,11 +77,24 @@ export function rank<T extends Candidate>(items: T[], tokens: string[], center: 
     const locTokens = tokenize([item.city ?? item.near ?? "", item.regionName, item.countryName].join(" "));
     let b = band(tokens, nameTokens, locTokens);
     if (item.corrected) b = Math.max(b, BAND.anyOrder);
-    if (item.partial || isOutside?.(item)) b = BAND.partial;
+    if (item.partial || item.semanticOnly || isOutside?.(item)) b = BAND.partial;
     const distanceKm = center ? km(center.lat, center.lng, item.lat, item.lng) : null;
     const proximity = distanceKm === null ? 0 : 1 / (1 + distanceKm / 25);
     const score = 0.6 * textScore(tokens, nameTokens) + 0.25 * proximity + 0.15 * (item.completeness / 100);
     return { item, band: b, score, distanceKm };
   });
-  return out.sort((a, b) => a.band - b.band || b.score - a.score || a.item.rid - b.item.rid);
+  out.sort((a, b) => a.band - b.band || b.score - a.score || a.item.rid - b.item.rid);
+  // Inside the lowest band, fuse the lexical order with the semantic order. Higher bands are untouched,
+  // so semantic search can add results but never reorder a real name match.
+  const low = out.filter((r) => r.band === BAND.partial);
+  if (low.some((r) => r.item.semanticRank)) {
+    const lexical = low.filter((r) => !r.item.semanticOnly);
+    const rrf = (r: Ranked<T>) => {
+      const li = lexical.indexOf(r);
+      return (li >= 0 ? 1 / (RRF_K + li + 1) : 0) + (r.item.semanticRank ? 1 / (RRF_K + r.item.semanticRank) : 0);
+    };
+    const fused = [...low].sort((a, b) => rrf(b) - rrf(a) || a.item.rid - b.item.rid);
+    return [...out.filter((r) => r.band !== BAND.partial), ...fused];
+  }
+  return out;
 }

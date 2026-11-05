@@ -40,3 +40,6 @@ CREATE TABLE vocab (id INTEGER PRIMARY KEY, token TEXT NOT NULL UNIQUE, df INTEG
 CREATE TABLE vocab_del (del TEXT NOT NULL, id INTEGER NOT NULL, PRIMARY KEY (del, id)) WITHOUT ROWID;
 CREATE TABLE moved (id TEXT PRIMARY KEY, moved_to TEXT NOT NULL);
 CREATE TABLE lookup_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+CREATE TABLE sync_state (region TEXT PRIMARY KEY, cc TEXT NOT NULL, synced_at INTEGER, dirty_at INTEGER, last_ms INTEGER, last_result TEXT);
+CREATE TABLE embed_pending (id TEXT PRIMARY KEY);
+CREATE INDEX places_lat ON places(lat);

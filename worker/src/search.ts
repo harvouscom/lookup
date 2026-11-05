@@ -3,10 +3,12 @@
 import { allTokens, anyToken, combine, geoAny, rungs, RUNG_SQL, type Scope } from "./match.ts";
 import { parseQuery, placeKeys, requiredTokens, STOPWORDS } from "./parse.ts";
 import { tokenize } from "./project.ts";
-import { km, rank, type Candidate } from "./rank.ts";
+import { BAND, km, rank, type Candidate } from "./rank.ts";
 import { COUNTRIES, REGIONS } from "./regions.generated.ts";
 import { lookupKeys, MIN_TYPO_LENGTH, pickCorrection, type Candidate as VocabCandidate } from "./vocab.ts";
 import { COMMON_TOKENS } from "./common.generated.ts";
+import type { EmbedEnv } from "./embed.ts";
+import { semanticIds, SEMANTIC_TIMEOUT_MS, withTimeout } from "./semantic.ts";
 
 /** Below this many distinct results, a query is short and may correct or relax. */
 export const SHORT_RESULTS = 3;
@@ -17,6 +19,8 @@ const MAX_KEYS = 90;
 const MAX_CORRECTED = 3;
 /** Results further than this from a place the person named rank below everything inside it. */
 const PLACE_KM = 75;
+/** Semantic search runs only on settled queries at least this long. */
+export const SEMANTIC_MIN_LENGTH = 4;
 
 export interface SearchInput {
   q: string;
@@ -26,6 +30,10 @@ export interface SearchInput {
   country?: string | null;
   region?: string | null;
   limit: number;
+  /** The person stopped typing. Only then may the semantic path run. */
+  settled?: boolean;
+  /** Present when semantic search is enabled and this caller is within its rate limit. */
+  semantic?: EmbedEnv | null;
   /** Request location. Used in memory only, and never when geo=off. */
   user?: { lat: number | null; lng: number | null; country: string | null } | null;
 }
@@ -40,7 +48,9 @@ export interface SearchResult {
   place: { name: string; region: string; country: string } | null;
   corrected: string | null;
   degraded: boolean;
-  timing: { statements: number; d1Ms: number };
+  /** Whether semantic search ran: "used", "skipped" (every word matched, or the query was too short), "off", or "failed". */
+  semantic: "used" | "skipped" | "off" | "failed";
+  timing: { statements: number; d1Ms: number; aiMs: number };
 }
 
 type Db = D1Database | D1DatabaseSession;
@@ -58,7 +68,7 @@ async function batch<T>(run: Run, stmts: { sql: string; params: unknown[] }[]): 
 
 const searchStmt = (match: string) => ({ sql: RUNG_SQL, params: [match] });
 
-function toCandidate(row: SearchRow, flags: Pick<Candidate, "corrected" | "partial"> = {}): SearchRow & Candidate {
+function toCandidate(row: SearchRow, flags: Pick<Candidate, "corrected" | "partial" | "semanticOnly" | "semanticRank"> = {}): SearchRow & Candidate {
   return {
     ...row, ...flags,
     regionName: REGIONS[row.region]?.n ?? row.region,
@@ -71,6 +81,9 @@ function present(r: ReturnType<typeof rank<SearchRow & Candidate>>[number]) {
   return {
     id: c.id,
     name: c.name,
+    // One line for display, e.g. "Grace Church, 241 St Davids Road, Thorold, Ontario".
+    label: `${c.name}, ${locationLabel(c)}`,
+    locationLabel: locationLabel(c),
     street: c.street,
     city: c.city,
     nearestPlace: c.city ? null : c.near,
@@ -84,7 +97,16 @@ function present(r: ReturnType<typeof rank<SearchRow & Candidate>>[number]) {
     completeness: c.completeness,
     distanceKm: r.distanceKm === null ? null : Math.round(r.distanceKm * 10) / 10,
     band: r.band,
+    source: c.semanticOnly ? "semantic" : c.semanticRank ? "both" : "lexical",
   };
+}
+
+/** Street and city when known, else city or nearest place with the region. */
+export function locationLabel(c: { street: string | null; city: string | null; near: string | null; regionName: string; countryName: string; region: string }): string {
+  if (c.street && c.city) return `${c.street}, ${c.city}, ${c.regionName}`;
+  if (c.city) return `${c.city}, ${c.regionName}`;
+  if (c.near) return `near ${c.near}, ${c.regionName}`;
+  return `${c.regionName}, ${c.countryName}`;
 }
 
 interface PlaceRow { key: string; name: string; region: string; country: string; lat: number; lng: number; n: number }
@@ -177,7 +199,7 @@ export async function search(db: Db, input: SearchInput): Promise<SearchResult> 
   const required = requiredTokens(tokens);
   const text = allTokens(required, true);
   if (!text && !scope.center && !scope.region && !scope.country && !filter) {
-    return { results: [], place: null, corrected: null, degraded: false, timing: { statements: run.statements, d1Ms: run.d1Ms } };
+    return { results: [], place: null, corrected: null, degraded: false, semantic: "skipped", timing: { statements: run.statements, d1Ms: run.d1Ms, aiMs: 0 } };
   }
 
   const found = new Map<number, SearchRow & Candidate>();
@@ -225,12 +247,51 @@ export async function search(db: Db, input: SearchInput): Promise<SearchResult> 
     if (countryHint) return c.country !== countryHint;
     return false;
   };
-  const ranked = rank([...found.values()], tokens, rankCenter, isOutside);
+  let ranked = rank([...found.values()], tokens, rankCenter, isOutside);
+
+  let semantic: SearchResult["semantic"] = input.semantic ? "skipped" : "off";
+  let aiMs = 0;
+  // Semantic search runs only when no word result matches every word. In the milestone 3 eval it never
+  // changed a query that lexical search had fully matched, so elsewhere it was cost and latency for nothing.
+  const weak = !ranked.length || ranked[0]!.band >= BAND.partial;
+  if (input.semantic && input.settled && input.q.trim().length >= SEMANTIC_MIN_LENGTH && weak) {
+    const t0 = Date.now();
+    try {
+      // Place words are already a filter, so embed only what's left.
+      const text = placeRow || parsed.regionHint || parsed.countryHint ? tokens.join(" ") : input.q.trim();
+      const hits = text ? await withTimeout((async () => {
+        const ids = await semanticIds(input.semantic!, text, {
+          country: input.country ?? (input.region ? null : countryHint ?? null),
+          region: input.region ?? (placeRow ? null : regionHint ?? null),
+          near: placeRow ? { lat: placeRow.lat, lng: placeRow.lng } : null,
+        });
+        if (!ids.length) return [];
+        const [rows] = await batch<SearchRow>(run, [{
+          sql: `SELECT rowid AS rid, id, name, street, city, near, region, country, lat, lng, denomination, completeness FROM church WHERE id IN (${ids.map(() => "?").join(",")})`,
+          params: ids.map((i) => i.id),
+        }]);
+        const order = new Map(ids.map((h, i) => [h.id, i + 1]));
+        return (rows ?? []).map((r) => ({ row: r, rank: order.get(r.id)! }));
+      })(), SEMANTIC_TIMEOUT_MS) : [];
+      for (const { row, rank: semanticRank } of hits) {
+        const existing = found.get(row.rid);
+        if (existing) existing.semanticRank = semanticRank;
+        else found.set(row.rid, toCandidate(row, { semanticOnly: true, semanticRank }));
+      }
+      ranked = rank([...found.values()], tokens, rankCenter, isOutside);
+      semantic = "used";
+    } catch {
+      semantic = "failed";
+      degraded = true;
+    }
+    aiMs = Date.now() - t0;
+  }
   return {
     results: ranked.slice(0, input.limit).map((r) => present(center ? r : { ...r, distanceKm: null })),
     place: placeRow ? { name: placeRow.name, region: placeRow.region, country: placeRow.country } : null,
     corrected,
     degraded,
-    timing: { statements: run.statements, d1Ms: run.d1Ms },
+    semantic,
+    timing: { statements: run.statements, d1Ms: run.d1Ms, aiMs },
   };
 }
