@@ -38,8 +38,8 @@
   <section class="hero" aria-labelledby="hero-h">
     <div class="panel">
       <div class="panel-copy">
-        <a class="badge" href="https://heresmychurch.com"><span>New</span>Built on the Here's My Church directory <span aria-hidden="true">›</span></a>
-        <h1 id="hero-h">Church details, <em>filled in</em></h1>
+        <p class="badge"><span>Hackathon</span>Built for AI for Church, Open Track</p>
+        <h1 id="hero-h">Church details,<br><em>filled in</em></h1>
         <p class="lede">A search box for any church app. Someone picks their church, and your form fills in its address, website and service times.</p>
         <div class="try">
           <church-lookup id="hero-search" label="Find a church" placeholder="Try “grace comm” or “church in dallas”" form="app-form" overwrite limit="6"></church-lookup>
@@ -56,7 +56,6 @@
         <form id="app-form" class="app" onsubmit="event.preventDefault()">
           <div class="app-head">
             <p class="app-t">Where do you go to church?</p>
-            <p class="app-status" id="app-status" aria-live="polite">Pick a church above to fill this in.</p>
           </div>
           <div class="app-grid">
             <div class="wide"><label for="a-name">Church</label><input id="a-name" data-hmc-field="name" autocomplete="off"></div>
@@ -71,6 +70,14 @@
           </div>
         </form>
       </figure>
+      <aside class="notes" aria-label="What's happening">
+        <ol>
+          <li><b>Search</b>Type above. Results come from 587,842 churches, nearby first.</li>
+          <li><b>Pick</b>Choose one with a click or the keyboard.</li>
+          <li><b>Filled</b><span id="app-status" aria-live="polite">Empty fields fill in. Anything typed is left alone.</span></li>
+        </ol>
+        <p class="note-src">Your app keeps the form. Lookup only fills it.</p>
+      </aside>
     </div>
 
     <ul class="stats" aria-label="Lookup at a glance">
