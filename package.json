@@ -1,0 +1,19 @@
+{
+  "name": "lookup",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "test": "vitest run --config worker/vitest.config.ts",
+    "typecheck": "tsc -p worker/tsconfig.json --noEmit",
+    "deploy": "wrangler deploy --config worker/wrangler.jsonc",
+    "eval": "node eval/run.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.0",
+    "@cloudflare/workers-types": "^4.20260101.0",
+    "typescript": "^5.6.0",
+    "vitest": "~3.2.0",
+    "wrangler": "^4.150.0"
+  }
+}

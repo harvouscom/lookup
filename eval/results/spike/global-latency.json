@@ -1,0 +1,171 @@
+[
+ {
+  "node": "at Austria",
+  "firstMedianMs": 223,
+  "secondMedianMs": 166,
+  "n": 1
+ },
+ {
+  "node": "bg Bulgaria",
+  "firstMedianMs": 312,
+  "secondMedianMs": 375,
+  "n": 1
+ },
+ {
+  "node": "br Brazil",
+  "firstMedianMs": 225,
+  "secondMedianMs": 499,
+  "n": 3
+ },
+ {
+  "node": "ca Canada",
+  "firstMedianMs": 143,
+  "secondMedianMs": 152,
+  "n": 3
+ },
+ {
+  "node": "ch Switzerland",
+  "firstMedianMs": 242,
+  "secondMedianMs": 260,
+  "n": 3
+ },
+ {
+  "node": "de Germany",
+  "firstMedianMs": 240,
+  "n": 4
+ },
+ {
+  "node": "es Spain",
+  "firstMedianMs": 287,
+  "secondMedianMs": 66,
+  "n": 3
+ },
+ {
+  "node": "fr France",
+  "secondMedianMs": 251,
+  "n": 0
+ },
+ {
+  "node": "gb UK",
+  "firstMedianMs": 336,
+  "n": 1
+ },
+ {
+  "node": "hk Hong Kong",
+  "firstMedianMs": 715,
+  "secondMedianMs": 1312,
+  "n": 1
+ },
+ {
+  "node": "hu Hungary",
+  "firstMedianMs": 283,
+  "secondMedianMs": 75,
+  "n": 2
+ },
+ {
+  "node": "id Indonesia",
+  "firstMedianMs": 468,
+  "secondMedianMs": 101,
+  "n": 2
+ },
+ {
+  "node": "il Israel",
+  "firstMedianMs": 281,
+  "secondMedianMs": 199,
+  "n": 3
+ },
+ {
+  "node": "in India",
+  "firstMedianMs": 649,
+  "n": 2
+ },
+ {
+  "node": "ir Iran",
+  "firstMedianMs": 407,
+  "secondMedianMs": 350,
+  "n": 14
+ },
+ {
+  "node": "is Iceland",
+  "secondMedianMs": 496,
+  "n": 0
+ },
+ {
+  "node": "it Italy",
+  "firstMedianMs": 251,
+  "n": 1
+ },
+ {
+  "node": "jp Japan",
+  "firstMedianMs": 303,
+  "secondMedianMs": 278,
+  "n": 1
+ },
+ {
+  "node": "kz Kazakhstan",
+  "firstMedianMs": 506,
+  "secondMedianMs": 536,
+  "n": 2
+ },
+ {
+  "node": "md Moldova",
+  "firstMedianMs": 339,
+  "n": 1
+ },
+ {
+  "node": "pl Poland",
+  "secondMedianMs": 118,
+  "n": 0
+ },
+ {
+  "node": "rs Serbia",
+  "firstMedianMs": 225,
+  "n": 1
+ },
+ {
+  "node": "ru Russia",
+  "firstMedianMs": 520,
+  "secondMedianMs": 277,
+  "n": 1
+ },
+ {
+  "node": "se Sweden",
+  "firstMedianMs": 212,
+  "secondMedianMs": 63,
+  "n": 2
+ },
+ {
+  "node": "sg Singapore",
+  "firstMedianMs": 388,
+  "secondMedianMs": 484,
+  "n": 3
+ },
+ {
+  "node": "si Slovenia",
+  "firstMedianMs": 301,
+  "secondMedianMs": 74,
+  "n": 2
+ },
+ {
+  "node": "tr Turkey",
+  "firstMedianMs": 435,
+  "secondMedianMs": 196,
+  "n": 2
+ },
+ {
+  "node": "ua Ukraine",
+  "firstMedianMs": 327,
+  "n": 2
+ },
+ {
+  "node": "us USA",
+  "firstMedianMs": 225,
+  "secondMedianMs": 167,
+  "n": 3
+ },
+ {
+  "node": "vn Vietnam",
+  "firstMedianMs": 610,
+  "n": 2
+ }
+]

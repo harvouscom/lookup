@@ -1,0 +1,81 @@
+{"id":"must-grac","q":"grac","class":"must-work","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["grace"]}}
+{"id":"must-gracee","q":"gracee","class":"must-work","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["grace"]}}
+{"id":"must-grace-comm","q":"grace comm","class":"must-work","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["grace","comm"]}}
+{"id":"must-first-bapt","q":"first bapt","class":"must-work","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["first","bapt"]}}
+{"id":"must-church-dallas","q":"church in dallas","class":"must-work","want":{"nameAll":["church"],"near":{"lat":32.78,"lng":-96.8,"km":40}}}
+{"id":"must-grac-nogeo","q":"grac","class":"must-work","want":{"nameAll":["grace"]}}
+{"id":"must-gracee-nogeo","q":"gracee","class":"must-work","want":{"nameAll":["grace"]}}
+{"id":"must-grace-comm-nogeo","q":"grace comm","class":"must-work","want":{"nameAll":["grace","comm"]}}
+{"id":"must-first-bapt-nogeo","q":"first bapt","class":"must-work","want":{"nameAll":["first","bapt"]}}
+{"id":"place-baptist-houston","q":"baptist near houston","class":"place","want":{"nameAll":["baptist"],"near":{"lat":29.76,"lng":-95.37,"km":50}}}
+{"id":"place-catholic-austin","q":"catholic church in austin tx","class":"place","want":{"anyField":["catholic"],"near":{"lat":30.27,"lng":-97.74,"km":40}}}
+{"id":"place-grace-comma","q":"grace, chicago","class":"place","want":{"nameAll":["grace"],"near":{"lat":41.88,"lng":-87.63,"km":50}}}
+{"id":"place-comma-state","q":"first baptist, tx","class":"place","want":{"nameAll":["first","baptist"],"region":"TX"}}
+{"id":"place-upper-code","q":"grace IN","class":"place","want":{"nameAll":["grace"],"region":"IN"}}
+{"id":"place-lower-in-not-indiana","q":"baptist in denver","class":"place","want":{"nameAll":["baptist"],"near":{"lat":39.74,"lng":-104.99,"km":40}}}
+{"id":"place-state-name","q":"calvary chapel california","class":"place","want":{"nameAll":["calvary","chapel"],"region":"CA"}}
+{"id":"place-state-two-word","q":"lutheran new york","class":"place","want":{"nameAll":["lutheran"],"region":"NY"}}
+{"id":"place-munich","q":"kirche in münchen","class":"place","want":{"nameAll":["kirche"],"near":{"lat":48.14,"lng":11.58,"km":40}}}
+{"id":"place-munchen-ascii","q":"kirche in munchen","class":"place","want":{"nameAll":["kirche"],"near":{"lat":48.14,"lng":11.58,"km":40}}}
+{"id":"place-paris","q":"eglise near paris","class":"place","want":{"nameAll":["eglise"],"near":{"lat":48.86,"lng":2.35,"km":40}}}
+{"id":"place-london","q":"methodist in london","class":"place","want":{"nameAll":["methodist"],"near":{"lat":51.51,"lng":-0.13,"km":40}}}
+{"id":"place-near-param","q":"grace","near":"seattle","class":"place","want":{"nameAll":["grace"],"near":{"lat":47.61,"lng":-122.33,"km":50}}}
+{"id":"place-st-louis","q":"baptist in st louis","class":"place","want":{"nameAll":["baptist"],"near":{"lat":38.63,"lng":-90.2,"km":40}}}
+{"id":"place-fort-worth","q":"grace in fort worth","class":"place","want":{"nameAll":["grace"],"near":{"lat":32.76,"lng":-97.33,"km":40}}}
+{"id":"place-germany","q":"baptist germany","class":"place","want":{"nameAll":["baptist"],"country":"DE"}}
+{"id":"saint-st-mary","q":"st mary","class":"saint","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAny":["saint","st"],"nameAll":["mary"]}}
+{"id":"saint-saint-mary","q":"saint mary","class":"saint","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAny":["saint","st"],"nameAll":["mary"]}}
+{"id":"saint-st-marys","q":"st marys","class":"saint","loc":{"lat":40.71,"lng":-74.0},"want":{"nameAny":["saint","st"],"nameAll":["mary"]}}
+{"id":"saint-apostrophe","q":"st. mary's","class":"saint","loc":{"lat":40.71,"lng":-74.0},"want":{"nameAny":["saint","st"],"nameAll":["mary"]}}
+{"id":"saint-st-john","q":"st john lutheran","class":"saint","want":{"nameAny":["saint","st"],"nameAll":["john","lutheran"]}}
+{"id":"saint-ste-anne","q":"ste anne","class":"saint","loc":{"lat":48.86,"lng":2.35},"want":{"nameAny":["sainte","ste"],"nameAll":["anne"]}}
+{"id":"saint-sankt-josef","q":"sankt josef","class":"saint","loc":{"lat":48.14,"lng":11.58},"want":{"nameAny":["sankt","st","saint"],"nameAll":["josef"]}}
+{"id":"saint-st-josef-de","q":"st josef kirche","class":"saint","loc":{"lat":48.14,"lng":11.58},"want":{"nameAny":["sankt","st","saint"],"nameAll":["josef"]}}
+{"id":"saint-mt-zion","q":"mt zion baptist","class":"abbreviation","want":{"nameAny":["mt","mount"],"nameAll":["zion","baptist"]}}
+{"id":"saint-mount-zion","q":"mount zion baptist","class":"abbreviation","want":{"nameAny":["mt","mount"],"nameAll":["zion","baptist"]}}
+{"id":"abbr-umc","q":"umc dallas","class":"abbreviation","want":{"nameAll":["methodist"],"near":{"lat":32.78,"lng":-96.8,"km":50}}}
+{"id":"abbr-sda","q":"sda church","class":"abbreviation","want":{"nameAny":["adventist","sda"]}}
+{"id":"abbr-lds","q":"lds church","class":"abbreviation","want":{"anyField":["latter","lds"]}}
+{"id":"abbr-ame","q":"ame church","class":"abbreviation","want":{"nameAll":["african","methodist"]}}
+{"id":"abbr-cogic","q":"cogic","class":"abbreviation","want":{"anyField":["cogic","church of god in christ"]}}
+{"id":"abbr-hl-geist","q":"hl geist","class":"abbreviation","loc":{"lat":48.14,"lng":11.58},"want":{"nameAny":["hl","heilig"],"nameAll":["geist"]}}
+{"id":"abbr-sw-jana","q":"sw jana","class":"abbreviation","loc":{"lat":52.41,"lng":16.93},"want":{"nameAny":["sw","swiet"],"nameAll":["jana"]}}
+{"id":"dia-kosciol","q":"kosciol","class":"diacritics","loc":{"lat":52.41,"lng":16.93},"want":{"nameAll":["kosciol"]}}
+{"id":"dia-koscioł","q":"kościół","class":"diacritics","loc":{"lat":52.41,"lng":16.93},"want":{"nameAll":["kosciol"]}}
+{"id":"dia-wroclaw","q":"kosciol wroclaw","class":"diacritics","want":{"nameAll":["kosciol"],"near":{"lat":51.11,"lng":17.03,"km":40}}}
+{"id":"dia-eglise","q":"eglise saint","class":"diacritics","loc":{"lat":48.86,"lng":2.35},"want":{"nameAll":["eglise","saint"]}}
+{"id":"dia-muenchen","q":"kirche muenchen","class":"diacritics","want":{"nameAll":["kirche"],"near":{"lat":48.14,"lng":11.58,"km":40}}}
+{"id":"dia-strasse","q":"kirche strasse","class":"diacritics","want":{"nameAll":["kirche"]}}
+{"id":"dia-sao","q":"igreja sao","class":"diacritics","loc":{"lat":38.72,"lng":-9.14},"want":{"nameAll":["igreja"]}}
+{"id":"dia-nino","q":"iglesia nino","class":"diacritics","loc":{"lat":40.42,"lng":-3.7},"want":{"nameAll":["iglesia"]}}
+{"id":"common-church","q":"church","class":"common-word","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["church"],"near":{"lat":32.78,"lng":-96.8,"km":60}}}
+{"id":"common-the-church","q":"the church","class":"common-word","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["church"]}}
+{"id":"common-church-of-christ","q":"church of christ","class":"common-word","loc":{"lat":35.15,"lng":-90.05},"want":{"nameAll":["church","christ"],"near":{"lat":35.15,"lng":-90.05,"km":60}}}
+{"id":"common-christ-church","q":"christ church","class":"common-word","loc":{"lat":51.75,"lng":-1.25},"want":{"nameAll":["christ","church"]}}
+{"id":"common-new-life","q":"new life","class":"common-word","loc":{"lat":44.98,"lng":-93.27},"want":{"nameAll":["new","life"]}}
+{"id":"common-first","q":"first","class":"common-word","loc":{"lat":33.45,"lng":-112.07},"want":{"nameAll":["first"]}}
+{"id":"common-saint","q":"saint","class":"common-word","loc":{"lat":48.86,"lng":2.35},"want":{"nameAny":["saint"]}}
+{"id":"common-de","q":"de","class":"common-word","loc":{"lat":40.42,"lng":-3.7},"want":{"anyField":["de"]}}
+{"id":"common-baptist","q":"baptist","class":"common-word","loc":{"lat":33.75,"lng":-84.39},"want":{"nameAll":["baptist"],"near":{"lat":33.75,"lng":-84.39,"km":60}}}
+{"id":"common-holy-trinity","q":"holy trinity","class":"common-word","loc":{"lat":51.51,"lng":-0.13},"want":{"nameAll":["holy","trinity"]}}
+{"id":"common-grace-church","q":"grace church","class":"common-word","want":{"nameAll":["grace","church"]}}
+{"id":"common-church-of-god","q":"church of god","class":"common-word","loc":{"lat":35.15,"lng":-85.25},"want":{"nameAll":["church","god"]}}
+{"id":"typo-baptst","q":"first baptst","class":"typo-hand","want":{"nameAll":["first","baptist"]}}
+{"id":"typo-presbyterain","q":"presbyterain","class":"typo-hand","loc":{"lat":35.22,"lng":-80.84},"want":{"nameAll":["presbyterian"]}}
+{"id":"typo-methodst","q":"methodst","class":"typo-hand","loc":{"lat":35.22,"lng":-80.84},"want":{"nameAll":["methodist"]}}
+{"id":"typo-luthern","q":"luthern church","class":"typo-hand","loc":{"lat":44.98,"lng":-93.27},"want":{"nameAll":["lutheran"]}}
+{"id":"typo-catholc","q":"catholc","class":"typo-hand","loc":{"lat":40.71,"lng":-74.0},"want":{"nameAll":["catholic"]}}
+{"id":"typo-comunity","q":"grace comunity","class":"typo-hand","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["grace","community"]}}
+{"id":"typo-calvery","q":"calvery chapel","class":"typo-hand","want":{"nameAll":["calvary","chapel"]}}
+{"id":"typo-episcopel","q":"episcopel","class":"typo-hand","want":{"nameAll":["episcopal"]}}
+{"id":"typo-pentacostal","q":"pentacostal","class":"typo-hand","want":{"nameAll":["pentecostal"]}}
+{"id":"typo-adventist","q":"adventsit","class":"typo-hand","want":{"nameAll":["adventist"]}}
+{"id":"typo-chruch","q":"grace chruch","class":"typo-hand","want":{"nameAll":["grace","church"]}}
+{"id":"typo-dallas","q":"first baptist dalas","class":"typo-hand","want":{"nameAll":["first","baptist"],"near":{"lat":32.78,"lng":-96.8,"km":60}}}
+{"id":"typo-kirhe","q":"evangelische kirhe","class":"typo-hand","want":{"nameAll":["evangelische","kirche"]}}
+{"id":"typo-dreifaltigkiet","q":"dreifaltigkiet","class":"typo-hand","want":{"nameAll":["dreifaltigkeit"]}}
+{"id":"trans-trinity-de","q":"trinity church munich","class":"translation","want":{"nameAny":["dreifaltigkeit","trinity"],"near":{"lat":48.14,"lng":11.58,"km":60}}}
+{"id":"trans-saint-peter-de","q":"saint peter kirche","class":"translation","want":{"nameAny":["peter","petrus"],"nameAll":["kirche"]}}
+{"id":"trans-church-pl","q":"church poznan","class":"translation","want":{"near":{"lat":52.41,"lng":16.93,"km":40}}}
+{"id":"trans-church-fr","q":"church paris","class":"translation","want":{"near":{"lat":48.86,"lng":2.35,"km":40}}}
+{"id":"trans-mormon","q":"mormon","class":"translation","want":{"anyField":["latter","lds"]}}
