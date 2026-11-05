@@ -82,7 +82,7 @@ svg, canvas { display: block; }
 .badge { margin: 0; display: inline-flex; align-items: center; gap: 10px; padding: 4px 14px 4px 4px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.88); font-size: .8125rem; text-decoration: none; }
 .badge:hover { color: #fff; background: rgba(255,255,255,.12); }
 .badge span:first-child { padding: 2px 8px; border-radius: 999px; background: var(--lilac); color: var(--violet); font-weight: 600; font-size: .75rem; }
-.hero h1 { margin: 24px auto 18px; font-size: clamp(2.75rem, 8.4vw, 6.25rem); font-weight: 420; letter-spacing: -0.012em; line-height: 1.06; color: #fff; text-wrap: balance; }
+.hero h1 { margin: 24px auto 18px; font-size: clamp(2.5rem, 5.4vw, 4.5rem); font-weight: 420; letter-spacing: -0.012em; line-height: 1.06; color: #fff; text-wrap: balance; }
 .hero h1 em { font-style: normal; color: var(--lilac); }
 .lede { margin: 0 auto 32px; max-width: 32rem; font-size: clamp(1.0625rem, 1.5vw, 1.1875rem); line-height: 1.6; color: rgba(255,255,255,.74); }
 .try { max-width: 34rem; margin: 0 auto; text-align: left; }
@@ -224,3 +224,4 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .notes b { display: block; color: var(--text); font-weight: 600; font-size: .9375rem; }
 #app-status.done { color: var(--brand); }
 .note-src { margin: 4px 0 0 34px; font-size: .8125rem; color: var(--muted); }
+@media (min-width: 760px) { .hero h1 { white-space: nowrap; } }
