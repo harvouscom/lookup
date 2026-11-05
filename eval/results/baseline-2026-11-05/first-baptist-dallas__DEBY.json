@@ -1,0 +1,17 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=first+baptist+dallas&state=DEBY",
+ "capturedAt": "2026-11-05T15:07:32.411Z",
+ "q": "first baptist dallas",
+ "state": "DEBY",
+ "status": 200,
+ "ms": 87,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "first baptist dallas",
+  "statesSearched": 1,
+  "stateFilter": [
+   "DEBY"
+  ]
+ }
+}

@@ -1,0 +1,1231 @@
+{
+ "label": "tx-only",
+ "repeat": 12,
+ "capturedAt": "2026-11-05T15:14:27.972Z",
+ "rows": [
+  {
+   "q": "gr",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 54,
+   "wallP50": 33,
+   "wallP95": 43,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.79,
+     "sqlP95": 2.6
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.29,
+     "sqlP95": 3.43
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.76,
+     "sqlP95": 1.94
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "gra",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 34,
+   "wallP50": 34,
+   "wallP95": 46,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 2.36,
+     "sqlP95": 3.35
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.4,
+     "sqlP95": 2.2
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.83,
+     "sqlP95": 1.26
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "grac",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 40,
+   "wallP50": 29,
+   "wallP95": 53,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 41,
+     "rowsRead": 82,
+     "sqlP50": 1.92,
+     "sqlP95": 3.99
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.46,
+     "sqlP95": 1.66
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.74,
+     "sqlP95": 1.66
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 320
+  },
+  {
+   "q": "grace",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 27,
+   "wallP50": 29,
+   "wallP95": 32,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 40,
+     "rowsRead": 80,
+     "sqlP50": 1.9,
+     "sqlP95": 2.23
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.42,
+     "sqlP95": 3.56
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.66,
+     "sqlP95": 1
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 318
+  },
+  {
+   "q": "grace c",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 41,
+   "wallP50": 42,
+   "wallP95": 48,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 35,
+     "rowsRead": 70,
+     "sqlP50": 6.12,
+     "sqlP95": 7.94
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 4.91,
+     "sqlP95": 6.28
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 3.95,
+     "sqlP95": 6.61
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 308
+  },
+  {
+   "q": "grace co",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 37,
+   "wallP50": 29,
+   "wallP95": 52,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 6,
+     "rowsRead": 12,
+     "sqlP50": 1.81,
+     "sqlP95": 2.12
+    },
+    {
+     "rung": "wider",
+     "rows": 10,
+     "rowsRead": 20,
+     "sqlP50": 1.58,
+     "sqlP95": 2.12
+    },
+    {
+     "rung": "country",
+     "rows": 31,
+     "rowsRead": 62,
+     "sqlP50": 1.07,
+     "sqlP95": 1.52
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 94
+  },
+  {
+   "q": "grace comm",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 35,
+   "wallP50": 26,
+   "wallP95": 51,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 4,
+     "rowsRead": 8,
+     "sqlP50": 1.63,
+     "sqlP95": 3.91
+    },
+    {
+     "rung": "wider",
+     "rows": 7,
+     "rowsRead": 14,
+     "sqlP50": 1.39,
+     "sqlP95": 1.56
+    },
+    {
+     "rung": "country",
+     "rows": 22,
+     "rowsRead": 44,
+     "sqlP50": 0.98,
+     "sqlP95": 1.12
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 66
+  },
+  {
+   "q": "gracee",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 25,
+   "wallP50": 29,
+   "wallP95": 41,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.1,
+     "sqlP95": 1.49
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.63,
+     "sqlP95": 0.89
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.23,
+     "sqlP95": 0.49
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "first bapt",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 30,
+   "wallP50": 29,
+   "wallP95": 79,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 56,
+     "rowsRead": 112,
+     "sqlP50": 2.19,
+     "sqlP95": 3.31
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.37,
+     "sqlP95": 4.36
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.7,
+     "sqlP95": 0.75
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 350
+  },
+  {
+   "q": "first baptist",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 25,
+   "wallP50": 29,
+   "wallP95": 38,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 56,
+     "rowsRead": 112,
+     "sqlP50": 2.31,
+     "sqlP95": 3.55
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.54,
+     "sqlP95": 1.7
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.93,
+     "sqlP95": 1.36
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 350
+  },
+  {
+   "q": "church",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 28,
+   "wallP50": 30,
+   "wallP95": 62,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 2.69,
+     "sqlP95": 3.14
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 2.16,
+     "sqlP95": 2.4
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.76,
+     "sqlP95": 1.96
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "church dallas",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 25,
+   "wallP50": 27,
+   "wallP95": 34,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.78,
+     "sqlP95": 2.18
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.42,
+     "sqlP95": 3.97
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.78,
+     "sqlP95": 1.05
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "baptist",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 53,
+   "wallP50": 31,
+   "wallP95": 34,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.71,
+     "sqlP95": 2.03
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.3,
+     "sqlP95": 1.56
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.84,
+     "sqlP95": 2.59
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "st mary",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 29,
+   "wallP50": 27,
+   "wallP95": 52,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.54,
+     "sqlP95": 2.33
+    },
+    {
+     "rung": "wider",
+     "rows": 4,
+     "rowsRead": 8,
+     "sqlP50": 1.23,
+     "sqlP95": 1.73
+    },
+    {
+     "rung": "country",
+     "rows": 21,
+     "rowsRead": 42,
+     "sqlP50": 0.74,
+     "sqlP95": 0.91
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 50
+  },
+  {
+   "q": "saint",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 28,
+   "wallP50": 30,
+   "wallP95": 78,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.7,
+     "sqlP95": 2.03
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.09,
+     "sqlP95": 1.45
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.54,
+     "sqlP95": 3.8
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "chu",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 24,
+   "wallP50": 33,
+   "wallP95": 53,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.59,
+     "sqlP95": 5.48
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.08,
+     "sqlP95": 1.4
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.58,
+     "sqlP95": 17.01
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "ch",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 29,
+   "wallP50": 33,
+   "wallP95": 50,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.73,
+     "sqlP95": 5.39
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.1,
+     "sqlP95": 2.11
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.55,
+     "sqlP95": 1.71
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "zzqx",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 26,
+   "wallP50": 28,
+   "wallP95": 56,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.18,
+     "sqlP95": 1.99
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.71,
+     "sqlP95": 2.81
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.23,
+     "sqlP95": 1.53
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "church catholic",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 29,
+   "wallP50": 31,
+   "wallP95": 45,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 2.25,
+     "sqlP95": 5.25
+    },
+    {
+     "rung": "wider",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 1.25,
+     "sqlP95": 2.44
+    },
+    {
+     "rung": "country",
+     "rows": 60,
+     "rowsRead": 119,
+     "sqlP50": 0.72,
+     "sqlP95": 0.84
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 357
+  },
+  {
+   "q": "baptist methodist",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 32,
+   "wallP50": 29,
+   "wallP95": 35,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.82,
+     "sqlP95": 2.51
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.67,
+     "sqlP95": 2.72
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.03,
+     "sqlP95": 1.78
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "first second third",
+   "where": "dallas",
+   "colo": "MCI",
+   "coldMs": 28,
+   "wallP50": 29,
+   "wallP95": 34,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.66,
+     "sqlP95": 2.07
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.31,
+     "sqlP95": 1.96
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.53,
+     "sqlP95": 0.88
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "ki",
+   "where": "munich",
+   "colo": "MCI",
+   "coldMs": 22,
+   "wallP50": 26,
+   "wallP95": 31,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.99,
+     "sqlP95": 1.15
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.6,
+     "sqlP95": 1.06
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.25,
+     "sqlP95": 0.45
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "kirche",
+   "where": "munich",
+   "colo": "MCI",
+   "coldMs": 48,
+   "wallP50": 25,
+   "wallP95": 28,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.05,
+     "sqlP95": 1.22
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.59,
+     "sqlP95": 1.34
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.25,
+     "sqlP95": 0.42
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "st",
+   "where": "munich",
+   "colo": "MCI",
+   "coldMs": 26,
+   "wallP50": 27,
+   "wallP95": 37,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.05,
+     "sqlP95": 1.37
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.63,
+     "sqlP95": 0.83
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.22,
+     "sqlP95": 0.25
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "evangelische kirche",
+   "where": "munich",
+   "colo": "MCI",
+   "coldMs": 23,
+   "wallP50": 24,
+   "wallP95": 31,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.09,
+     "sqlP95": 1.65
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.69,
+     "sqlP95": 1.06
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.29,
+     "sqlP95": 0.42
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "dreif",
+   "where": "munich",
+   "colo": "MCI",
+   "coldMs": 23,
+   "wallP50": 27,
+   "wallP95": 49,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.01,
+     "sqlP95": 1.93
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.56,
+     "sqlP95": 1.1
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.2,
+     "sqlP95": 0.29
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "dreifaltigkeit",
+   "where": "munich",
+   "colo": "MCI",
+   "coldMs": 34,
+   "wallP50": 24,
+   "wallP95": 33,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.09,
+     "sqlP95": 1.46
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.59,
+     "sqlP95": 0.72
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.23,
+     "sqlP95": 0.29
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "kath kirche",
+   "where": "munich",
+   "colo": "MCI",
+   "coldMs": 24,
+   "wallP50": 25,
+   "wallP95": 29,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.1,
+     "sqlP95": 1.77
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.64,
+     "sqlP95": 0.74
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.27,
+     "sqlP95": 0.33
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "sankt josef",
+   "where": "munich",
+   "colo": "MCI",
+   "coldMs": 26,
+   "wallP50": 25,
+   "wallP95": 31,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.07,
+     "sqlP95": 1.37
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.57,
+     "sqlP95": 0.94
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.26,
+     "sqlP95": 0.46
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "pa",
+   "where": "poznan",
+   "colo": "MCI",
+   "coldMs": 33,
+   "wallP50": 26,
+   "wallP95": 31,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.93,
+     "sqlP95": 1.79
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.53,
+     "sqlP95": 0.8
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.21,
+     "sqlP95": 0.26
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "parafia",
+   "where": "poznan",
+   "colo": "MCI",
+   "coldMs": 30,
+   "wallP50": 25,
+   "wallP95": 30,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.07,
+     "sqlP95": 2.05
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.57,
+     "sqlP95": 0.86
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.21,
+     "sqlP95": 0.32
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "parafia sw",
+   "where": "poznan",
+   "colo": "MCI",
+   "coldMs": 23,
+   "wallP50": 26,
+   "wallP95": 35,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.17,
+     "sqlP95": 1.29
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.64,
+     "sqlP95": 2.06
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.27,
+     "sqlP95": 0.36
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "kosciol",
+   "where": "poznan",
+   "colo": "MCI",
+   "coldMs": 23,
+   "wallP50": 26,
+   "wallP95": 32,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.98,
+     "sqlP95": 8.44
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.59,
+     "sqlP95": 0.7
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.21,
+     "sqlP95": 0.34
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "kościół",
+   "where": "poznan",
+   "colo": "MCI",
+   "coldMs": 25,
+   "wallP50": 26,
+   "wallP95": 32,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.25,
+     "sqlP95": 4.13
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.58,
+     "sqlP95": 0.96
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.26,
+     "sqlP95": 0.4
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "kościół pw",
+   "where": "poznan",
+   "colo": "MCI",
+   "coldMs": 24,
+   "wallP50": 24,
+   "wallP95": 27,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 1.03,
+     "sqlP95": 1.92
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.64,
+     "sqlP95": 0.79
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.26,
+     "sqlP95": 0.41
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  },
+  {
+   "q": "kosciol pw",
+   "where": "poznan",
+   "colo": "MCI",
+   "coldMs": 30,
+   "wallP50": 24,
+   "wallP95": 29,
+   "rungs": [
+    {
+     "rung": "nearby",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.96,
+     "sqlP95": 1.3
+    },
+    {
+     "rung": "wider",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.61,
+     "sqlP95": 1.29
+    },
+    {
+     "rung": "country",
+     "rows": 0,
+     "rowsRead": 0,
+     "sqlP50": 0.24,
+     "sqlP95": 0.36
+    }
+   ],
+   "region": "ENAM",
+   "primary": true,
+   "totalRowsRead": 0
+  }
+ ]
+}

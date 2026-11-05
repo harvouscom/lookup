@@ -1,0 +1,32 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=st+marys&state=TX",
+ "capturedAt": "2026-11-05T15:08:01.827Z",
+ "q": "st marys",
+ "state": "TX",
+ "status": 200,
+ "ms": 520,
+ "count": 1,
+ "body": {
+  "results": [
+   {
+    "id": "TX-430501236",
+    "shortId": "43050123",
+    "name": "St Marys Catholic Church",
+    "city": "",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Catholic",
+    "attendance": 209,
+    "lat": 34.2941949,
+    "lng": -99.74142714999999,
+    "address": "",
+    "locationLabel": "Somewhere in Texas"
+   }
+  ],
+  "query": "st marys",
+  "statesSearched": 1,
+  "stateFilter": [
+   "TX"
+  ]
+ }
+}

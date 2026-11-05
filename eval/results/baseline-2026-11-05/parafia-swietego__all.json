@@ -1,0 +1,14 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=parafia+swietego",
+ "capturedAt": "2026-11-05T15:09:43.830Z",
+ "q": "parafia swietego",
+ "state": null,
+ "status": 200,
+ "ms": 21474,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "parafia swietego",
+  "statesSearched": 543
+ }
+}

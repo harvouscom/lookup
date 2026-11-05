@@ -1,0 +1,14 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=grace+comm",
+ "capturedAt": "2026-11-05T15:07:08.259Z",
+ "q": "grace comm",
+ "state": null,
+ "status": 200,
+ "ms": 15842,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "grace comm",
+  "statesSearched": 543
+ }
+}

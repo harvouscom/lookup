@@ -1,0 +1,17 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=saint+mary&state=DEBY",
+ "capturedAt": "2026-11-05T15:07:47.016Z",
+ "q": "saint mary",
+ "state": "DEBY",
+ "status": 200,
+ "ms": 173,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "saint mary",
+  "statesSearched": 1,
+  "stateFilter": [
+   "DEBY"
+  ]
+ }
+}

@@ -1,0 +1,446 @@
+[
+ {
+  "name": "A prefix 2-5 (section 2)",
+  "mb": 211,
+  "cases": {
+   "grace": {
+    "rows": "40/60/60",
+    "ms": 1
+   },
+   "grace c": {
+    "rows": "35/60/60",
+    "ms": 537.7
+   },
+   "grace co": {
+    "rows": "6/12/60",
+    "ms": 14.5
+   },
+   "first bapt": {
+    "rows": "57/60/60",
+    "ms": 3.2
+   },
+   "first baptist": {
+    "rows": "57/60/60",
+    "ms": 162.6
+   },
+   "church": {
+    "rows": "60/60/60",
+    "ms": 295.4
+   },
+   "church c": {
+    "rows": "60/60/60",
+    "ms": 702.5
+   },
+   "baptist": {
+    "rows": "60/60/60",
+    "ms": 16.1
+   },
+   "methodist": {
+    "rows": "60/60/60",
+    "ms": 3.9
+   },
+   "community": {
+    "rows": "60/60/60",
+    "ms": 2
+   },
+   "presbyterian": {
+    "rows": "60/60/60",
+    "ms": 1.8
+   },
+   "church of christ": {
+    "rows": "60/60/60",
+    "ms": 36.5
+   },
+   "baptist methodist": {
+    "rows": "0/0/0",
+    "ms": 25.1
+   },
+   "kirche": {
+    "rows": "60/60/60",
+    "ms": 3.8
+   },
+   "evangelische": {
+    "rows": "22/60/60",
+    "ms": 1.2
+   },
+   "kosciol": {
+    "rows": "0/0/0",
+    "ms": 0.2
+   },
+   "wroclaw": {
+    "rows": "0/0/0",
+    "ms": 0.1
+   }
+  }
+ },
+ {
+  "name": "B prefix 2-5, folded",
+  "mb": 210,
+  "cases": {
+   "grace": {
+    "rows": "40/60/60",
+    "ms": 1
+   },
+   "grace c": {
+    "rows": "35/60/60",
+    "ms": 366.7
+   },
+   "grace co": {
+    "rows": "6/12/60",
+    "ms": 1.7
+   },
+   "first bapt": {
+    "rows": "57/60/60",
+    "ms": 1.9
+   },
+   "first baptist": {
+    "rows": "57/60/60",
+    "ms": 21.5
+   },
+   "church": {
+    "rows": "60/60/60",
+    "ms": 65.8
+   },
+   "church c": {
+    "rows": "60/60/60",
+    "ms": 266.6
+   },
+   "baptist": {
+    "rows": "60/60/60",
+    "ms": 16.9
+   },
+   "methodist": {
+    "rows": "60/60/60",
+    "ms": 4.1
+   },
+   "community": {
+    "rows": "60/60/60",
+    "ms": 1.9
+   },
+   "presbyterian": {
+    "rows": "60/60/60",
+    "ms": 1.8
+   },
+   "church of christ": {
+    "rows": "60/60/60",
+    "ms": 12.6
+   },
+   "baptist methodist": {
+    "rows": "0/0/0",
+    "ms": 9
+   },
+   "kirche": {
+    "rows": "60/60/60",
+    "ms": 3.5
+   },
+   "evangelische": {
+    "rows": "22/60/60",
+    "ms": 1.3
+   },
+   "kosciol": {
+    "rows": "60/60/60",
+    "ms": 13.8
+   },
+   "wroclaw": {
+    "rows": "0/60/60",
+    "ms": 1.4
+   }
+  }
+ },
+ {
+  "name": "C prefix 2-8, folded",
+  "mb": 229,
+  "cases": {
+   "grace": {
+    "rows": "40/60/60",
+    "ms": 1
+   },
+   "grace c": {
+    "rows": "35/60/60",
+    "ms": 207.8
+   },
+   "grace co": {
+    "rows": "6/12/60",
+    "ms": 1.8
+   },
+   "first bapt": {
+    "rows": "57/60/60",
+    "ms": 1.9
+   },
+   "first baptist": {
+    "rows": "57/60/60",
+    "ms": 1.8
+   },
+   "church": {
+    "rows": "60/60/60",
+    "ms": 0.7
+   },
+   "church c": {
+    "rows": "60/60/60",
+    "ms": 150.2
+   },
+   "baptist": {
+    "rows": "60/60/60",
+    "ms": 0.8
+   },
+   "methodist": {
+    "rows": "60/60/60",
+    "ms": 4.8
+   },
+   "community": {
+    "rows": "60/60/60",
+    "ms": 2
+   },
+   "presbyterian": {
+    "rows": "60/60/60",
+    "ms": 1.8
+   },
+   "church of christ": {
+    "rows": "60/60/60",
+    "ms": 2.3
+   },
+   "baptist methodist": {
+    "rows": "0/0/0",
+    "ms": 7.3
+   },
+   "kirche": {
+    "rows": "60/60/60",
+    "ms": 0.9
+   },
+   "evangelische": {
+    "rows": "22/60/60",
+    "ms": 1
+   },
+   "kosciol": {
+    "rows": "60/60/60",
+    "ms": 0.5
+   },
+   "wroclaw": {
+    "rows": "0/60/60",
+    "ms": 0.7
+   }
+  }
+ },
+ {
+  "name": "D prefix 1-5, folded",
+  "mb": 230,
+  "cases": {
+   "grace": {
+    "rows": "40/60/60",
+    "ms": 1.1
+   },
+   "grace c": {
+    "rows": "35/60/60",
+    "ms": 2.4
+   },
+   "grace co": {
+    "rows": "6/12/60",
+    "ms": 1.8
+   },
+   "first bapt": {
+    "rows": "57/60/60",
+    "ms": 1.9
+   },
+   "first baptist": {
+    "rows": "57/60/60",
+    "ms": 13.9
+   },
+   "church": {
+    "rows": "60/60/60",
+    "ms": 37
+   },
+   "church c": {
+    "rows": "60/60/60",
+    "ms": 1
+   },
+   "baptist": {
+    "rows": "60/60/60",
+    "ms": 12.9
+   },
+   "methodist": {
+    "rows": "60/60/60",
+    "ms": 2.6
+   },
+   "community": {
+    "rows": "60/60/60",
+    "ms": 1.4
+   },
+   "presbyterian": {
+    "rows": "60/60/60",
+    "ms": 1.6
+   },
+   "church of christ": {
+    "rows": "60/60/60",
+    "ms": 9.7
+   },
+   "baptist methodist": {
+    "rows": "0/0/0",
+    "ms": 8
+   },
+   "kirche": {
+    "rows": "60/60/60",
+    "ms": 3.5
+   },
+   "evangelische": {
+    "rows": "22/60/60",
+    "ms": 1.7
+   },
+   "kosciol": {
+    "rows": "60/60/60",
+    "ms": 6.1
+   },
+   "wroclaw": {
+    "rows": "0/60/60",
+    "ms": 1.3
+   }
+  }
+ },
+ {
+  "name": "E prefix 1-8, folded",
+  "mb": 247,
+  "cases": {
+   "grace": {
+    "rows": "40/60/60",
+    "ms": 0.8
+   },
+   "grace c": {
+    "rows": "35/60/60",
+    "ms": 1.6
+   },
+   "grace co": {
+    "rows": "6/12/60",
+    "ms": 1.8
+   },
+   "first bapt": {
+    "rows": "57/60/60",
+    "ms": 1.9
+   },
+   "first baptist": {
+    "rows": "57/60/60",
+    "ms": 1.6
+   },
+   "church": {
+    "rows": "60/60/60",
+    "ms": 0.5
+   },
+   "church c": {
+    "rows": "60/60/60",
+    "ms": 0.7
+   },
+   "baptist": {
+    "rows": "60/60/60",
+    "ms": 0.5
+   },
+   "methodist": {
+    "rows": "60/60/60",
+    "ms": 2.2
+   },
+   "community": {
+    "rows": "60/60/60",
+    "ms": 1.1
+   },
+   "presbyterian": {
+    "rows": "60/60/60",
+    "ms": 1.3
+   },
+   "church of christ": {
+    "rows": "60/60/60",
+    "ms": 2.3
+   },
+   "baptist methodist": {
+    "rows": "0/0/0",
+    "ms": 7.9
+   },
+   "kirche": {
+    "rows": "60/60/60",
+    "ms": 0.8
+   },
+   "evangelische": {
+    "rows": "22/60/60",
+    "ms": 0.9
+   },
+   "kosciol": {
+    "rows": "60/60/60",
+    "ms": 0.6
+   },
+   "wroclaw": {
+    "rows": "0/60/60",
+    "ms": 0.6
+   }
+  }
+ },
+ {
+  "name": "F prefix 2-5, folded, exact last token",
+  "mb": 210,
+  "cases": {
+   "grace": {
+    "rows": "38/60/60",
+    "ms": 1
+   },
+   "grace c": {
+    "rows": "0/0/0",
+    "ms": 0.9
+   },
+   "grace co": {
+    "rows": "0/0/0",
+    "ms": 0.1
+   },
+   "first bapt": {
+    "rows": "0/0/0",
+    "ms": 0.1
+   },
+   "first baptist": {
+    "rows": "57/60/60",
+    "ms": 1.7
+   },
+   "church": {
+    "rows": "60/60/60",
+    "ms": 1
+   },
+   "church c": {
+    "rows": "1/6/60",
+    "ms": 1.2
+   },
+   "baptist": {
+    "rows": "60/60/60",
+    "ms": 1.6
+   },
+   "methodist": {
+    "rows": "60/60/60",
+    "ms": 1.1
+   },
+   "community": {
+    "rows": "60/60/60",
+    "ms": 1.1
+   },
+   "presbyterian": {
+    "rows": "60/60/60",
+    "ms": 1.1
+   },
+   "church of christ": {
+    "rows": "60/60/60",
+    "ms": 2.7
+   },
+   "baptist methodist": {
+    "rows": "0/0/0",
+    "ms": 8.4
+   },
+   "kirche": {
+    "rows": "60/60/60",
+    "ms": 1.1
+   },
+   "evangelische": {
+    "rows": "20/60/60",
+    "ms": 0.8
+   },
+   "kosciol": {
+    "rows": "60/60/60",
+    "ms": 0.7
+   },
+   "wroclaw": {
+    "rows": "0/60/60",
+    "ms": 0.9
+   }
+  }
+ }
+]

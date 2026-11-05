@@ -1,0 +1,7 @@
+node_modules/
+.wrangler/
+.dev.vars
+.env*
+scripts/spike/wrangler.jsonc
+# Spike inputs come from public R2 files with unmoderated overlays. Never commit them.
+spike-data/

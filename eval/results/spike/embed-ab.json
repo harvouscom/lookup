@@ -1,0 +1,896 @@
+{
+ "rows": 16018,
+ "dim": 1024,
+ "tokens": {
+  "A": 191966,
+  "B": 410014,
+  "C": 356364
+ },
+ "sampleB": "<name>. Methodist. Fulshear, Texas, United States.",
+ "queries": [
+  {
+   "q": "catholic church in austin",
+   "relevantInTx": 65,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 1,
+     "p10": 0.1,
+     "rr": 0.5
+    },
+    "A-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0.3,
+     "rr": 0.16666666666666666
+    },
+    "B-raw": {
+     "hit1": 0,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 0.5
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.8,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 0.5
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.6,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "presbyterian church lubbock",
+   "relevantInTx": 9,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 0,
+     "hit5": 1,
+     "p10": 0.3,
+     "rr": 0.3333333333333333
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "methodist church in waco",
+   "relevantInTx": 27,
+   "modes": {
+    "A-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.9,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "episcopal church san antonio",
+   "relevantInTx": 36,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.8,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "church of christ amarillo",
+   "relevantInTx": 21,
+   "modes": {
+    "A-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 1
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.6,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.8,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.9,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.8,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.9,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "first baptist fort worth",
+   "relevantInTx": 40,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0.1,
+     "rr": 0.125
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.8,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 1,
+     "p10": 0.1,
+     "rr": 0.3333333333333333
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.8,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "seventh day adventist austin",
+   "relevantInTx": 7,
+   "modes": {
+    "A-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.1,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "lutheran church near plano",
+   "relevantInTx": 46,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "mormon church el paso",
+   "relevantInTx": 0,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "B-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "B-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "C-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    }
+   }
+  },
+  {
+   "q": "jehovahs witnesses corpus christi",
+   "relevantInTx": 0,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "B-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "B-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "C-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    }
+   }
+  },
+  {
+   "q": "iglesia bautista dallas",
+   "relevantInTx": 12,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 0,
+     "hit5": 1,
+     "p10": 0.3,
+     "rr": 0.3333333333333333
+    },
+    "B-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "spanish speaking church san antonio",
+   "relevantInTx": 73,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.3,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.3,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "korean church dallas",
+   "relevantInTx": 13,
+   "modes": {
+    "A-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.3,
+     "rr": 1
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.3,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "vietnamese catholic houston",
+   "relevantInTx": 5,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 0.5
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.3,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.1,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "chinese church houston",
+   "relevantInTx": 7,
+   "modes": {
+    "A-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.3,
+     "rr": 1
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.7,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "greek orthodox houston",
+   "relevantInTx": 15,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.8,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.6,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "pentecostal church dallas",
+   "relevantInTx": 150,
+   "modes": {
+    "A-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 0.3333333333333333
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "cowboy church fort worth",
+   "relevantInTx": 1,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "A-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "B-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "B-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "C-parsed": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    }
+   }
+  },
+  {
+   "q": "non denominational church plano",
+   "relevantInTx": 224,
+   "modes": {
+    "A-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0.1,
+     "rr": 0.125
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.5,
+     "rr": 1
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 1,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0.1,
+     "rr": 0.14285714285714285
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    }
+   }
+  },
+  {
+   "q": "grace comunity church dallas",
+   "relevantInTx": 4,
+   "modes": {
+    "A-raw": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.2,
+     "rr": 1
+    },
+    "A-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 1
+    },
+    "B-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0,
+     "rr": 0
+    },
+    "B-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 1
+    },
+    "C-raw": {
+     "hit1": 0,
+     "hit5": 0,
+     "p10": 0.1,
+     "rr": 0.125
+    },
+    "C-parsed": {
+     "hit1": 1,
+     "hit5": 1,
+     "p10": 0.4,
+     "rr": 1
+    }
+   }
+  }
+ ],
+ "aggregate": {
+  "A-raw": {
+   "n": 18,
+   "hit1": 0.389,
+   "hit5": 0.5,
+   "p10": 0.122,
+   "mrr": 0.451
+  },
+  "A-parsed": {
+   "n": 18,
+   "hit1": 0.778,
+   "hit5": 0.889,
+   "p10": 0.6,
+   "mrr": 0.824
+  },
+  "B-raw": {
+   "n": 18,
+   "hit1": 0.722,
+   "hit5": 0.778,
+   "p10": 0.344,
+   "mrr": 0.757
+  },
+  "B-parsed": {
+   "n": 18,
+   "hit1": 0.944,
+   "hit5": 0.944,
+   "p10": 0.739,
+   "mrr": 0.944
+  },
+  "C-raw": {
+   "n": 18,
+   "hit1": 0.556,
+   "hit5": 0.722,
+   "p10": 0.278,
+   "mrr": 0.635
+  },
+  "C-parsed": {
+   "n": 18,
+   "hit1": 0.944,
+   "hit5": 0.944,
+   "p10": 0.65,
+   "mrr": 0.944
+  }
+ }
+}

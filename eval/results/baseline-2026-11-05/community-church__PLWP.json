@@ -1,0 +1,17 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=community+church&state=PLWP",
+ "capturedAt": "2026-11-05T15:08:05.992Z",
+ "q": "community church",
+ "state": "PLWP",
+ "status": 200,
+ "ms": 56,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "community church",
+  "statesSearched": 1,
+  "stateFilter": [
+   "PLWP"
+  ]
+ }
+}

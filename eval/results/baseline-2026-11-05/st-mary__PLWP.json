@@ -1,0 +1,17 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=st+mary&state=PLWP",
+ "capturedAt": "2026-11-05T15:07:43.345Z",
+ "q": "st mary",
+ "state": "PLWP",
+ "status": 200,
+ "ms": 244,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "st mary",
+  "statesSearched": 1,
+  "stateFilter": [
+   "PLWP"
+  ]
+ }
+}

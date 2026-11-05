@@ -1,0 +1,17 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=gracee&state=DEBY",
+ "capturedAt": "2026-11-05T15:06:51.856Z",
+ "q": "gracee",
+ "state": "DEBY",
+ "status": 200,
+ "ms": 573,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "gracee",
+  "statesSearched": 1,
+  "stateFilter": [
+   "DEBY"
+  ]
+ }
+}

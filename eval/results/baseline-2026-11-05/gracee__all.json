@@ -1,0 +1,14 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=gracee",
+ "capturedAt": "2026-11-05T15:06:50.344Z",
+ "q": "gracee",
+ "state": null,
+ "status": 200,
+ "ms": 15391,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "gracee",
+  "statesSearched": 543
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=parafia+swietego&state=PLWP",
+ "capturedAt": "2026-11-05T15:09:46.320Z",
+ "q": "parafia swietego",
+ "state": "PLWP",
+ "status": 200,
+ "ms": 332,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "parafia swietego",
+  "statesSearched": 1,
+  "stateFilter": [
+   "PLWP"
+  ]
+ }
+}

@@ -1,0 +1,130 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=calvary+chapel&state=TX",
+ "capturedAt": "2026-11-05T15:08:25.579Z",
+ "q": "calvary chapel",
+ "state": "TX",
+ "status": 200,
+ "ms": 427,
+ "count": 8,
+ "body": {
+  "results": [
+   {
+    "id": "TX-356860736",
+    "shortId": "63317674",
+    "name": "Calvary Chapel",
+    "city": "",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Non-denominational",
+    "attendance": 110,
+    "lat": 29.4665522,
+    "lng": -98.5117443,
+    "address": "",
+    "locationLabel": "Somewhere in Texas"
+   },
+   {
+    "id": "TX-46141735",
+    "shortId": "46141735",
+    "name": "Calvary Chapel",
+    "city": "Leander",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Non-denominational",
+    "attendance": 102,
+    "lat": 30.5657853,
+    "lng": -97.84511,
+    "address": "1007 Leander Dr",
+    "locationLabel": "1007 Leander Dr, Leander"
+   },
+   {
+    "id": "TX-1069997476",
+    "shortId": "10699974",
+    "name": "Calvary Chapel Assembly of God Church",
+    "city": "",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Pentecostal",
+    "attendance": 226,
+    "lat": 29.7013279,
+    "lng": -95.15445585,
+    "address": "",
+    "locationLabel": "Somewhere in Texas"
+   },
+   {
+    "id": "TX-356860740",
+    "shortId": "35686074",
+    "name": "Calvary Chapel North",
+    "city": "",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Non-denominational",
+    "attendance": 110,
+    "lat": 29.4980525,
+    "lng": -98.5076693,
+    "address": "",
+    "locationLabel": "Somewhere in Texas"
+   },
+   {
+    "id": "TX-735005515",
+    "shortId": "73500551",
+    "name": "Calvary Chapel of El Paso",
+    "city": "",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Non-denominational",
+    "attendance": 424,
+    "lat": 31.752971000000002,
+    "lng": -106.27941425,
+    "address": "",
+    "locationLabel": "Somewhere in Texas"
+   },
+   {
+    "id": "TX-356843578",
+    "shortId": "27528191",
+    "name": "Calvary Chapel of Fort Worth Church",
+    "city": "Haltom City",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Non-denominational",
+    "attendance": 128,
+    "lat": 32.8211376,
+    "lng": -97.2634295,
+    "address": "5617 Diamond Oaks Drive South",
+    "locationLabel": "5617 Diamond Oaks Drive South, Haltom City"
+   },
+   {
+    "id": "TX-356860742",
+    "shortId": "63343621",
+    "name": "Calvary Chapel Southside",
+    "city": "San Antonio",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Non-denominational",
+    "attendance": 139,
+    "lat": 29.3644503,
+    "lng": -98.4946357,
+    "address": "6025 South Flores Street",
+    "locationLabel": "6025 South Flores Street, San Antonio"
+   },
+   {
+    "id": "TX-356826973",
+    "shortId": "82008475",
+    "name": "Calvary Baptist Chapel Church",
+    "city": "",
+    "state": "TX",
+    "country": "US",
+    "denomination": "Baptist",
+    "attendance": 89,
+    "lat": 30.0385511,
+    "lng": -95.0799292,
+    "address": "",
+    "locationLabel": "Somewhere in Texas"
+   }
+  ],
+  "query": "calvary chapel",
+  "statesSearched": 1,
+  "stateFilter": [
+   "TX"
+  ]
+ }
+}

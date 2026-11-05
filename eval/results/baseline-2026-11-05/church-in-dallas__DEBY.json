@@ -1,0 +1,116 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=church+in+dallas&state=DEBY",
+ "capturedAt": "2026-11-05T15:07:28.121Z",
+ "q": "church in dallas",
+ "state": "DEBY",
+ "status": 200,
+ "ms": 92,
+ "count": 7,
+ "body": {
+  "results": [
+   {
+    "id": "DE-DEBY-330503768",
+    "shortId": "33050376",
+    "name": "Church of God in Christ",
+    "city": "",
+    "state": "DEBY",
+    "country": "DE",
+    "denomination": "Pentecostal",
+    "attendance": 90,
+    "lat": 49.5847874,
+    "lng": 11.7944329,
+    "address": "",
+    "locationLabel": "Somewhere in Bayern"
+   },
+   {
+    "id": "DE-DEBY-8931285218",
+    "shortId": "89312852",
+    "name": "Hour of Prayer Church of God in Christ e.V.",
+    "city": "",
+    "state": "DEBY",
+    "country": "DE",
+    "denomination": "Church of God",
+    "attendance": 71,
+    "lat": 49.6043527,
+    "lng": 11.8062272,
+    "address": "",
+    "locationLabel": "Somewhere in Bayern"
+   },
+   {
+    "id": "DE-DEBY-221173822",
+    "shortId": "22117382",
+    "name": "Unnamed Church",
+    "city": "Friesenried",
+    "state": "DEBY",
+    "country": "DE",
+    "denomination": "Unknown",
+    "attendance": 10,
+    "lat": 47.887522700000005,
+    "lng": 10.5187259,
+    "address": "1 In der Au, 87654",
+    "locationLabel": "1 In der Au, 87654, Friesenried"
+   },
+   {
+    "id": "DE-DEBY-233996277",
+    "shortId": "23399627",
+    "name": "Unnamed Church",
+    "city": "Hofheim in Unterfranken",
+    "state": "DEBY",
+    "country": "DE",
+    "denomination": "Lutheran",
+    "attendance": 33,
+    "lat": 50.1580619,
+    "lng": 10.567995849999999,
+    "address": "3 Zur Bettenburg, 97461",
+    "locationLabel": "3 Zur Bettenburg, 97461, Hofheim in Unterfranken"
+   },
+   {
+    "id": "DE-DEBY-234258263",
+    "shortId": "23425826",
+    "name": "Unnamed Church",
+    "city": "Hofheim in Unterfranken",
+    "state": "DEBY",
+    "country": "DE",
+    "denomination": "Unknown",
+    "attendance": 16,
+    "lat": 50.1340332,
+    "lng": 10.570362,
+    "address": "87 Dorfstraße, 97461",
+    "locationLabel": "87 Dorfstraße, 97461, Hofheim in Unterfranken"
+   },
+   {
+    "id": "DE-DEBY-252967130",
+    "shortId": "25296713",
+    "name": "Unnamed Church",
+    "city": "Weißenburg in Bayern",
+    "state": "DEBY",
+    "country": "DE",
+    "denomination": "Unknown",
+    "attendance": 44,
+    "lat": 49.02831355,
+    "lng": 10.9674639,
+    "address": "2 Am Kirchhof, 91781",
+    "locationLabel": "2 Am Kirchhof, 91781, Weißenburg in Bayern"
+   },
+   {
+    "id": "DE-DEBY-1704689355",
+    "shortId": "17046893",
+    "name": "Unnamed Church",
+    "city": "Eschenbach in der Oberpfalz",
+    "state": "DEBY",
+    "country": "DE",
+    "denomination": "Catholic",
+    "attendance": 837,
+    "lat": 49.7385196,
+    "lng": 11.8221058,
+    "address": "4 Koppe-Platz, 92676",
+    "locationLabel": "4 Koppe-Platz, 92676, Eschenbach in der Oberpfalz"
+   }
+  ],
+  "query": "church in dallas",
+  "statesSearched": 1,
+  "stateFilter": [
+   "DEBY"
+  ]
+ }
+}

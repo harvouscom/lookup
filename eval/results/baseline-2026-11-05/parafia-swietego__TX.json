@@ -1,0 +1,17 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=parafia+swietego&state=TX",
+ "capturedAt": "2026-11-05T15:09:44.707Z",
+ "q": "parafia swietego",
+ "state": "TX",
+ "status": 200,
+ "ms": 620,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "parafia swietego",
+  "statesSearched": 1,
+  "stateFilter": [
+   "TX"
+  ]
+ }
+}

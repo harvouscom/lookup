@@ -1,0 +1,9 @@
+// Copy to wrangler.jsonc (gitignored) and fill in database_id from `wrangler d1 create lookup-spike`.
+{
+  "name": "lookup-spike",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-01",
+  "observability": { "enabled": false },
+  "d1_databases": [{ "binding": "DB", "database_name": "lookup-spike", "database_id": "REPLACE_ME" }],
+  "ai": { "binding": "AI" }
+}

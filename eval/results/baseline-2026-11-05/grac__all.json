@@ -1,0 +1,14 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=grac",
+ "capturedAt": "2026-11-05T15:06:32.815Z",
+ "q": "grac",
+ "state": null,
+ "status": 200,
+ "ms": 20315,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "grac",
+  "statesSearched": 543
+ }
+}

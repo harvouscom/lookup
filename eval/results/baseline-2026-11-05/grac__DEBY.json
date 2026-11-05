@@ -1,0 +1,17 @@
+{
+ "url": "https://api.heresmychurch.com/churches/search?q=grac&state=DEBY",
+ "capturedAt": "2026-11-05T15:06:34.263Z",
+ "q": "grac",
+ "state": "DEBY",
+ "status": 200,
+ "ms": 495,
+ "count": 0,
+ "body": {
+  "results": [],
+  "query": "grac",
+  "statesSearched": 1,
+  "stateFilter": [
+   "DEBY"
+  ]
+ }
+}

@@ -1,0 +1,114 @@
+[
+ {
+  "q": "grace",
+  "c": 1,
+  "batchesPerSec": 36,
+  "p50": 28,
+  "p95": 29,
+  "max": 29
+ },
+ {
+  "q": "grace",
+  "c": 10,
+  "batchesPerSec": 72,
+  "p50": 122,
+  "p95": 151,
+  "max": 155
+ },
+ {
+  "q": "grace",
+  "c": 25,
+  "batchesPerSec": 103,
+  "p50": 242,
+  "p95": 255,
+  "max": 255
+ },
+ {
+  "q": "grace",
+  "c": 50,
+  "batchesPerSec": 102,
+  "p50": 489,
+  "p95": 503,
+  "max": 524
+ },
+ {
+  "q": "grace",
+  "c": 75,
+  "batchesPerSec": 104,
+  "p50": 717,
+  "p95": 729,
+  "max": 729
+ },
+ {
+  "q": "grace",
+  "c": 100,
+  "batchesPerSec": 119,
+  "p50": 842,
+  "p95": 957,
+  "max": 1069
+ },
+ {
+  "q": "grace",
+  "c": 150,
+  "batchesPerSec": 121,
+  "p50": 1236,
+  "p95": 1463,
+  "max": 1527
+ },
+ {
+  "q": "grace c",
+  "c": 1,
+  "batchesPerSec": 14,
+  "p50": 73,
+  "p95": 73,
+  "max": 73
+ },
+ {
+  "q": "grace c",
+  "c": 10,
+  "batchesPerSec": 79,
+  "p50": 109,
+  "p95": 135,
+  "max": 145
+ },
+ {
+  "q": "grace c",
+  "c": 25,
+  "batchesPerSec": 84,
+  "p50": 289,
+  "p95": 314,
+  "max": 314
+ },
+ {
+  "q": "grace c",
+  "c": 50,
+  "batchesPerSec": 91,
+  "p50": 522,
+  "p95": 558,
+  "max": 558
+ },
+ {
+  "q": "grace c",
+  "c": 75,
+  "batchesPerSec": 89,
+  "p50": 844,
+  "p95": 943,
+  "max": 943
+ },
+ {
+  "q": "grace c",
+  "c": 100,
+  "batchesPerSec": 90,
+  "p50": 1072,
+  "p95": 1111,
+  "max": 1168
+ },
+ {
+  "q": "grace c",
+  "c": 150,
+  "batchesPerSec": 85,
+  "p50": 1696,
+  "p95": 1796,
+  "max": 1955
+ }
+]

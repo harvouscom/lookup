@@ -1,0 +1,562 @@
+[
+ {
+  "q": "grace",
+  "state": null,
+  "status": 200,
+  "ms": 2510,
+  "count": 10
+ },
+ {
+  "q": "grace",
+  "state": "TX",
+  "status": 200,
+  "ms": 103,
+  "count": 100
+ },
+ {
+  "q": "grace",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 739,
+  "count": 0
+ },
+ {
+  "q": "grace",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 377,
+  "count": 0
+ },
+ {
+  "q": "grac",
+  "state": null,
+  "status": 200,
+  "ms": 20315,
+  "count": 0
+ },
+ {
+  "q": "grac",
+  "state": "TX",
+  "status": 200,
+  "ms": 452,
+  "count": 0
+ },
+ {
+  "q": "grac",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 495,
+  "count": 0
+ },
+ {
+  "q": "grac",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 186,
+  "count": 0
+ },
+ {
+  "q": "gracee",
+  "state": null,
+  "status": 200,
+  "ms": 15391,
+  "count": 0
+ },
+ {
+  "q": "gracee",
+  "state": "TX",
+  "status": 200,
+  "ms": 435,
+  "count": 0
+ },
+ {
+  "q": "gracee",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 573,
+  "count": 0
+ },
+ {
+  "q": "gracee",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 59,
+  "count": 0
+ },
+ {
+  "q": "grace comm",
+  "state": null,
+  "status": 200,
+  "ms": 15842,
+  "count": 0
+ },
+ {
+  "q": "grace comm",
+  "state": "TX",
+  "status": 200,
+  "ms": 465,
+  "count": 0
+ },
+ {
+  "q": "grace comm",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 420,
+  "count": 0
+ },
+ {
+  "q": "grace comm",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 54,
+  "count": 0
+ },
+ {
+  "q": "first bapt",
+  "state": null,
+  "status": 200,
+  "ms": 14875,
+  "count": 0
+ },
+ {
+  "q": "first bapt",
+  "state": "TX",
+  "status": 200,
+  "ms": 496,
+  "count": 0
+ },
+ {
+  "q": "first bapt",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 486,
+  "count": 0
+ },
+ {
+  "q": "first bapt",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 45,
+  "count": 0
+ },
+ {
+  "q": "church in dallas",
+  "state": null,
+  "status": 200,
+  "ms": 255,
+  "count": 0
+ },
+ {
+  "q": "church in dallas",
+  "state": "TX",
+  "status": 200,
+  "ms": 158,
+  "count": 100
+ },
+ {
+  "q": "church in dallas",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 92,
+  "count": 7
+ },
+ {
+  "q": "church in dallas",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 56,
+  "count": 0
+ },
+ {
+  "q": "first baptist",
+  "state": null,
+  "status": 200,
+  "ms": 1418,
+  "count": 10
+ },
+ {
+  "q": "first baptist",
+  "state": "TX",
+  "status": 200,
+  "ms": 124,
+  "count": 100
+ },
+ {
+  "q": "first baptist",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 103,
+  "count": 0
+ },
+ {
+  "q": "first baptist",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 45,
+  "count": 0
+ },
+ {
+  "q": "first baptist dallas",
+  "state": null,
+  "status": 200,
+  "ms": 323,
+  "count": 10
+ },
+ {
+  "q": "first baptist dallas",
+  "state": "TX",
+  "status": 200,
+  "ms": 121,
+  "count": 100
+ },
+ {
+  "q": "first baptist dallas",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 87,
+  "count": 0
+ },
+ {
+  "q": "first baptist dallas",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 48,
+  "count": 0
+ },
+ {
+  "q": "st mary",
+  "state": null,
+  "status": 200,
+  "ms": 8458,
+  "count": 10
+ },
+ {
+  "q": "st mary",
+  "state": "TX",
+  "status": 200,
+  "ms": 452,
+  "count": 21
+ },
+ {
+  "q": "st mary",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 452,
+  "count": 0
+ },
+ {
+  "q": "st mary",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 244,
+  "count": 0
+ },
+ {
+  "q": "saint mary",
+  "state": null,
+  "status": 200,
+  "ms": 2640,
+  "count": 10
+ },
+ {
+  "q": "saint mary",
+  "state": "TX",
+  "status": 200,
+  "ms": 103,
+  "count": 64
+ },
+ {
+  "q": "saint mary",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 173,
+  "count": 0
+ },
+ {
+  "q": "saint mary",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 52,
+  "count": 0
+ },
+ {
+  "q": "st marys",
+  "state": null,
+  "status": 200,
+  "ms": 13483,
+  "count": 10
+ },
+ {
+  "q": "st marys",
+  "state": "TX",
+  "status": 200,
+  "ms": 520,
+  "count": 1
+ },
+ {
+  "q": "st marys",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 523,
+  "count": 0
+ },
+ {
+  "q": "st marys",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 47,
+  "count": 0
+ },
+ {
+  "q": "community church",
+  "state": null,
+  "status": 200,
+  "ms": 1810,
+  "count": 10
+ },
+ {
+  "q": "community church",
+  "state": "TX",
+  "status": 200,
+  "ms": 118,
+  "count": 100
+ },
+ {
+  "q": "community church",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 101,
+  "count": 0
+ },
+ {
+  "q": "community church",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 56,
+  "count": 0
+ },
+ {
+  "q": "calvary",
+  "state": null,
+  "status": 200,
+  "ms": 365,
+  "count": 10
+ },
+ {
+  "q": "calvary",
+  "state": "TX",
+  "status": 200,
+  "ms": 207,
+  "count": 100
+ },
+ {
+  "q": "calvary",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 110,
+  "count": 0
+ },
+ {
+  "q": "calvary",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 95,
+  "count": 0
+ },
+ {
+  "q": "calvary chapel",
+  "state": null,
+  "status": 200,
+  "ms": 16873,
+  "count": 10
+ },
+ {
+  "q": "calvary chapel",
+  "state": "TX",
+  "status": 200,
+  "ms": 427,
+  "count": 8
+ },
+ {
+  "q": "calvary chapel",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 453,
+  "count": 0
+ },
+ {
+  "q": "calvary chapel",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 45,
+  "count": 0
+ },
+ {
+  "q": "dreifaltigkeit",
+  "state": null,
+  "status": 200,
+  "ms": 19032,
+  "count": 10
+ },
+ {
+  "q": "dreifaltigkeit",
+  "state": "TX",
+  "status": 200,
+  "ms": 414,
+  "count": 0
+ },
+ {
+  "q": "dreifaltigkeit",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 888,
+  "count": 93
+ },
+ {
+  "q": "dreifaltigkeit",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 501,
+  "count": 0
+ },
+ {
+  "q": "evangelische kirche",
+  "state": null,
+  "status": 200,
+  "ms": 8573,
+  "count": 10
+ },
+ {
+  "q": "evangelische kirche",
+  "state": "TX",
+  "status": 200,
+  "ms": 121,
+  "count": 0
+ },
+ {
+  "q": "evangelische kirche",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 469,
+  "count": 61
+ },
+ {
+  "q": "evangelische kirche",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 292,
+  "count": 0
+ },
+ {
+  "q": "parafia",
+  "state": null,
+  "status": 200,
+  "ms": 20488,
+  "count": 10
+ },
+ {
+  "q": "parafia",
+  "state": "TX",
+  "status": 200,
+  "ms": 944,
+  "count": 0
+ },
+ {
+  "q": "parafia",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 478,
+  "count": 0
+ },
+ {
+  "q": "parafia",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 288,
+  "count": 24
+ },
+ {
+  "q": "parafia swietego",
+  "state": null,
+  "status": 200,
+  "ms": 21474,
+  "count": 0
+ },
+ {
+  "q": "parafia swietego",
+  "state": "TX",
+  "status": 200,
+  "ms": 620,
+  "count": 0
+ },
+ {
+  "q": "parafia swietego",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 778,
+  "count": 0
+ },
+ {
+  "q": "parafia swietego",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 332,
+  "count": 0
+ },
+ {
+  "q": "lakewood",
+  "state": null,
+  "status": 200,
+  "ms": 30836,
+  "count": 10
+ },
+ {
+  "q": "lakewood",
+  "state": "TX",
+  "status": 200,
+  "ms": 1788,
+  "count": 9
+ },
+ {
+  "q": "lakewood",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 1508,
+  "count": 0
+ },
+ {
+  "q": "lakewood",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 457,
+  "count": 0
+ },
+ {
+  "q": "baptist",
+  "state": null,
+  "status": 200,
+  "ms": 1348,
+  "count": 10
+ },
+ {
+  "q": "baptist",
+  "state": "TX",
+  "status": 200,
+  "ms": 64,
+  "count": 100
+ },
+ {
+  "q": "baptist",
+  "state": "DEBY",
+  "status": 200,
+  "ms": 164,
+  "count": 100
+ },
+ {
+  "q": "baptist",
+  "state": "PLWP",
+  "status": 200,
+  "ms": 116,
+  "count": 12
+ }
+]
