@@ -119,6 +119,9 @@ describe("meta and routing", () => {
     const { body } = await get("/v1/meta");
     expect(body.completenessWeights.serviceTimes).toBe(25);
     expect(body.contributableFields.email).toBeUndefined();
+    expect(body.contributableFields.pastorName).toBeUndefined();
+    expect(body.contributableFields.name.review).toBe("moderated");
+    expect(body.contributableFields.serviceTimes.review).toBe("live");
     expect(body.counts.churches).toBe(rows.length);
   });
   it("404s other paths and refuses writes", async () => {
