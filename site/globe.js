@@ -30,6 +30,7 @@ export function createGlobe(canvas, data, opts = {}) {
   let idleUntil = 0;
   let visible = true;
   let raf = 0;
+  let drift = 1;
 
   function resize() {
     const r = canvas.getBoundingClientRect();
@@ -159,7 +160,11 @@ export function createGlobe(canvas, data, opts = {}) {
       lng0 = anim.fromLng + anim.dLng * e;
       if (k >= 1) anim = null;
     } else if (!dragging && !reduceMotion() && t > idleUntil && !selected) {
-      lng0 += 0.045;
+      // Sweep between western North America and eastern Europe, where the churches are,
+      // rather than spinning on into an empty Pacific.
+      if (lng0 > 30) drift = -1;
+      else if (lng0 < -125) drift = 1;
+      lng0 += 0.045 * drift;
     }
     draw(t);
     if (visible && (anim || selected || (!reduceMotion() && !dragging))) raf = requestAnimationFrame(frame);
