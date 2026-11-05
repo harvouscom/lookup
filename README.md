@@ -2,7 +2,7 @@
 
 The autofill for your church info: a church typeahead and autofill API, SDK and widget built on the [Here's My Church](https://heresmychurch.com) directory.
 
-Early work. Lexical search is live at `https://hmc-lookup.harvous.workers.dev/v1/search?q=grac`. The address will change to `lookup.heresmychurch.com`.
+Early work. Lexical search is live at `https://lookup.heresmychurch.com/v1/search?q=grac`.
 
 | Path | Contents |
 |---|---|

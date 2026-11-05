@@ -1,6 +1,6 @@
 # Milestone 2: full load, lexical search, eval
 
-Measured 2026-11-05 against production data from the moderated export, at `https://hmc-lookup.harvous.workers.dev`. The planned address, `lookup.heresmychurch.com`, isn't attached yet because that DNS change needs the owner's approval.
+Measured 2026-11-05 against production data from the moderated export, at `https://hmc-lookup.harvous.workers.dev`. The same Worker was then attached at `https://lookup.heresmychurch.com`, and the five must-work queries were re-checked there.
 
 ## Result
 
@@ -131,7 +131,6 @@ Europe sees about 210-340 ms on a miss, and about 65 ms on nodes with a clean ca
 
 ## Not done
 
-- `lookup.heresmychurch.com`, pending approval.
 - A daily rate cap. The 120 per minute per-IP limit is in place, but a daily cap needs storage.
 - Automated sync. The index is a one-time load from the export taken on 2026-11-05. Cron is milestone 3.
 - A check of field integrity on 1,000 random ids against the export, from section 6.
@@ -155,7 +154,7 @@ node scripts/verify-load.mjs <buildDir>
 ```
 
 ```bash
-LOOKUP_URL=https://hmc-lookup.harvous.workers.dev node eval/run.mjs lookup --split test
+node eval/run.mjs lookup --split test
 ```
 
 ```bash
