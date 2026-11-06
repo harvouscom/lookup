@@ -6,7 +6,7 @@
 
 - [Overview](https://lookup.heresmychurch.com/docs/index.md): Lookup is a church search box that fills in your form from Here's My Church. One script tag, an open API, no key.
 - [Quickstart](https://lookup.heresmychurch.com/docs/quickstart.md): Add a church search box that fills in your form. Hand this to your AI agent, or follow three steps yourself.
-- [See it in real apps](https://lookup.heresmychurch.com/docs/examples.md): Three made-up apps built with Lookup, each opening full screen. A church management app, a nonprofit sign-up and a church website builder.
+- [Example apps](https://lookup.heresmychurch.com/docs/examples.md): Made-up apps built with Lookup, using the real widget and live data. A church management app, a nonprofit sign-up and a church website builder.
 - [The widget](https://lookup.heresmychurch.com/docs/widget.md): <church-lookup> is an accessible combobox: it searches as people type and fills your form when they choose.
 - [React and shadcn/ui](https://lookup.heresmychurch.com/docs/react.md): Own the code. Add a ChurchLookup component, a hook and a share-fixes panel to your shadcn app from Lookup's registry.
 - [Service times](https://lookup.heresmychurch.com/docs/service-times.md): Edit a service-times field as rows of day, time and label, while it still submits one plain string.

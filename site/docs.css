@@ -256,3 +256,18 @@ pre.shiki:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px;
   .dx-head h1 { font-size: 1.625rem; }
 }
 @media (prefers-reduced-motion: reduce) { .dx-side { transition: none; } }
+
+/* Example app cards */
+.excards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0 28px; }
+.excard { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px 12px; align-content: start; padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); text-decoration: none; transition: border-color .15s, transform .15s, box-shadow .15s; }
+.excard:hover { border-color: var(--line-2); transform: translateY(-1px); box-shadow: 0 12px 30px -20px rgba(0,0,0,.35); }
+.excard-ic { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px -6px rgba(0,0,0,.5); }
+.excard-ic svg { width: 100%; height: 100%; display: block; }
+.excard-t { display: grid; align-content: center; gap: 1px; }
+.excard-t small { font-family: var(--mono); font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.excard-t b { font-size: 1rem; font-weight: 600; color: var(--text); line-height: 1.25; }
+.excard-d { grid-column: 1 / -1; font-size: .875rem; line-height: 1.55; color: var(--text-2); }
+.excard-tags { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+.excard-tags i { font-style: normal; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); background: var(--side); font-size: .75rem; color: var(--text-2); }
+.excard-go { grid-column: 1 / -1; font-size: .8125rem; font-weight: 600; color: var(--brand); }
+@media (max-width: 640px) { .excards { grid-template-columns: 1fr; } }

@@ -6,7 +6,7 @@ Source: https://lookup.heresmychurch.com/docs/theming
 
 The widget reads its own `--hmc-*` CSS variables. When one isn't set, it falls back to the shadcn/ui token names (`--background`, `--foreground`, `--accent`, `--border`, `--radius` and so on), the same names [Sensible UI](https://sensibleui.com) by [Cam Pak](https://cameronpak.com) uses. So on those pages it matches with no setup. Anywhere else, set a few variables.
 
-Pick a design system church apps are often built on, then drag across to compare it with the default.
+Try it below. The right side has no Lookup CSS at all, only the page's tokens. Pick a set, edit any value or paste a theme from [ui.shadcn.com/themes](https://ui.shadcn.com/themes), then drag across to compare it with no tokens.
 
 ## Variables
 

@@ -97,5 +97,5 @@ Add `client="lookup-demo"` while you build. Corrections people share are checked
 :::cards
 - [The widget](/docs/widget): Attributes, events, icons and the form field, with a live preview.
 - [Theming](/docs/theming): Match your design system with a few CSS variables.
-- [See it in real apps](/docs/examples): Three believable apps built with Lookup.
+- [Example apps](/docs/examples): Three made-up apps built with Lookup.
 :::

@@ -9,7 +9,7 @@ Church tools keep asking people for the same details. Lookup fills them in from 
 ## What you get
 
 - [Quickstart](/docs/quickstart): Add the search box to a form in a few minutes, or hand the job to your agent.
-- [See it in real apps](/docs/examples): A church management app, a nonprofit sign-up and a church website builder.
+- [Example apps](/docs/examples): A church management app, a nonprofit sign-up and a church website builder.
 - [The widget](/docs/widget): Every attribute, event and form option, with a live preview.
 - [API](/docs/api): Search and church records over plain HTTP, with open CORS and no key.
 

@@ -14,50 +14,88 @@ const setTheme = (dark) => {
 themeBtn?.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
 themeBtn?.addEventListener("click", () => setTheme(document.documentElement.dataset.theme !== "dark"));
 
-// ── Theming: a before/after slider with a small token playground ──
+// ── Theming: the widget reads your page's design tokens. Edit them and watch it follow. ──
+// The right side gets no Lookup-specific CSS at all: only the token names shadcn/ui and Sensible UI
+// use (--background, --foreground, --accent, --border, --radius, ...), set on the page around it.
 (function themingPlayground() {
   const ba = $("#ba");
   if (!ba) return;
-  const after = $("#ba-after church-lookup");
   const layer = $("#ba-after");
-  // Common design systems church apps are built on. Each one sets only the tokens the widget reads.
-  const PRESETS = {
-    hmc: { name: "Here's My Church", accent: "#8B5CF6", radius: 14, font: '"Google Sans Flex", ui-sans-serif, sans-serif', mode: "dark" },
-    bootstrap: { name: "Bootstrap", accent: "#0D6EFD", radius: 6, font: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', mode: "light", page: "#FFFFFF", border: "#DEE2E6", input: "#CED4DA", muted: "#6C757D", text: "#212529" },
-    material: { name: "Material", accent: "#6750A4", radius: 4, font: 'Roboto, "Helvetica Neue", Arial, sans-serif', mode: "light", page: "#FEF7FF", popover: "#F3EDF7", border: "#CAC4D0", input: "#79747E", muted: "#49454F", text: "#1D1B20" },
-    apple: { name: "Apple", accent: "#007AFF", radius: 10, font: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif', mode: "light", page: "#F2F2F7", border: "#E5E5EA", input: "#D1D1D6", muted: "#6E6E73", text: "#1C1C1E" },
-    tailwind: { name: "Tailwind", accent: "#4F46E5", radius: 6, font: 'Inter, ui-sans-serif, system-ui, sans-serif', mode: "light", page: "#F9FAFB", border: "#E5E7EB", input: "#D1D5DB", muted: "#6B7280", text: "#111827" },
+  const box = $("#ba-tokens");
+  const SETS = {
+    light: { name: "shadcn/ui light", scheme: "light", css: `--background: oklch(1 0 0);
+--foreground: oklch(0.145 0 0);
+--popover: oklch(1 0 0);
+--popover-foreground: oklch(0.145 0 0);
+--accent: oklch(0.97 0 0);
+--accent-foreground: oklch(0.205 0 0);
+--muted-foreground: oklch(0.556 0 0);
+--border: oklch(0.922 0 0);
+--input: oklch(0.922 0 0);
+--ring: oklch(0.708 0 0);
+--radius: 0.625rem;` },
+    dark: { name: "shadcn/ui dark", scheme: "dark", css: `--background: oklch(0.145 0 0);
+--foreground: oklch(0.985 0 0);
+--popover: oklch(0.205 0 0);
+--popover-foreground: oklch(0.985 0 0);
+--accent: oklch(0.269 0 0);
+--accent-foreground: oklch(0.985 0 0);
+--muted-foreground: oklch(0.708 0 0);
+--border: oklch(1 0 0 / 10%);
+--input: oklch(1 0 0 / 15%);
+--ring: oklch(0.556 0 0);
+--radius: 0.625rem;` },
+    rose: { name: "Rose", scheme: "light", css: `--background: oklch(0.99 0.004 20);
+--foreground: oklch(0.2 0.02 15);
+--popover: oklch(1 0 0);
+--popover-foreground: oklch(0.2 0.02 15);
+--accent: oklch(0.95 0.035 15);
+--accent-foreground: oklch(0.42 0.16 15);
+--muted-foreground: oklch(0.5 0.03 15);
+--border: oklch(0.91 0.02 15);
+--input: oklch(0.82 0.06 15);
+--ring: oklch(0.6 0.2 15);
+--radius: 1.25rem;` },
+    ocean: { name: "Ocean", scheme: "dark", css: `--background: oklch(0.24 0.045 245);
+--foreground: oklch(0.97 0.01 245);
+--popover: oklch(0.28 0.05 245);
+--popover-foreground: oklch(0.97 0.01 245);
+--accent: oklch(0.38 0.09 240);
+--accent-foreground: oklch(0.99 0 0);
+--muted-foreground: oklch(0.78 0.04 245);
+--border: oklch(1 0 0 / 12%);
+--input: oklch(1 0 0 / 22%);
+--ring: oklch(0.75 0.14 225);
+--radius: 0.25rem;` },
   };
-  let state = PRESETS.hmc;
-  const mix = (c, p, base) => `color-mix(in oklab, ${c} ${p}%, ${base})`;
-  function tokens() {
-    const { accent: a, radius: r, mode } = state;
-    if (mode === "dark") return {
-      "--hmc-bg": mix(a, 12, "#110C20"), "--hmc-popover": mix(a, 14, "#140E26"), "--hmc-text": "#FFFFFF", "--hmc-popover-text": "#FFFFFF",
-      "--hmc-muted": "#B8B2CC", "--hmc-border": mix(a, 28, "#2A2340"), "--hmc-input-border": mix(a, 45, "#2A2340"),
-      "--hmc-accent": mix(a, 55, "white"), "--hmc-active-bg": mix(a, 32, "transparent"), "--hmc-active-text": "#FFFFFF", "--hmc-radius": `${r}px`,
-    };
-    return {
-      "--hmc-bg": "#FFFFFF", "--hmc-popover": state.popover ?? "#FFFFFF", "--hmc-text": state.text, "--hmc-popover-text": state.text,
-      "--hmc-muted": state.muted, "--hmc-border": state.border, "--hmc-input-border": state.input,
-      "--hmc-accent": a, "--hmc-active-bg": mix(a, 12, "white"), "--hmc-active-text": state.text, "--hmc-radius": `${r}px`,
-    };
+  let set = "light";
+  let applied = [];
+  // Older shadcn themes write colors as bare HSL parts ("222 47% 11%"); wrap those in hsl().
+  const fix = (v) => (/^-?[\d.]+\s+[\d.]+%\s+[\d.]+%(\s*\/\s*[\d.]+%?)?$/.test(v) ? `hsl(${v})` : v);
+  function apply() {
+    for (const k of applied) layer.style.removeProperty(k);
+    applied = [];
+    for (const m of box.value.matchAll(/(--[\w-]+)\s*:\s*([^;]+);?/g)) {
+      layer.style.setProperty(m[1], fix(m[2].trim()));
+      applied.push(m[1]);
+    }
+    const preset = SETS[set];
+    layer.style.colorScheme = preset && box.value === preset.css ? preset.scheme : "normal";
+    $("#ba-tag").textContent = preset && box.value === preset.css ? preset.name : "your tokens";
   }
-  function render() {
-    const t = tokens();
-    for (const [k, v] of Object.entries(t)) after.style.setProperty(k, v);
-    after.style.fontFamily = state.font;
-    after.style.colorScheme = state.mode;
-    layer.dataset.mode = state.mode;
-    layer.style.setProperty("--ba-bg", state.mode === "dark" ? mix(state.accent, 16, "#0B0814") : state.page);
-    $("#ba-tag").textContent = state.name;
-    for (const b of $$("[data-preset]")) b.setAttribute("aria-pressed", String(PRESETS[b.dataset.preset] === state));
-    const lines = Object.entries(t).map(([k, v]) => `    ${k}: ${v};`);
-    $("#ba-css").textContent = `<style>\n  church-lookup {\n${lines.join("\n")}\n    font-family: ${state.font};\n  }\n</style>\n<church-lookup label="Your church"></church-lookup>`;
+  function pick(key) {
+    set = key;
+    box.value = SETS[key].css;
+    for (const b of $$("[data-tokens]")) b.setAttribute("aria-pressed", String(b.dataset.tokens === key));
+    apply();
   }
-  $$("[data-preset]").forEach((b) => b.addEventListener("click", () => { state = PRESETS[b.dataset.preset]; render(); }));
+  $$("[data-tokens]").forEach((b) => b.addEventListener("click", () => pick(b.dataset.tokens)));
+  box.addEventListener("input", () => {
+    for (const b of $$("[data-tokens]")) b.setAttribute("aria-pressed", String(SETS[b.dataset.tokens].css === box.value));
+    apply();
+  });
   $("#ba-range").addEventListener("input", (e) => ba.style.setProperty("--pos", `${e.target.value}%`));
-  render();
+  pick("light");
   // Open both widgets on the same search the first time the slider comes into view.
   new IntersectionObserver(([e], io) => {
     if (!e.isIntersecting) return;

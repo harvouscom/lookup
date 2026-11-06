@@ -136,8 +136,8 @@
   </section>
 
   <section id="examples" aria-labelledby="ex-h">
-    <h2 id="ex-h">See it in real apps</h2>
-    <p>Three made-up apps using the real widget and live data. Each opens full screen, in demo mode, so nothing you share is sent.</p>
+    <h2 id="ex-h">Try it in example apps</h2>
+    <p>Three made-up apps built on the real widget and live data. Each opens full screen, in demo mode, so nothing you share is sent.</p>
     <ul class="exs">
       <li><button type="button" class="ex-card" data-ex="kinship" aria-label="Open the Kinship example">
         <span class="ex-thumb ex-kinship" aria-hidden="true"><span class="ext-bar"><i></i><i></i><i></i></span><span class="ext-body"><span class="ext-side"><i></i><i class="on"></i><i></i><i></i></span><span class="ext-main"><b></b><em></em><span class="ext-fields"><i></i><i></i><i></i><i></i></span><span class="ext-btn"></span></span></span></span>
@@ -232,11 +232,11 @@ pnpm dlx shadcn@latest add <span class="s">https://lookup.heresmychurch.com/r/ch
 
   <section id="theming" aria-labelledby="theme-h">
     <h2 id="theme-h">Fits your design system</h2>
-    <p>The widget reads its own <code>--hmc-*</code> CSS variables, and falls back to the shadcn/ui token names that <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://cameronpak.com">Cam Pak</a> also uses, so on those pages it matches with no setup. Pick a design system church apps are often built on, then drag across to compare.</p>
+    <p>The widget reads its own <code>--hmc-*</code> CSS variables, and falls back to the shadcn/ui token names that <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://cameronpak.com">Cam Pak</a> also uses, so on those pages it matches with no setup. Try it: the right side has no Lookup CSS at all, only your page&#8217;s tokens. Pick a set or edit any value, then drag across to compare with no tokens.</p>
     <div class="frame"><div class="frame-in flush ba-wrap">
       <div class="ba" id="ba" style="--pos: 50%">
         <div class="ba-layer ba-before" inert>
-          <span class="ba-tag">default</span>
+          <span class="ba-tag">no tokens</span>
           <div class="ba-form"><church-lookup label="Your church" placeholder="Search for a church" geo="off" limit="3"></church-lookup></div>
         </div>
         <div class="ba-layer ba-after" id="ba-after" inert>
@@ -248,17 +248,17 @@ pnpm dlx shadcn@latest add <span class="s">https://lookup.heresmychurch.com/r/ch
       </div>
       <div class="ba-controls">
         <div class="ba-group" role="group" aria-labelledby="ba-presets-l">
-          <span class="ba-l" id="ba-presets-l">design system</span>
-          <button type="button" class="ba-chip" data-preset="hmc" aria-pressed="true">Here's My Church</button>
-          <button type="button" class="ba-chip" data-preset="bootstrap" aria-pressed="false">Bootstrap</button>
-          <button type="button" class="ba-chip" data-preset="material" aria-pressed="false">Material</button>
-          <button type="button" class="ba-chip" data-preset="apple" aria-pressed="false">Apple</button>
-          <button type="button" class="ba-chip" data-preset="tailwind" aria-pressed="false">Tailwind</button>
+          <span class="ba-l" id="ba-presets-l">your page's tokens</span>
+          <button type="button" class="ba-chip" data-tokens="light" aria-pressed="true">shadcn/ui light</button>
+          <button type="button" class="ba-chip" data-tokens="dark" aria-pressed="false">shadcn/ui dark</button>
+          <button type="button" class="ba-chip" data-tokens="rose" aria-pressed="false">Rose</button>
+          <button type="button" class="ba-chip" data-tokens="ocean" aria-pressed="false">Ocean</button>
         </div>
+        <label class="ba-edit" for="ba-tokens"><span class="ba-l">edit them, or paste a shadcn/ui theme</span></label>
+        <textarea id="ba-tokens" class="ba-tokens" rows="11" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
       </div>
     </div></div>
-    <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html · your tokens</span><button class="copy" type="button">copy</button></div>
-<pre tabindex="0"><code id="ba-css"></code></pre></div></div>
+    
     <p class="more"><a href="/docs/theming">Theming docs<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
   </section>
 </main>

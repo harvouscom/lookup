@@ -5,13 +5,13 @@ description: Match your design system with a few CSS variables. On pages with sh
 
 The widget reads its own `--hmc-*` CSS variables. When one isn't set, it falls back to the shadcn/ui token names (`--background`, `--foreground`, `--accent`, `--border`, `--radius` and so on), the same names [Sensible UI](https://sensibleui.com) by [Cam Pak](https://cameronpak.com) uses. So on those pages it matches with no setup. Anywhere else, set a few variables.
 
-Pick a design system church apps are often built on, then drag across to compare it with the default.
+Try it below. The right side has no Lookup CSS at all, only the page's tokens. Pick a set, edit any value or paste a theme from [ui.shadcn.com/themes](https://ui.shadcn.com/themes), then drag across to compare it with no tokens.
 
 :::html
 <div class="frame"><div class="frame-in flush ba-wrap">
       <div class="ba" id="ba" style="--pos: 50%">
         <div class="ba-layer ba-before" inert>
-          <span class="ba-tag">default</span>
+          <span class="ba-tag">no tokens</span>
           <div class="ba-form"><church-lookup label="Your church" placeholder="Search for a church" geo="off" limit="3"></church-lookup></div>
         </div>
         <div class="ba-layer ba-after" id="ba-after" inert>
@@ -23,16 +23,17 @@ Pick a design system church apps are often built on, then drag across to compare
       </div>
       <div class="ba-controls">
         <div class="ba-group" role="group" aria-labelledby="ba-presets-l">
-          <span class="ba-l" id="ba-presets-l">design system</span>
-          <button type="button" class="ba-chip" data-preset="hmc" aria-pressed="true">Here's My Church</button>
-          <button type="button" class="ba-chip" data-preset="bootstrap" aria-pressed="false">Bootstrap</button>
-          <button type="button" class="ba-chip" data-preset="material" aria-pressed="false">Material</button>
-          <button type="button" class="ba-chip" data-preset="apple" aria-pressed="false">Apple</button>
-          <button type="button" class="ba-chip" data-preset="tailwind" aria-pressed="false">Tailwind</button>
+          <span class="ba-l" id="ba-presets-l">your page's tokens</span>
+          <button type="button" class="ba-chip" data-tokens="light" aria-pressed="true">shadcn/ui light</button>
+          <button type="button" class="ba-chip" data-tokens="dark" aria-pressed="false">shadcn/ui dark</button>
+          <button type="button" class="ba-chip" data-tokens="rose" aria-pressed="false">Rose</button>
+          <button type="button" class="ba-chip" data-tokens="ocean" aria-pressed="false">Ocean</button>
         </div>
+        <label class="ba-edit" for="ba-tokens"><span class="ba-l">edit them, or paste a shadcn/ui theme</span></label>
+        <textarea id="ba-tokens" class="ba-tokens" rows="11" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
       </div>
     </div></div>
-    <div class="cb"><div class="cb-bar"><span class="cb-l">html · your tokens</span><button class="copy cb-copy" type="button">Copy</button></div><pre class="shiki" tabindex="0"><code id="ba-css"></code></pre></div>
+    
 :::
 
 ## Variables

@@ -53,11 +53,11 @@
     <p class="dx-desc">Match your design system with a few CSS variables. On pages with shadcn/ui-style tokens, it matches with no setup.</p>
     <article class="dx-prose">
 <p>The widget reads its own <code>--hmc-*</code> CSS variables. When one isn&#39;t set, it falls back to the shadcn/ui token names (<code>--background</code>, <code>--foreground</code>, <code>--accent</code>, <code>--border</code>, <code>--radius</code> and so on), the same names <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://cameronpak.com">Cam Pak</a> uses. So on those pages it matches with no setup. Anywhere else, set a few variables.</p>
-<p>Pick a design system church apps are often built on, then drag across to compare it with the default.</p>
+<p>Try it below. The right side has no Lookup CSS at all, only the page&#39;s tokens. Pick a set, edit any value or paste a theme from <a href="https://ui.shadcn.com/themes">ui.shadcn.com/themes</a>, then drag across to compare it with no tokens.</p>
 <div class="frame"><div class="frame-in flush ba-wrap">
       <div class="ba" id="ba" style="--pos: 50%">
         <div class="ba-layer ba-before" inert>
-          <span class="ba-tag">default</span>
+          <span class="ba-tag">no tokens</span>
           <div class="ba-form"><church-lookup label="Your church" placeholder="Search for a church" geo="off" limit="3"></church-lookup></div>
         </div>
         <div class="ba-layer ba-after" id="ba-after" inert>
@@ -69,16 +69,17 @@
       </div>
       <div class="ba-controls">
         <div class="ba-group" role="group" aria-labelledby="ba-presets-l">
-          <span class="ba-l" id="ba-presets-l">design system</span>
-          <button type="button" class="ba-chip" data-preset="hmc" aria-pressed="true">Here's My Church</button>
-          <button type="button" class="ba-chip" data-preset="bootstrap" aria-pressed="false">Bootstrap</button>
-          <button type="button" class="ba-chip" data-preset="material" aria-pressed="false">Material</button>
-          <button type="button" class="ba-chip" data-preset="apple" aria-pressed="false">Apple</button>
-          <button type="button" class="ba-chip" data-preset="tailwind" aria-pressed="false">Tailwind</button>
+          <span class="ba-l" id="ba-presets-l">your page's tokens</span>
+          <button type="button" class="ba-chip" data-tokens="light" aria-pressed="true">shadcn/ui light</button>
+          <button type="button" class="ba-chip" data-tokens="dark" aria-pressed="false">shadcn/ui dark</button>
+          <button type="button" class="ba-chip" data-tokens="rose" aria-pressed="false">Rose</button>
+          <button type="button" class="ba-chip" data-tokens="ocean" aria-pressed="false">Ocean</button>
         </div>
+        <label class="ba-edit" for="ba-tokens"><span class="ba-l">edit them, or paste a shadcn/ui theme</span></label>
+        <textarea id="ba-tokens" class="ba-tokens" rows="11" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
       </div>
     </div></div>
-    <div class="cb"><div class="cb-bar"><span class="cb-l">html · your tokens</span><button class="copy cb-copy" type="button">Copy</button></div><pre class="shiki" tabindex="0"><code id="ba-css"></code></pre></div>
+    
 
 <h2 id="variables"><a class="hash" href="#variables" aria-hidden="true" tabindex="-1">#</a>Variables</h2>
 <div class="tw" tabindex="0" role="region" aria-label="Variable, Falls back to, Used for"><table><thead><tr><th>Variable</th><th>Falls back to</th><th>Used for</th></tr></thead><tbody><tr><td><code>--hmc-bg</code></td><td><code>--background</code></td><td>The input background</td></tr><tr><td><code>--hmc-text</code></td><td><code>--foreground</code></td><td>Text</td></tr><tr><td><code>--hmc-popover</code>, <code>--hmc-popover-text</code></td><td><code>--popover</code>, <code>--popover-foreground</code></td><td>The results list</td></tr><tr><td><code>--hmc-border</code></td><td><code>--border</code></td><td>The results list border</td></tr><tr><td><code>--hmc-input-border</code></td><td><code>--input</code></td><td>The input border</td></tr><tr><td><code>--hmc-accent</code></td><td><code>--ring</code></td><td>Focus ring and icons</td></tr><tr><td><code>--hmc-active-bg</code>, <code>--hmc-active-text</code></td><td><code>--accent</code>, <code>--accent-foreground</code></td><td>The highlighted result</td></tr><tr><td><code>--hmc-muted</code></td><td><code>--muted-foreground</code></td><td>Secondary text</td></tr><tr><td><code>--hmc-radius</code></td><td><code>--radius</code></td><td>Corners</td></tr></tbody></table></div><p>The widget also takes your page&#39;s font. For anything else, style its parts with <code>::part(label)</code>, <code>::part(input)</code> and <code>::part(popup)</code>.</p>
