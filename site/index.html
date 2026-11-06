@@ -59,7 +59,13 @@
     </form>
     <p class="meta"><span data-stat="churches">587,842</span> churches <i>·</i> <span data-stat="countries">19</span> countries <i>·</i> ~170 ms <i>·</i> no api key</p>
   </div>
-  <div class="horizon" aria-hidden="true"><canvas id="globe"></canvas></div>
+  <div class="horizon" aria-hidden="true">
+    <span class="orbit o1"></span><span class="orbit o2"></span>
+    <canvas id="globe"></canvas>
+    <div class="tags" id="tags"></div>
+    <p class="hud hud-l"><i></i>live index <b data-stat="churches">587,842</b> churches</p>
+    <p class="hud hud-r" id="hud-q">drag to turn the globe</p>
+  </div>
 </header>
 
 <main class="docs" id="docs">

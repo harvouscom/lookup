@@ -177,6 +177,14 @@ export function createGlobe(canvas, data, opts = {}) {
     }
   }
 
+  // Where a point sits on screen right now, in CSS pixels, so HTML labels can follow the globe.
+  function screen(la, lo) {
+    const { R, cx, cy } = geometry();
+    const sinLat0 = Math.sin(lat0 * RAD), cosLat0 = Math.cos(lat0 * RAD);
+    const [x, y, c] = project(Math.sin(la * RAD), Math.cos(la * RAD), lo * RAD, sinLat0, cosLat0, Math.cos(lng0 * RAD), Math.sin(lng0 * RAD));
+    return { x: (cx + x * R) / dpr, y: (cy - y * R) / dpr, visible: c > 0.05 };
+  }
+
   function dot(x, y, r, fill, ring, ringColor = "#0A0618") {
     ctx.beginPath();
     ctx.arc(x, y, r + ring, 0, Math.PI * 2);
@@ -204,6 +212,7 @@ export function createGlobe(canvas, data, opts = {}) {
       lng0 += 0.04 * drift;
     }
     draw(t);
+    opts.onFrame?.(screen);
     if (visible && !reduceMotion() && !dragging) raf = requestAnimationFrame(frame);
     else if (visible && anim) raf = requestAnimationFrame(frame);
   }
@@ -223,6 +232,7 @@ export function createGlobe(canvas, data, opts = {}) {
     lng0 = dragging.lng0 - (e.clientX - dragging.x) * k;
     lat0 = Math.max(-60, Math.min(70, dragging.lat0 + (e.clientY - dragging.y) * k));
     draw();
+    opts.onFrame?.(screen);
   });
   const end = () => { dragging = null; idleUntil = performance.now() + 2500; wake(); };
   canvas.addEventListener("pointerup", end);
@@ -236,10 +246,12 @@ export function createGlobe(canvas, data, opts = {}) {
 
   return {
     particles: n,
+    screen,
     setPins(list) {
       pins = list.filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
       if (!selected && pins.length && !dragging) this.flyTo(pins[0].lat, pins[0].lng, { soft: true });
       draw();
+      opts.onFrame?.(screen);
       wake();
     },
     select(p) {
@@ -252,7 +264,7 @@ export function createGlobe(canvas, data, opts = {}) {
       const toLat = Math.max(-60, Math.min(70, la));
       const dLng = ((lo - lng0 + 540) % 360) - 180;
       if (reduceMotion()) {
-        lat0 = toLat; lng0 += dLng; anim = null; draw(); return;
+        lat0 = toLat; lng0 += dLng; anim = null; draw(); opts.onFrame?.(screen); return;
       }
       // While typing, only drift toward results; a pick gets the full flight.
       const ms = soft ? 900 : 1400;

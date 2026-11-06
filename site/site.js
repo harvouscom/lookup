@@ -14,7 +14,7 @@ let globe = null;
 fetch("/data/globe.json")
   .then((r) => r.json())
   // A pick is aimed south of the church, so its pin rises into the visible top of the globe.
-  .then((data) => { globe = createGlobe($("#globe"), data, { lat: 10, lng: -45, pinOffset: small() ? 40 : 48 }); })
+  .then((data) => { globe = createGlobe($("#globe"), data, { lat: 10, lng: -45, pinOffset: small() ? 40 : 48, onFrame: placeTags }); })
   .catch(() => { $(".horizon").hidden = true; });
 
 fetch("/v1/meta")
@@ -25,8 +25,37 @@ fetch("/v1/meta")
   })
   .catch(() => {});
 
+// Labels pinned to churches on the globe. They follow it every frame and hide on the far side.
+const tagLayer = $("#tags");
+const hud = $("#hud-q");
+let tags = [];
+function showTags(list) {
+  tagLayer.replaceChildren();
+  tags = list.map((t) => {
+    const el = document.createElement("div");
+    el.className = t.big ? "tag big" : "tag";
+    el.textContent = t.text;
+    if (t.big) { const sub = document.createElement("small"); sub.textContent = t.sub ?? ""; el.append(sub); }
+    tagLayer.append(el);
+    return { ...t, el };
+  });
+  if (globe) placeTags(globe.screen);
+}
+function placeTags(screen) {
+  const h = tagLayer.clientHeight;
+  for (const t of tags) {
+    const p = screen(t.lat, t.lng);
+    const on = p.visible && p.y > 24 && p.y < h - 8;
+    t.el.style.opacity = on ? "1" : "0";
+    t.el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, calc(-100% - ${t.big ? 18 : 12}px))`;
+  }
+}
+
 hero.addEventListener("church-results", (e) => {
-  globe?.setPins(e.detail.results.map((r) => ({ lat: r.latitude, lng: r.longitude })));
+  const { query, results } = e.detail;
+  globe?.setPins(results.map((r) => ({ lat: r.latitude, lng: r.longitude })));
+  showTags(results.slice(0, 4).map((r) => ({ lat: r.latitude, lng: r.longitude, text: r.name })));
+  hud.textContent = `"${query}" → ${results.length} ${results.length === 1 ? "church" : "churches"}`;
 });
 hero.addEventListener("church-select", (e) => {
   const r = e.detail.result;
@@ -37,6 +66,8 @@ hero.addEventListener("church-select", (e) => {
   $$("input", card).forEach((i) => { i.value = ""; i.placeholder = "…"; });
   $("#result-foot").textContent = "";
   card.hidden = false;
+  showTags([{ lat: r.latitude, lng: r.longitude, text: r.name, sub: r.locationLabel, big: true }]);
+  hud.textContent = `flying to ${r.city || r.nearestPlace || r.regionName}…`;
 });
 hero.addEventListener("church-fill", (e) => {
   const { changes } = e.detail;
@@ -47,6 +78,9 @@ hero.addEventListener("church-fill", (e) => {
     void card.offsetWidth;
     card.classList.add("go");
     $("#result-foot").textContent = `filled ${changes.length} fields from here's my church`;
+    const big = $(".tag.big small", tagLayer);
+    if (big) big.textContent = `${changes.length} fields filled`;
+    hud.textContent = `filled ${changes.length} fields`;
   });
 });
 
