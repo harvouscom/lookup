@@ -51,7 +51,6 @@
     <span class="orbit o1"></span><span class="orbit o2"></span>
     <canvas id="globe"></canvas>
     <div class="tags" id="tags"></div>
-    <p class="hud hud-l"><i></i>live index <b data-stat="churches">587,842</b> churches</p>
     <p class="hud hud-r" id="hud-q">drag to turn the globe</p>
   </div>
 </header>
@@ -119,6 +118,7 @@
 
 <main class="docs" id="docs">
   <nav class="index" aria-label="On this page">
+    <p class="index-h" aria-hidden="true">on this page</p>
     <a href="#overview"><i>01</i> overview</a>
     <a href="#quickstart"><i>02</i> quickstart</a>
     <a href="#widget"><i>03</i> widget</a>
@@ -130,18 +130,18 @@
   </nav>
 
   <section id="overview" aria-labelledby="overview-h">
-    <p class="num">01</p>
+    <p class="num" aria-hidden="true"><span>01</span>overview</p>
     <h2 id="overview-h">Stop retyping church details</h2>
     <p class="lead">Church tools keep asking people for the same details. Lookup fills them in from <a href="https://heresmychurch.com">Here's My Church</a>, an open directory of 587,842 churches in 19 countries.</p>
-    <ul class="rows">
-      <li><b>Search as you type</b><span>Prefixes, typos and places like "church in dallas" all work, nearby churches first.</span></li>
-      <li><b>Fill your form</b><span>Pick a church and empty fields fill in. Anything already typed is left alone.</span></li>
-      <li><b>Share fixes back</b><span>Corrections made in your app flow back to the directory. <em>Coming next.</em></span></li>
+    <ul class="features">
+      <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 12.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM14.5 14.5l-3.6-3.6"/></svg></span><b>Search as you type</b><span>Prefixes, typos and places like "church in dallas" all work, nearby churches first.</span></li>
+      <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h6M11 11.5l1.5 1.5 2.5-3"/></svg></span><b>Fill your form</b><span>Pick a church and empty fields fill in. Anything already typed is left alone.</span></li>
+      <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 6A5.5 5.5 0 0 0 3.2 4.6M2.5 2v3h3M2.5 10a5.5 5.5 0 0 0 10.3 1.4M13.5 14v-3h-3"/></svg></span><b>Share fixes back <em>next</em></b><span>Corrections made in your app flow back to the directory.</span></li>
     </ul>
   </section>
 
   <section id="quickstart" aria-labelledby="quickstart-h">
-    <p class="num">02</p>
+    <p class="num" aria-hidden="true"><span>02</span>quickstart</p>
     <h2 id="quickstart-h">Quickstart</h2>
     <p>Add the script, put <code>&lt;church-lookup&gt;</code> in your form, and mark the fields it should fill with <code>data-hmc-field</code>. There's no key to request.</p>
     <div class="frame"><div class="frame-in code" data-tabs>
@@ -182,7 +182,7 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="widget" aria-labelledby="widget-h">
-    <p class="num">03</p>
+    <p class="num" aria-hidden="true"><span>03</span>widget</p>
     <h2 id="widget-h">The widget</h2>
     <p><code>&lt;church-lookup&gt;</code> is an accessible combobox. It searches as people type, asks for smarter results when they pause, and fills your form when they choose.</p>
     <h3>Attributes</h3>
@@ -203,11 +203,11 @@ npm install @heresmychurch/lookup</code></pre>
       <div><dt><code>church-select</code></dt><dd>A church was chosen. Cancel it to stop the fill.</dd></div>
       <div><dt><code>church-fill</code></dt><dd>Fields are about to fill. Cancel it to fill them yourself from <code>detail.record</code>.</dd></div>
     </dl>
-    <p class="muted">An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. Results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.</p>
+    <p class="note">An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. Results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.</p>
   </section>
 
   <section id="service-times" aria-labelledby="st-h">
-    <p class="num">04</p>
+    <p class="num" aria-hidden="true"><span>04</span>service times</p>
     <h2 id="st-h">Service times</h2>
     <p>Wrap a service-times field in <code>&lt;church-service-times&gt;</code> to edit it as rows of day, time and label, the same way Here's My Church does. The field keeps one plain string, such as <code>Sun 9:00 AM (Main Service); Wed 7:00 PM</code>, so it submits like any input.</p>
     <div class="frame"><div class="frame-in demo">
@@ -221,12 +221,12 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="theming" aria-labelledby="theme-h">
-    <p class="num">05</p>
+    <p class="num" aria-hidden="true"><span>05</span>theming</p>
     <h2 id="theme-h">Theming</h2>
     <p>The widget takes colors, corners and fonts from CSS variables. On a page using <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://github.com/cameronapak">Cam Pak</a>, or any shadcn/ui-style tokens, it matches with no setup.</p>
     <div class="frame"><div class="frame-in flush">
-      <div class="frame-bar"><span>three looks: here's my church, out of the box, your design system</span><a href="/examples/autofill">open ↗</a></div>
-      <iframe src="/examples/autofill" title="Theming example with three looks" loading="lazy"></iframe>
+      <div class="frame-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>three looks: here's my church, out of the box, your design system</span><a href="/examples/autofill">open ↗</a></div>
+      <iframe src="/examples/autofill" title="Theming example with three looks"></iframe>
     </div></div>
     <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">css</span><button class="copy" type="button">copy</button></div>
 <pre tabindex="0"><code>church-lookup, church-service-times {
@@ -237,7 +237,7 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="api" aria-labelledby="api-h">
-    <p class="num">06</p>
+    <p class="num" aria-hidden="true"><span>06</span>api</p>
     <h2 id="api-h">API</h2>
     <p>Base URL <code>https://lookup.heresmychurch.com/v1</code>. Open CORS, no key, no cookies.</p>
     <h3><span class="verb">GET</span> /v1/search</h3>
@@ -267,11 +267,11 @@ npm install @heresmychurch/lookup</code></pre>
     <p>The autofill record. Every key in <code>fields</code> is always present, with <code>null</code> or <code>[]</code> when empty, plus <code>missing</code>, <code>completeness</code> and <code>hints</code>.</p>
     <h3><span class="verb">GET</span> /v1/meta</h3>
     <p>Field names, what can be contributed and how it's reviewed, completeness weights, counts and attribution.</p>
-    <p class="muted">120 searches and 30 semantic searches a minute per visitor. Over the limit returns <code>429</code>, a busy database returns <code>503</code>, and both send <code>Retry-After</code>.</p>
+    <p class="note">120 searches and 30 semantic searches a minute per visitor. Over the limit returns <code>429</code>, a busy database returns <code>503</code>, and both send <code>Retry-After</code>.</p>
   </section>
 
   <section id="how-search-works" aria-labelledby="how-h">
-    <p class="num">07</p>
+    <p class="num" aria-hidden="true"><span>07</span>how search works</p>
     <h2 id="how-h">How search works</h2>
     <ol class="flow">
       <li><b>Words, as you type.</b> A full-text index finds names that start with what's typed: nearby first, then wider, then the whole country.</li>
@@ -285,14 +285,14 @@ npm install @heresmychurch/lookup</code></pre>
       <tbody>
         <tr><td>Today's search</td><td class="num">28%</td><td class="num">31%</td><td class="num">41%</td><td class="num">20 s</td></tr>
         <tr><td>Lookup, words only</td><td class="num">78%</td><td class="num">85%</td><td class="num">1%</td><td class="num">150 ms</td></tr>
-        <tr><td>Lookup, with semantic</td><td class="num win">78%</td><td class="num win">87%</td><td class="num win">0%</td><td class="num">170 ms</td></tr>
+        <tr><td>Lookup, with semantic</td><td class="num best">78%</td><td class="num best">87%</td><td class="num best">0%</td><td class="num">170 ms</td></tr>
       </tbody>
     </table></div></div>
-    <p class="muted">Semantic search helped two queries in 78 and hurt none. It doesn't fix translations such as "trinity church munich", and common names with no location stay hard. <a href="https://github.com/harvouscom/lookup/tree/main/eval/results">Full write-up</a>.</p>
+    <p class="note">Semantic search helped two queries in 78 and hurt none. It doesn't fix translations such as "trinity church munich", and common names with no location stay hard. <a href="https://github.com/harvouscom/lookup/tree/main/eval/results">Full write-up</a>.</p>
   </section>
 
   <section id="data" aria-labelledby="data-h">
-    <p class="num">08</p>
+    <p class="num" aria-hidden="true"><span>08</span>data</p>
     <h2 id="data-h">Data and review</h2>
     <p>Lookup reads Here's My Church's reviewed listings and re-syncs changed regions every 5 minutes. Searches aren't logged, and approximate location is only used in memory to rank nearby churches.</p>
     <h3>Sharing fixes back <span class="soon">coming next</span></h3>
@@ -308,8 +308,16 @@ npm install @heresmychurch/lookup</code></pre>
 
 <footer class="foot">
   <div class="foot-in">
-    <a class="brand" href="/"><img src="/brand/mark.svg" alt="" width="22" height="22"><span>lookup</span></a>
-    <p>Built on <a href="https://heresmychurch.com">Here's My Church</a>. Data from OpenStreetMap contributors (ODbL) and Here's My Church contributors. Theming example styled with <a href="https://sensibleui.com">Sensible UI</a> by Cam Pak. <a href="https://github.com/harvouscom/lookup">MIT on GitHub</a>.</p>
+    <div class="foot-brand">
+      <a class="brand" href="/"><img src="/brand/mark.svg" alt="" width="24" height="24"><span>lookup</span></a>
+      <p>Church details, filled in. Built on <a href="https://heresmychurch.com">Here's My Church</a> for the AI for Church hackathon.</p>
+    </div>
+    <nav class="foot-cols" aria-label="Footer">
+      <div><p class="foot-h">Docs</p><a href="#quickstart">Quickstart</a><a href="#widget">Widget</a><a href="#theming">Theming</a><a href="#api">API</a></div>
+      <div><p class="foot-h">Project</p><a href="https://github.com/harvouscom/lookup">GitHub</a><a href="https://github.com/harvouscom/lookup/tree/main/eval/results">Eval results</a><a href="https://heresmychurch.com">Here's My Church</a></div>
+      <div><p class="foot-h">Thanks</p><a href="https://sensibleui.com">Sensible UI</a><a href="https://github.com/cameronapak">Cam Pak</a><a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a></div>
+    </nav>
+    <p class="foot-legal">Data from OpenStreetMap contributors (ODbL) and Here's My Church contributors. Theming example styled with Sensible UI by Cam Pak. MIT licensed.</p>
   </div>
 </footer>
 

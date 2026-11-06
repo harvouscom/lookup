@@ -141,6 +141,26 @@ function logEvent(name, text, replace = false) {
   while (log.children.length > 4) log.firstElementChild.remove();
 }
 
+// ── Theming example: size the frame to its content so it never scrolls on its own ──
+const demoFrame = $("#theming iframe");
+function fitFrame() {
+  try {
+    const doc = demoFrame.contentDocument;
+    if (!doc?.body) return;
+    const bottom = Math.max(0, ...[...doc.body.children].map((el) => el.getBoundingClientRect().bottom));
+    const pad = parseFloat(getComputedStyle(doc.body).paddingBottom) || 0;
+    if (bottom) demoFrame.style.height = `${Math.ceil(bottom + pad)}px`;
+  } catch { /* cross-origin or not ready: keep the CSS height */ }
+}
+demoFrame?.addEventListener("load", () => {
+  fitFrame();
+  try {
+    const ro = new ResizeObserver(fitFrame);
+    for (const el of demoFrame.contentDocument.body.children) ro.observe(el);
+  } catch { /* keep the CSS height */ }
+});
+if (demoFrame?.contentDocument?.readyState === "complete") fitFrame();
+
 // ── Nav: dark over the header, solid once the docs scroll in ──
 const nav = $("#nav");
 new IntersectionObserver(([e]) => nav.classList.toggle("solid", !e.isIntersecting), { rootMargin: "-64px 0px 0px 0px" }).observe($(".hdr"));

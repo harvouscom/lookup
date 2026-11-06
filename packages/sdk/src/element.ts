@@ -19,7 +19,7 @@ const CSS = `
 --_muted:var(--hmc-muted,var(--muted-foreground,#52525b));--_r:var(--hmc-radius,var(--radius,10px))}
 label{display:block;margin-bottom:8px;font-weight:600;font-size:.9375rem}
 .field{position:relative}
-.field svg{position:absolute;left:14px;top:50%;width:20px;height:20px;margin-top:-10px;color:var(--_muted);pointer-events:none}
+.field svg{position:absolute;z-index:1;left:14px;top:50%;width:20px;height:20px;margin-top:-10px;color:var(--_muted);pointer-events:none}
 input{box-sizing:border-box;width:100%;min-height:52px;padding:12px 16px 12px 44px;font:inherit;font-size:1.0625rem;color:inherit;background:var(--_bg);border:1px solid var(--_input);border-radius:var(--_r);outline:none;transition:border-color .15s,box-shadow .15s}
 input::placeholder{color:var(--_muted);opacity:.85}
 input:focus-visible{border-color:var(--_ring);box-shadow:0 0 0 4px color-mix(in oklab,var(--_ring) 22%,transparent)}
