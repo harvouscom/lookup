@@ -120,6 +120,7 @@ export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps
   const [active, setActive] = React.useState("")
   const inputRef = React.useRef<HTMLInputElement>(null)
   const wrapRef = React.useRef<HTMLDivElement>(null)
+  const listRef = React.useRef<HTMLDivElement>(null)
   React.useImperativeHandle(ref, () => inputRef.current!)
   const chosenId = lookup.selected?.id ?? ""
   const comfy = density === "comfortable"
@@ -193,6 +194,16 @@ export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps
     }
   }
 
+  // cmdk refocuses its input by the id it gave it whenever the highlight moves. The id is the form's
+  // here (so FormLabel points at it), so cmdk focuses the list instead: put focus back in the box.
+  function highlight(v: string) {
+    setActive(v)
+    const focused = document.activeElement
+    if (focused && focused !== inputRef.current && (focused === listRef.current || wrapRef.current?.contains(focused))) {
+      inputRef.current?.focus({ preventScroll: true })
+    }
+  }
+
   async function more() {
     const added = await lookup.more()
     if (added[0]) setActive(added[0].id)
@@ -228,7 +239,7 @@ export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps
 
   return (
     <div ref={wrapRef} className={cn("relative w-full", className)} data-slot="church-lookup">
-      <Command shouldFilter={false} loop label={label ?? t.label} value={active} onValueChange={setActive} className="h-auto overflow-visible bg-transparent">
+      <Command shouldFilter={false} loop label={label ?? t.label} value={active} onValueChange={highlight} className="h-auto overflow-visible bg-transparent">
         <Popover open={lookup.open} onOpenChange={lookup.setOpen}>
           <PopoverAnchor asChild>
             <div className="relative">
@@ -287,7 +298,7 @@ export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps
             {lookup.corrected && lookup.results.length > 0 && (
               <p className="text-muted-foreground px-3 pt-2 text-xs" data-slot="church-lookup-corrected">{t.corrected(lookup.corrected)}</p>
             )}
-            <CommandList className="max-h-[min(60vh,26rem)]">
+            <CommandList ref={listRef} className="max-h-[min(60vh,26rem)]">
               {lookup.error ? (
                 <div className="text-muted-foreground px-3 py-4 text-sm">
                   <p>{t.error}</p>
