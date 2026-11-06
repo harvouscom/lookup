@@ -195,7 +195,15 @@ npm install @heresmychurch/lookup</code></pre>
       <div><dt><code>form</code></dt><dd>The id of the form to fill. Defaults to the enclosing form.</dd></div>
       <div><dt><code>overwrite</code></dt><dd>Replace fields that already have values.</dd></div>
       <div><dt><code>limit</code></dt><dd>How many results to show, up to 20. Defaults to 8.</dd></div>
+      <div><dt><code>icons="none"</code></dt><dd>Hide the icon beside each result.</dd></div>
     </dl>
+    <h3>Icons</h3>
+    <p>Use the icons your design system already has. Put one with <code>slot="search-icon"</code> in the box, and one with <code>slot="result-icon"</code> to repeat beside every result. It works with SVG sets like Lucide or Heroicons, icon fonts like Tabler or Font Awesome, and icon components like Iconify, because the icons stay in your page and pick up its CSS.</p>
+    <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html</span><button class="copy" type="button">copy</button></div>
+<pre tabindex="0"><code><span class="t">&lt;church-lookup</span> <span class="a">label</span>=<span class="s">"Your church"</span><span class="t">&gt;</span>
+  <span class="t">&lt;i</span> <span class="a">slot</span>=<span class="s">"search-icon"</span> <span class="a">class</span>=<span class="s">"ti ti-search"</span><span class="t">&gt;&lt;/i&gt;</span>
+  <span class="t">&lt;i</span> <span class="a">slot</span>=<span class="s">"result-icon"</span> <span class="a">class</span>=<span class="s">"ti ti-building-church"</span><span class="t">&gt;&lt;/i&gt;</span>
+<span class="t">&lt;/church-lookup&gt;</span></code></pre></div></div>
     <h3>Fields</h3>
     <p>Use any of these in <code>data-hmc-field</code>: <code>name</code>, <code>street</code>, <code>city</code>, <code>region</code>, <code>regionName</code>, <code>postalCode</code>, <code>country</code>, <code>countryName</code>, <code>latitude</code>, <code>longitude</code>, <code>phone</code>, <code>email</code>, <code>website</code>, <code>denomination</code>, <code>serviceTimes</code>, <code>languages</code>, <code>ministries</code>, <code>pastorName</code> and <code>id</code>.</p>
     <h3>Events</h3>
@@ -257,6 +265,12 @@ npm install @heresmychurch/lookup</code></pre>
             <option value="Georgia, 'Times New Roman', serif">Serif</option>
             <option value='"Geist Mono", ui-monospace, monospace'>Mono</option>
           </select></label>
+          <div class="ba-group" role="group" aria-labelledby="ba-icons-l">
+            <span class="ba-l" id="ba-icons-l">icons</span>
+            <button type="button" class="ba-chip" data-icons="builtin" aria-pressed="true">built-in</button>
+            <button type="button" class="ba-chip" data-icons="lucide" aria-pressed="false">Lucide</button>
+            <button type="button" class="ba-chip" data-icons="tabler" aria-pressed="false">Tabler</button>
+          </div>
           <div class="ba-group" role="group" aria-labelledby="ba-mode-l">
             <span class="ba-l" id="ba-mode-l">mode</span>
             <button type="button" class="ba-chip" data-mode="light" aria-pressed="false">light</button>
@@ -265,7 +279,7 @@ npm install @heresmychurch/lookup</code></pre>
         </div>
       </div>
     </div></div>
-    <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">css · your tokens</span><button class="copy" type="button">copy</button></div>
+    <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html · your tokens</span><button class="copy" type="button">copy</button></div>
 <pre tabindex="0"><code id="ba-css"></code></pre></div></div>
     <p class="note">Want to see it fill a real form? <a href="/examples/autofill">Open the full theming example</a>.</p>
   </section>

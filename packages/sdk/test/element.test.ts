@@ -200,3 +200,45 @@ describe("helpers", () => {
     expect(fieldValue(record as never, "id")).toBe("R-1");
   });
 });
+
+describe("icons", () => {
+  function mountWith(inner: string) {
+    document.body.innerHTML = `<form id="f"><church-lookup label="Your church">${inner}</church-lookup></form>`;
+    const el = document.querySelector("church-lookup") as ChurchLookup;
+    el.lookup = createLookup({
+      fetch: (async () => Response.json({ query: "grac", results: [result("R-1", "Grace Church"), result("R-2", "Grace Chapel")], corrected: null, degraded: false, attribution: "" })) as typeof fetch,
+    });
+    return { el, root: el.shadowRoot!, input: el.shadowRoot!.querySelector("input")! };
+  }
+  it("takes a search icon through a slot", () => {
+    const { root } = mountWith(`<i slot="search-icon" class="ti ti-search"></i>`);
+    expect(root.querySelector("slot[name=search-icon]")).not.toBeNull();
+  });
+  it("copies a result icon into each row's slot", async () => {
+    const { el, root, input } = mountWith(`<i slot="result-icon" class="ti ti-building-church"></i>`);
+    type(input, "grac");
+    await flush(160);
+    const copies = el.querySelectorAll("[data-hmc-icon]");
+    expect(copies).toHaveLength(2);
+    expect([...copies].map((c) => c.getAttribute("slot"))).toEqual(["hmc-ic-0", "hmc-ic-1"]);
+    expect(copies[0]!.getAttribute("aria-hidden")).toBe("true");
+    expect(root.querySelectorAll("li slot[name^=hmc-ic-]")).toHaveLength(2);
+  });
+  it("accepts a template and replaces old copies on each render", async () => {
+    const { el, input } = mountWith(`<template slot="result-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></template>`);
+    type(input, "grac");
+    await flush(160);
+    type(input, "grace");
+    await flush(160);
+    const copies = el.querySelectorAll("[data-hmc-icon]");
+    expect(copies).toHaveLength(2);
+    expect(copies[0]!.querySelector("svg")).not.toBeNull();
+  });
+  it("falls back to the built-in icon without one", async () => {
+    const { el, root, input } = mountWith("");
+    type(input, "grac");
+    await flush(160);
+    expect(el.querySelectorAll("[data-hmc-icon]")).toHaveLength(0);
+    expect(root.querySelector("li .ic svg")).not.toBeNull();
+  });
+});

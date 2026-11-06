@@ -29,7 +29,7 @@ ul{list-style:none;margin:0;padding:0;max-height:min(60vh,400px);overflow:auto;d
 li{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;min-height:56px;padding:8px 10px;border-radius:var(--_r);cursor:pointer}
 li:hover,li[aria-selected=true]{background:var(--_active);color:var(--_active-fg)}
 .ic{display:grid;place-items:center;width:40px;height:40px;border-radius:calc(var(--_r) - 2px);background:color-mix(in oklab,var(--_ring) 12%,transparent);color:var(--_ring)}
-.ic svg{width:20px;height:20px}
+.ic svg{width:20px;height:20px}.ic ::slotted(*){display:grid;place-items:center;width:20px;height:20px;font-size:20px;line-height:1}.field ::slotted([slot=search-icon]){position:absolute;z-index:1;left:14px;top:50%;display:grid;place-items:center;width:20px;height:20px;margin-top:-10px;font-size:20px;line-height:1;color:var(--_muted);pointer-events:none}:host([icons=none]) .ic{display:none}:host([icons=none]) li{grid-template-columns:1fr auto}
 .t{display:grid;gap:2px;min-width:0}
 .n{font-weight:600;line-height:1.3}
 .sub{color:var(--_muted);font-size:.875rem;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -80,7 +80,7 @@ export class ChurchLookup extends HTMLElement {
     if (this.shadowRoot) return;
     const root = this.attachShadow({ mode: "open" });
     const id = this.id;
-    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field">${SEARCH}<input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">${HMC}<span><i>Data from </i><b><a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></b></span><a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div></div><div class="sr" role="status" aria-live="polite"></div>`;
+    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field"><slot name="search-icon">${SEARCH}</slot><input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">${HMC}<span><i>Data from </i><b><a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></b></span><a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div></div><div class="sr" role="status" aria-live="polite"></div>`;
     this.input = root.querySelector("input")!;
     this.list = root.querySelector("ul")!;
     this.pop = root.querySelector(".pop")!;
@@ -148,6 +148,7 @@ export class ChurchLookup extends HTMLElement {
       this.active = Math.min(at, next.length - 1);
     } else this.active = -1;
     this.results = next;
+    this.placeIcons(next.length);
     this.list.replaceChildren(...next.map((r, i) => {
       const li = document.createElement("li");
       li.id = `${this.id}-o${i}`;
@@ -155,7 +156,7 @@ export class ChurchLookup extends HTMLElement {
       li.setAttribute("part", "option");
       li.setAttribute("aria-selected", String(i === this.active));
       li.dataset.i = String(i);
-      li.innerHTML = `<span class="ic">${CHURCH}</span><span class="t"><span class="n"></span><span class="sub"></span></span><span class="d"></span>`;
+      li.innerHTML = `<span class="ic"><slot name="hmc-ic-${i}">${CHURCH}</slot></span><span class="t"><span class="n"></span><span class="sub"></span></span><span class="d"></span>`;
       li.querySelector(".n")!.textContent = r.name;
       li.querySelector(".sub")!.textContent = r.locationLabel;
       li.querySelector(".d")!.textContent = r.distanceKm == null ? "" : r.distanceKm < 10 ? `${r.distanceKm} km` : `${Math.round(r.distanceKm)} km`;
@@ -220,6 +221,30 @@ export class ChurchLookup extends HTMLElement {
   private say(text: string): void {
     this.live.textContent = "";
     setTimeout(() => (this.live.textContent = text), 50);
+  }
+
+  /**
+   * Your own result icon, from any icon library: a child with slot="result-icon" (an element or a
+   * <template>). It's copied once per result into the light DOM and slotted into that row, so page
+   * CSS still styles it, which icon fonts need. Without one, the built-in church icon shows.
+   */
+  private placeIcons(n: number): void {
+    const kids = [...this.children];
+    kids.filter((el) => el.hasAttribute("data-hmc-icon")).forEach((el) => el.remove());
+    const src = kids.find((el) => el.getAttribute("slot") === "result-icon");
+    if (!src) return;
+    for (let i = 0; i < n; i++) {
+      let copy: Element;
+      if (src instanceof HTMLTemplateElement) {
+        copy = document.createElement("span");
+        copy.append(src.content.cloneNode(true));
+      } else copy = src.cloneNode(true) as Element;
+      copy.setAttribute("slot", `hmc-ic-${i}`);
+      copy.setAttribute("aria-hidden", "true");
+      copy.setAttribute("data-hmc-icon", "");
+      copy.removeAttribute("id");
+      this.append(copy);
+    }
   }
 
   private targets(): Map<string, FieldTarget> {

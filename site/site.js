@@ -421,7 +421,46 @@ const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, T
     sensible: { accent: "#171717", radius: 4, font: "ui-sans-serif, system-ui, sans-serif", mode: "light" },
     parish: { accent: "#9A3412", radius: 2, font: "Georgia, 'Times New Roman', serif", mode: "light" },
   };
-  const state = { ...PRESETS.hmc };
+  const state = { ...PRESETS.hmc, icons: "builtin" };
+  // Icons from two kinds of library: Lucide as inline SVG, Tabler as an icon font loaded on first use.
+  const lucide = (paths) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+  const ICONS = {
+    lucide: {
+      search: lucide('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'),
+      result: lucide('<path d="M10 9h4"/><path d="M12 7v5"/><path d="M14 22v-4a2 2 0 0 0-4 0v4"/><path d="M18 22V5.6a1 1 0 0 0-.55-.9l-4.56-2.27a2 2 0 0 0-1.78 0L6.55 4.7A1 1 0 0 0 6 5.6V22"/><path d="m18 7 3.45 1.72a1 1 0 0 1 .55.9V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9.38a1 1 0 0 1 .55-.9L6 7"/>'),
+    },
+    tabler: {
+      search: '<i class="ti ti-search"></i>',
+      result: '<i class="ti ti-building-church"></i>',
+      markup: ['<i slot="search-icon" class="ti ti-search"></i>', '<i slot="result-icon" class="ti ti-building-church"></i>'],
+    },
+  };
+  ICONS.lucide.markup = [ICONS.lucide.search.replace("<svg ", '<svg slot="search-icon" '), ICONS.lucide.result.replace("<svg ", '<svg slot="result-icon" ')];
+  function loadTabler() {
+    if (document.getElementById("tabler-css")) return;
+    const l = document.createElement("link");
+    l.id = "tabler-css";
+    l.rel = "stylesheet";
+    l.href = "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css";
+    document.head.append(l);
+  }
+  function applyIcons() {
+    for (const el of [...after.children]) if (el.slot === "search-icon" || el.slot === "result-icon") el.remove();
+    const set = ICONS[state.icons];
+    if (set) {
+      if (state.icons === "tabler") loadTabler();
+      for (const [slot, html] of [["search-icon", set.search], ["result-icon", set.result]]) {
+        const t = document.createElement("template");
+        t.innerHTML = html.trim();
+        const node = t.content.firstElementChild;
+        node.setAttribute("slot", slot);
+        after.append(node);
+      }
+    }
+    // Re-run the search so the open results pick up the new icon.
+    const input = after.shadowRoot?.querySelector("input");
+    if (input?.value) input.dispatchEvent(new Event("input"));
+  }
   const mix = (c, p, base) => `color-mix(in oklab, ${c} ${p}%, ${base})`;
   function tokens() {
     const { accent: a, radius: r, mode } = state;
@@ -453,8 +492,10 @@ const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, T
       const p = PRESETS[b.dataset.preset];
       b.setAttribute("aria-pressed", String(Object.keys(p).every((k) => String(p[k]).toLowerCase() === String(state[k]).toLowerCase())));
     }
-    const lines = Object.entries(t).map(([k, v]) => `  ${k}: ${v};`);
-    $("#ba-css").textContent = `church-lookup {\n${lines.join("\n")}\n  font-family: ${state.font};\n}`;
+    for (const b of $$("[data-icons]")) b.setAttribute("aria-pressed", String(b.dataset.icons === state.icons));
+    const lines = Object.entries(t).map(([k, v]) => `    ${k}: ${v};`);
+    const kids = ICONS[state.icons]?.markup.map((m) => `  ${m}`).join("\n");
+    $("#ba-css").textContent = `<style>\n  church-lookup {\n${lines.join("\n")}\n    font-family: ${state.font};\n  }\n</style>\n<church-lookup label="Your church">${kids ? `\n${kids}\n` : ""}</church-lookup>`;
   }
   $$("[data-preset]").forEach((b) => b.addEventListener("click", () => { Object.assign(state, PRESETS[b.dataset.preset]); render(); }));
   $$(".ba-sw").forEach((b) => b.addEventListener("click", () => { state.accent = b.dataset.accent; render(); }));
@@ -462,6 +503,7 @@ const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, T
   $("#ba-r").addEventListener("input", (e) => { state.radius = Number(e.target.value); render(); });
   $("#ba-font").addEventListener("change", (e) => { state.font = e.target.value; render(); });
   $$("[data-mode]", ba.parentElement).forEach((b) => b.addEventListener("click", () => { state.mode = b.dataset.mode; render(); }));
+  $$("[data-icons]").forEach((b) => b.addEventListener("click", () => { state.icons = b.dataset.icons; applyIcons(); render(); }));
   $("#ba-range").addEventListener("input", (e) => ba.style.setProperty("--pos", `${e.target.value}%`));
   render();
   // Open both widgets on the same search the first time the slider comes into view.
