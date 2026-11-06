@@ -654,3 +654,11 @@ p.num::after { margin-left: 2px; }
 .sc-credit img { border-radius: 4px; }
 .sc-btn { flex: none; white-space: nowrap; min-height: 34px; padding: 0 14px; }
 @container (max-width: 440px) { .sc-credit { padding: 4px; } .sc-credit span { display: none; } }
+/* Below the rail breakpoint, the section index docks under the nav as one continuous bar. */
+@media (max-width: 1000px) {
+  .index { top: 64px; margin: 0 -24px 72px; padding: 8px 24px; border-radius: 0; border-bottom: 1px solid var(--line); background: color-mix(in oklab, var(--page) 86%, transparent); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); box-shadow: 0 8px 24px -20px rgba(17,12,34,.4); }
+  .nav.solid.scrolled { box-shadow: none; }
+  html { scroll-padding-top: 128px; }
+  section { scroll-margin-top: 128px; }
+}
+@media (max-width: 640px) { .index { top: 58px; } }

@@ -520,8 +520,12 @@ const spy = new IntersectionObserver((entries) => {
   for (const e of entries) {
     if (!e.isIntersecting) continue;
     links.forEach((a) => {
-      if (a.getAttribute("href") === `#${e.target.id}`) a.setAttribute("aria-current", "true");
-      else a.removeAttribute("aria-current");
+      if (a.getAttribute("href") === `#${e.target.id}`) {
+        a.setAttribute("aria-current", "true");
+        // In the horizontal bar, keep the current section's link in view.
+        const bar = a.parentElement;
+        if (bar.scrollWidth > bar.clientWidth) bar.scrollTo({ left: a.offsetLeft - 16, behavior: "smooth" });
+      } else a.removeAttribute("aria-current");
     });
   }
 }, { rootMargin: "-20% 0px -70% 0px" });
