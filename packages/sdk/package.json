@@ -18,6 +18,10 @@
       "types": "./dist/core.d.ts",
       "default": "./dist/core.js"
     },
+    "./fields": {
+      "types": "./dist/fields.d.ts",
+      "default": "./dist/fields.js"
+    },
     "./element": {
       "types": "./dist/element.d.ts",
       "default": "./dist/element.js"

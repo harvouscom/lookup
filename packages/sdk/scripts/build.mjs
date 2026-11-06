@@ -9,6 +9,7 @@ rmSync("dist", { recursive: true, force: true });
 const common = { bundle: true, minify: true, format: "esm", target: "es2020", legalComments: "none" };
 await build({ ...common, entryPoints: ["src/index.ts"], outfile: "dist/index.js" });
 await build({ ...common, entryPoints: ["src/core.ts"], outfile: "dist/core.js" });
+await build({ ...common, entryPoints: ["src/fields.ts"], outfile: "dist/fields.js" });
 await build({ ...common, entryPoints: ["src/element.ts"], outfile: "dist/element.js" });
 await build({ ...common, entryPoints: ["src/service-times.ts"], outfile: "dist/service-times.js" });
 for (const l of ["es", "fr", "de", "pt", "pl"]) await build({ ...common, entryPoints: [`src/strings-${l}.ts`], outfile: `dist/strings-${l}.js` });
@@ -23,4 +24,4 @@ for (const f of readdirSync("dist").filter((f) => f.endsWith(".d.ts"))) {
   writeFileSync(`dist/${f}`, src.replace(/((?:from|import\()\s*["']\.\/[\w-]+?)(?:\.d)?\.ts(["'])/g, "$1.js$2").replace('path="../src/', 'path="./'));
 }
 
-for (const f of ["dist/index.js", "dist/core.js", "dist/element.js", "dist/service-times.js"]) console.log(f, gzipSync(readFileSync(f)).length, "bytes gzipped");
+for (const f of ["dist/index.js", "dist/core.js", "dist/fields.js", "dist/element.js", "dist/service-times.js"]) console.log(f, gzipSync(readFileSync(f)).length, "bytes gzipped");

@@ -53,7 +53,10 @@ export interface SearchResponse {
 
 export interface ChurchRecord {
   id: string;
+  /** Only with { follow: false }: this listing merged into another. Load that ID instead. */
   movedTo?: string;
+  /** The ID you asked for, when it merged into this church. Store this record's `id` instead. */
+  movedFrom?: string;
   fields: Record<string, unknown> & { name: string; serviceTimes: { raw: string | null } };
   missing: string[];
   completeness: number;
@@ -121,8 +124,11 @@ export function createLookup(opts: LookupOptions = {}) {
       if (opts.client) p.set("client", opts.client);
       return get(`/search?${p}`, o.signal);
     },
-    getChurch(id: string, o: { signal?: AbortSignal } = {}): Promise<ChurchRecord> {
-      return get(`/churches/${encodeURIComponent(id)}`, o.signal);
+    /** The autofill record. An ID whose listing merged into another loads that church, with `movedFrom`. */
+    async getChurch(id: string, o: { signal?: AbortSignal; follow?: boolean } = {}): Promise<ChurchRecord> {
+      const one = (i: string) => get<ChurchRecord>(`/churches/${encodeURIComponent(i)}`, o.signal);
+      const rec = await one(id);
+      return rec.movedTo && o.follow !== false ? { ...(await one(rec.movedTo)), movedFrom: id } : rec;
     },
     /** Field names, which fields can be contributed and how each is reviewed. */
     meta(): Promise<Meta> {

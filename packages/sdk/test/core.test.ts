@@ -10,21 +10,31 @@ const record = {
 let searches: { q: string; settled: boolean; params: URLSearchParams }[] = [];
 let responses: Record<string, ReturnType<typeof result>[]> = {};
 let fail = false;
+/** Statuses (and Retry-After) the next searches fail with, in order. */
+let failures: [number, string?][] = [];
+let churchFails = false;
 const lookup = createLookup({
   client: "lookup-demo",
   fetch: (async (url: string) => {
     const u = new URL(url);
-    if (u.pathname.startsWith("/v1/churches/")) return Response.json(record);
+    if (u.pathname.startsWith("/v1/churches/")) return churchFails ? Response.json({ error: "down" }, { status: 500 }) : Response.json(record);
     if (fail) return Response.json({ error: "down" }, { status: 503 });
     const q = u.searchParams.get("q")!;
     const settled = u.searchParams.get("settled") === "1";
     searches.push({ q, settled, params: u.searchParams });
-    return Response.json({ query: q, results: responses[settled ? `${q}|settled` : q] ?? responses[q] ?? [] });
+    const f = failures.shift();
+    if (f) return Response.json({ error: "busy" }, { status: f[0], headers: f[1] ? { "retry-after": f[1] } : {} });
+    // Like the API: the top `limit` rows, and whether more ranked past them.
+    const all = responses[settled ? `${q}|settled` : q] ?? responses[q] ?? [];
+    const limit = Number(u.searchParams.get("limit")) || 8;
+    return Response.json({ query: q, results: all.slice(0, limit), hasMore: all.length > limit, corrected: q === "gracee" ? "grace" : null });
   }) as typeof fetch,
 });
 const flush = (ms = 200) => vi.advanceTimersByTimeAsync(ms);
+const many = (n: number) => Array.from({ length: n }, (_, i) => result(`R-${i}`, `Grace ${i}`));
+const ids = (s: Readonly<ControllerState>) => s.results.map((r) => r.id);
 
-beforeEach(() => { vi.useFakeTimers(); searches = []; responses = {}; fail = false; });
+beforeEach(() => { vi.useFakeTimers(); searches = []; responses = {}; fail = false; failures = []; churchFails = false; });
 afterEach(() => { vi.useRealTimers(); });
 
 describe("createLookupController", () => {
@@ -147,6 +157,142 @@ describe("createLookupController", () => {
     expect(ctl.state.selected).toBeNull();
   });
 
+  it("says it's loading while a search is in flight", async () => {
+    const seen: boolean[] = [];
+    const ctl = createLookupController({ lookup, onChange: (s) => seen.push(s.loading) });
+    ctl.input("grac");
+    await flush(160);
+    expect(seen).toContain(true);
+    expect(ctl.state.loading).toBe(false);
+  });
+
+  it("shows more with one request, appending only new rows", async () => {
+    responses.grace = many(20);
+    const more: boolean[] = [];
+    const ctl = createLookupController({ lookup, onResults: (d) => more.push(d.more) });
+    ctl.input("grace");
+    await flush(160);
+    expect(ids(ctl.state)).toEqual(ids({ results: many(8) } as never));
+    expect(ctl.state.hasMore).toBe(true);
+    const first = ctl.state.results.slice();
+    const added = await ctl.more();
+    expect(added.map((r) => r.id)).toEqual(["R-8", "R-9", "R-10", "R-11", "R-12", "R-13", "R-14", "R-15"]);
+    expect(ctl.state.results.slice(0, 8)).toEqual(first);
+    // One request for every row it can reach, which replaces the pending settled search.
+    expect(searches.map((s) => [s.params.get("limit"), s.settled])).toEqual([["8", false], ["50", true]]);
+    await ctl.more();
+    expect(ctl.state.results).toHaveLength(20);
+    expect(ctl.state.hasMore).toBe(false);
+    await flush(800);
+    expect(searches).toHaveLength(2);
+    expect(more).toEqual([false, true, true]);
+  });
+
+  it("keeps the rows already shown in place when more arrive in a different order", async () => {
+    responses.grace = many(10);
+    const ctl = createLookupController({ lookup, params: { semantic: false } });
+    ctl.input("grace");
+    await flush(160);
+    responses.grace = [...many(10)].reverse();
+    await ctl.more();
+    expect(ids(ctl.state)).toEqual([...ids({ results: many(8) } as never), "R-9", "R-8"]);
+  });
+
+  it("stops at maxResults and uses limit as the page size", async () => {
+    responses.grace = many(30);
+    const ctl = createLookupController({ lookup, params: { limit: 5, maxResults: 12 } });
+    ctl.input("grace");
+    await flush(160);
+    expect(ctl.state.results).toHaveLength(5);
+    await ctl.more();
+    expect(searches.at(-1)!.params.get("limit")).toBe("12");
+    expect(ctl.state.results).toHaveLength(10);
+    await ctl.more();
+    expect(ctl.state.results).toHaveLength(12);
+    expect(ctl.state.hasMore).toBe(false);
+  });
+
+  it("drops more results for text that's no longer in the box", async () => {
+    responses.grace = many(20);
+    let text = "grace";
+    const ctl = createLookupController({ lookup, text: () => text });
+    ctl.input("grace");
+    await flush(160);
+    const pending = ctl.more();
+    text = "grace c";
+    expect(await pending).toEqual([]);
+    expect(ctl.state.results).toHaveLength(8);
+  });
+
+  it("moves through the Show more row, and down on it shows more", async () => {
+    responses.grace = many(20);
+    const ctl = createLookupController({ lookup });
+    ctl.input("grace");
+    await flush(160);
+    ctl.move(-1);
+    expect(ctl.state.active).toBe(8);
+    ctl.move(1);
+    await flush(0);
+    expect(ctl.state.results).toHaveLength(16);
+    expect(ctl.state.active).toBe(8);
+    ctl.highlight(16);
+    expect(await ctl.choose()).toBeNull();
+    expect(ctl.state.results).toHaveLength(20);
+    expect(ctl.state.active).toBe(16);
+  });
+
+  it("reports the corrected spelling", async () => {
+    responses.gracee = [result("R-1", "Grace Church")];
+    const ctl = createLookupController({ lookup, params: { semantic: false } });
+    ctl.input("gracee");
+    await flush(160);
+    expect(ctl.state.corrected).toBe("grace");
+  });
+
+  it("waits out a short Retry-After once, and reports other failures", async () => {
+    responses.grac = [result("R-1", "Grace Church")];
+    failures = [[503, "2"]];
+    const errors: unknown[] = [];
+    const ctl = createLookupController({ lookup, onError: (e) => errors.push(e) });
+    ctl.input("grac");
+    await flush(160);
+    expect(ctl.state).toMatchObject({ loading: true, error: false });
+    await flush(2000);
+    expect(ids(ctl.state)).toEqual(["R-1"]);
+    expect(errors).toEqual([]);
+    failures = [[429, "60"]];
+    ctl.input("grace");
+    await flush(160);
+    expect(ctl.state.error).toBe(true);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatchObject({ status: 429, retryAfter: 60 });
+    ctl.retry();
+    await flush(0);
+    expect(ctl.state.error).toBe(false);
+  });
+
+  it("honors minChars, debounce, semantic and lat/lng", async () => {
+    const ctl = createLookupController({ lookup, params: { minChars: 3, debounce: 400, semantic: false, lat: 32.78, lng: -96.8 } });
+    ctl.input("gr");
+    await flush(800);
+    expect(searches).toEqual([]);
+    ctl.input("grace comm");
+    await flush(300);
+    expect(searches).toEqual([]);
+    await flush(800);
+    expect(searches.map((s) => [s.settled, s.params.get("lat"), s.params.get("lng")])).toEqual([[false, "32.78", "-96.8"]]);
+  });
+
+  it("only marks a church chosen once its record loads", async () => {
+    responses.grac = [result("R-1", "Grace Church")];
+    churchFails = true;
+    const ctl = createLookupController({ lookup });
+    ctl.input("grac");
+    await flush(160);
+    await expect(ctl.choose(0)).rejects.toMatchObject({ status: 500 });
+    expect(ctl.state.selected).toBeNull();
+  });
+
   it("stops pending searches on reset and destroy", async () => {
     const ctl = createLookupController({ lookup });
     ctl.input("grace comm");
@@ -176,6 +322,13 @@ describe("fill", () => {
     const f = form(`<input data-hmc-field="website" value="old"><select data-hmc-field="region"><option>CA</option></select>`);
     expect(planFill(record as never, findTargets(f)).changes).toEqual([]);
     expect(planFill(record as never, findTargets(f), { overwrite: true }).changes.map((c) => c.field)).toEqual(["website"]);
+  });
+  it("picks select options by value or text, as a code or a name", () => {
+    const f = form(`<select data-hmc-field="region"><option value="">Pick</option><option value="tx">Texas</option></select>
+      <select data-hmc-field="regionName"><option value=""></option><option value="1">TX</option></select>
+      <select data-hmc-field="country"><option value=""></option><option value="840"> United States </option></select>`);
+    const rec = { ...record, fields: { ...record.fields, regionName: "Texas", countryName: "United States" } };
+    expect(planFill(rec as never, findTargets(f)).changes.map((c) => [c.field, c.value])).toEqual([["region", "tx"], ["regionName", "1"], ["country", "840"]]);
   });
   it("fieldValue flattens lists and service times", () => {
     expect(fieldValue(record as never, "languages")).toBe("English, Spanish");

@@ -93,7 +93,7 @@ describe("combobox semantics", () => {
     const seen: any[] = [];
     el.addEventListener("church-results", (e) => seen.push((e as CustomEvent).detail));
     type(input, "grac"); await flush();
-    expect(seen).toEqual([{ query: "grac", results: [expect.objectContaining({ id: "R-1" })], settled: false }]);
+    expect(seen).toEqual([{ query: "grac", results: [expect.objectContaining({ id: "R-1" })], settled: false, more: false }]);
   });
   it("closes on Escape", async () => {
     responses.grac = [result("R-1", "Grace Church")];

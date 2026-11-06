@@ -1,7 +1,7 @@
 // @heresmychurch/lookup/core: the headless engine behind <church-lookup>, for building your own UI
 // (the shadcn registry components use it). No rendering and no side effects on import: nothing is
 // registered, and timers only run while a search is pending.
-import { createLookup, type ChurchRecord, type Lookup, type Meta, type SearchResult } from "./client.ts";
+import { createLookup, type ChurchRecord, type Lookup, type LookupError, type Meta, type SearchResult } from "./client.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
 
 export * from "./client.ts";
@@ -13,6 +13,10 @@ export const SETTLE_MS = 700;
 /** Queries this long or longer also get a settled search, which may use semantic search. */
 export const SETTLED_MIN = 4;
 export const MIN_QUERY = 2;
+/** Results on the first page, and each "Show more" after it. */
+export const PAGE_SIZE = 8;
+/** The most results "Show more" reaches: the API's highest limit. */
+export const MAX_RESULTS = 50;
 
 /** A record field as the text a form field should hold, or null when the directory has nothing. */
 export function fieldValue(record: ChurchRecord, field: string): string | null {
@@ -25,13 +29,33 @@ export function fieldValue(record: ChurchRecord, field: string): string | null {
 
 // ── Search state ──
 
-export interface SearchParams { region?: string; country?: string; near?: string; limit?: number; geo?: boolean }
+export interface SearchParams {
+  region?: string;
+  country?: string;
+  /** Rank near a place, such as "Dallas". */
+  near?: string;
+  /** Rank near a point, such as the device's location. Send both. */
+  lat?: number;
+  lng?: number;
+  /** Results per page: the first page and each "Show more". Defaults to 8. */
+  limit?: number;
+  /** The most results "Show more" can reach. Defaults to 50, the most the API returns. */
+  maxResults?: number;
+  /** Characters typed before searching. Defaults to 2. */
+  minChars?: number;
+  /** Milliseconds to wait after typing before searching. Defaults to 150. */
+  debounce?: number;
+  /** Set false to skip the search after a pause, which may use semantic search. */
+  semantic?: boolean;
+  /** Set false to stop the API using the visitor's approximate location. */
+  geo?: boolean;
+}
 
 export interface ControllerState {
   /** The text being searched, trimmed. */
   query: string;
   results: SearchResult[];
-  /** Index of the highlighted result, or -1. */
+  /** Index of the highlighted result, or -1. Equals results.length when the "Show more" row is highlighted. */
   active: number;
   open: boolean;
   /** True while a search for the current query is in flight. */
@@ -40,6 +64,12 @@ export interface ControllerState {
   error: boolean;
   /** The chosen church, or null. */
   selected: SearchResult | null;
+  /** More results can be shown with more(). Show a "Show more" row after the results. */
+  hasMore: boolean;
+  /** True while more() is loading. */
+  loadingMore: boolean;
+  /** The spelling searched instead of what was typed, such as "grace" for "gracee", or null. */
+  corrected: string | null;
 }
 
 export interface ControllerOptions {
@@ -52,10 +82,12 @@ export interface ControllerOptions {
   /** The text currently in the box. Results for anything else are dropped. Defaults to the last input(). */
   text?: () => string;
   onChange?: (state: ControllerState) => void;
-  /** New results (or an error) are ready to render. Called before onChange opens the list. */
-  onShow?: (state: ControllerState) => void;
-  /** Results arrived and are shown. */
-  onResults?: (detail: { query: string; results: SearchResult[]; settled: boolean }) => void;
+  /** New results (or an error) are ready to render, with the rows more() added. Called before onChange. */
+  onShow?: (state: ControllerState, added?: SearchResult[]) => void;
+  /** Results arrived and are shown. `more` is true when they came from more(). */
+  onResults?: (detail: { query: string; results: SearchResult[]; settled: boolean; more: boolean }) => void;
+  /** A search or a "Show more" failed. */
+  onError?: (error: unknown, query: string) => void;
   /** A church is about to be chosen. Return false to cancel. */
   onSelect?: (result: SearchResult) => boolean | void;
 }
@@ -68,45 +100,107 @@ export function createLookupController(opts: ControllerOptions = {}) {
     const l = typeof opts.lookup === "function" ? opts.lookup() : opts.lookup;
     return l ?? (own ??= createLookup({ client: opts.client, baseUrl: opts.baseUrl }));
   };
-  const state: ControllerState = { query: "", results: [], active: -1, open: false, loading: false, error: false, selected: null };
+  const state: ControllerState = { query: "", results: [], active: -1, open: false, loading: false, error: false, selected: null, hasMore: false, loadingMore: false, corrected: null };
   let timers: ReturnType<typeof setTimeout>[] = [];
   let ctrl: AbortController | null = null;
   let seq = 0;
+  /** The query the shown results belong to, and the ranked rows more() hasn't revealed yet. */
+  let shown = "";
+  let rest: SearchResult[] = [];
   const emit = () => opts.onChange?.(state);
   const clearTimers = () => { for (const t of timers) clearTimeout(t); timers = []; };
+  const params = (): SearchParams => (typeof opts.params === "function" ? opts.params() : opts.params) ?? {};
+  const most = (p: SearchParams) => Math.min(p.maxResults || MAX_RESULTS, MAX_RESULTS);
+  const page = (p: SearchParams) => Math.max(1, Math.min(p.limit || PAGE_SIZE, most(p)));
+  const current = () => (opts.text ? opts.text().trim() : state.query);
+  const isAbort = (e: unknown, n: number) => (e as Error).name === "AbortError" || n !== seq;
 
-  async function run(q: string, settled: boolean): Promise<void> {
+  function request(q: string, settled: boolean, limit: number) {
     ctrl?.abort();
     const mine = (ctrl = new AbortController());
-    const n = ++seq;
-    const p = (typeof opts.params === "function" ? opts.params() : opts.params) ?? {};
-    state.loading = true;
+    const p = params();
+    const at = p.lat != null && p.lng != null ? { lat: p.lat, lng: p.lng } : {};
+    return { n: ++seq, res: client().search(q, { settled, signal: mine.signal, region: p.region, country: p.country, near: p.near, ...at, limit, geo: p.geo !== false }) };
+  }
+
+  async function run(q: string, settled: boolean, retried = false): Promise<void> {
+    const p = params();
+    const { n, res } = request(q, settled, page(p));
+    if (!state.loading) { state.loading = true; emit(); }
     try {
-      const res = await client().search(q, { settled, signal: mine.signal, region: p.region, country: p.country, near: p.near, limit: p.limit || 8, geo: p.geo !== false });
-      if (n !== seq || (opts.text ? opts.text().trim() : state.query) !== q) return;
-      show(res.results, false);
-      opts.onResults?.({ query: q, results: state.results, settled });
+      const r = await res;
+      if (n !== seq || current() !== q) return;
+      rest = [];
+      shown = q;
+      show(r.results, false, (r.hasMore ?? r.results.length >= page(p)) && r.results.length < most(p), r.corrected);
+      opts.onResults?.({ query: q, results: state.results, settled, more: false });
     } catch (e) {
-      if ((e as Error).name === "AbortError" || n !== seq) return;
-      show([], true);
+      if (isAbort(e, n)) return;
+      const wait = (e as LookupError).retryAfter;
+      // A busy database asks for a short pause: wait once, quietly, then try again.
+      if (!retried && (e as LookupError).status === 503 && wait && wait <= 5) {
+        timers.push(setTimeout(() => void run(q, settled, true), wait * 1000));
+        return;
+      }
+      opts.onError?.(e, q);
+      show([], true, false, null);
     }
   }
 
   /** The highlighted church keeps its place when settled results arrive. */
-  function show(next: SearchResult[], error: boolean): void {
+  function show(next: SearchResult[], error: boolean, hasMore: boolean, corrected: string | null): void {
+    const onMore = state.hasMore && state.active === state.results.length;
     const pinned = state.results[state.active];
     if (pinned) {
       const at = state.active;
       next = next.filter((r) => r.id !== pinned.id);
       next.splice(Math.min(at, next.length), 0, pinned);
       state.active = Math.min(at, next.length - 1);
-    } else state.active = -1;
-    state.results = next;
-    state.error = error;
-    state.loading = false;
-    state.open = true;
+    } else state.active = onMore && hasMore ? next.length : -1;
+    Object.assign(state, { results: next, error, hasMore, corrected, loading: false, loadingMore: false, open: true });
     opts.onShow?.(state);
     emit();
+  }
+
+  /** Append the next page from the rows already loaded. The rows already shown never move. */
+  function reveal(): SearchResult[] {
+    const p = params();
+    const added = rest.splice(0, Math.min(page(p), most(p) - state.results.length));
+    const wasOnMore = state.active === state.results.length;
+    state.results = state.results.concat(added);
+    state.hasMore = rest.length > 0 && state.results.length < most(p);
+    if (wasOnMore) state.active = state.results.length - (added.length || 1);
+    opts.onShow?.(state, added);
+    emit();
+    opts.onResults?.({ query: shown, results: state.results, settled: true, more: true });
+    return added;
+  }
+
+  /** Show the next page of results. Resolves to the rows it added. */
+  async function more(): Promise<SearchResult[]> {
+    const q = shown;
+    if (!state.hasMore || state.loadingMore || current() !== q) return [];
+    if (rest.length) return reveal();
+    // One request for every row "Show more" can reach. It replaces any pending settled search.
+    clearTimers();
+    const p = params();
+    const { n, res } = request(q, q.length >= SETTLED_MIN && p.semantic !== false, most(p));
+    state.loadingMore = true;
+    emit();
+    try {
+      const r = await res;
+      if (n !== seq || current() !== q) return [];
+      const seen = new Set(state.results.map((x) => x.id));
+      rest = r.results.filter((x) => !seen.has(x.id));
+      state.loadingMore = false;
+      return reveal();
+    } catch (e) {
+      if (isAbort(e, n)) return [];
+      state.loadingMore = false;
+      opts.onError?.(e, q);
+      emit();
+      return [];
+    }
   }
 
   return {
@@ -116,27 +210,34 @@ export function createLookupController(opts: ControllerOptions = {}) {
     input(text: string): void {
       clearTimers();
       const q = text.trim();
+      const p = params();
       state.query = q;
       // Typing after a pick starts over: the old choice no longer matches what's in the box.
       if (state.selected && q !== state.selected.name) state.selected = null;
-      if (q.length < MIN_QUERY) {
+      if (q.length < (p.minChars ?? MIN_QUERY)) {
         ctrl?.abort();
-        state.results = [];
-        state.loading = false;
-        state.open = false;
-        state.active = -1;
+        Object.assign(state, { results: [], loading: false, loadingMore: false, open: false, active: -1, hasMore: false, corrected: null });
         emit();
         return;
       }
       emit();
-      timers.push(setTimeout(() => void run(q, false), DEBOUNCE_MS));
-      if (q.length >= SETTLED_MIN) timers.push(setTimeout(() => void run(q, true), SETTLE_MS));
+      const wait = p.debounce ?? DEBOUNCE_MS;
+      const settle = q.length >= SETTLED_MIN && p.semantic !== false;
+      if (!settle || wait < SETTLE_MS) timers.push(setTimeout(() => void run(q, false), wait));
+      if (settle) timers.push(setTimeout(() => void run(q, true), Math.max(SETTLE_MS, wait)));
     },
-    /** Move the highlight by one, wrapping. Opens the list if it has results. */
+    /** Search the current text again, such as after an error. */
+    retry(): void {
+      clearTimers();
+      if (state.query) void run(state.query, false);
+    },
+    more,
+    /** Move the highlight by one, wrapping, through the results and the "Show more" row. Down on that row shows more. */
     move(dir: 1 | -1): void {
-      const n = state.results.length;
-      if (!state.open && n) state.open = true;
+      const n = state.results.length + (state.hasMore ? 1 : 0);
+      if (!state.open && state.results.length) state.open = true;
       if (!n) return emit();
+      if (dir === 1 && state.hasMore && state.active === state.results.length) { void more(); return; }
       state.active = dir === 1 ? (state.active + 1) % n : state.active <= 0 ? n - 1 : state.active - 1;
       emit();
     },
@@ -144,23 +245,28 @@ export function createLookupController(opts: ControllerOptions = {}) {
     open(): void { if (state.results.length) { state.open = true; emit(); } },
     close(): void { if (state.open) { state.open = false; emit(); } },
     /**
-     * Choose a result (the highlighted one by default) and load its record. Resolves to the record,
-     * or null when cancelled by onSelect. Rejects when the record can't load.
+     * Choose a result (the highlighted one by default) and load its record. Resolves to the record, or
+     * null when cancelled by onSelect, when the index is the "Show more" row (which shows more instead),
+     * or when the text changed while it loaded. Rejects when the record can't load.
      */
     async choose(i = state.active): Promise<ChurchRecord | null> {
+      if (i === state.results.length && state.hasMore) { await more(); return null; }
       const result = state.results[i];
       if (!result) return null;
       clearTimers();
-      state.open = false;
+      ctrl?.abort();
       // A new search after choosing starts fresh, with nothing pinned.
-      state.results = [];
-      state.active = -1;
+      Object.assign(state, { open: false, results: [], active: -1, loading: false, loadingMore: false, hasMore: false, corrected: null });
+      rest = [];
       emit();
       if (opts.onSelect?.(result) === false) return null;
-      state.selected = result;
       state.query = result.name;
       emit();
-      return client().getChurch(result.id);
+      const record = await client().getChurch(result.id);
+      if (state.query !== result.name) return null;
+      state.selected = record.id === result.id ? result : { ...result, id: record.id };
+      emit();
+      return record;
     },
     /** Mark a church as chosen without searching, such as one saved earlier. */
     select(result: SearchResult | null): void { state.selected = result; if (result) state.query = result.name; emit(); },
@@ -168,7 +274,9 @@ export function createLookupController(opts: ControllerOptions = {}) {
     reset(): void {
       clearTimers();
       ctrl?.abort();
-      Object.assign(state, { query: "", results: [], active: -1, open: false, loading: false, error: false, selected: null });
+      rest = [];
+      shown = "";
+      Object.assign(state, { query: "", results: [], active: -1, open: false, loading: false, error: false, selected: null, hasMore: false, loadingMore: false, corrected: null });
       emit();
     },
     /** Stop pending searches, such as when the UI unmounts. */
@@ -190,8 +298,15 @@ export function planFill(record: ChurchRecord, targets: Targets, { overwrite = f
     const value = fieldValue(record, field);
     if (value == null) { empty.push(field); continue; }
     if (!overwrite && element.value.trim()) continue;
-    if (element instanceof HTMLSelectElement && ![...element.options].some((o) => o.value === value)) continue;
-    changes.push({ field, element, value });
+    let v: string | undefined = value;
+    if (element instanceof HTMLSelectElement) {
+      // An option whose value or text is the code or the name: "TX" or "Texas", "US" or "United States".
+      const pair = fieldValue(record, field.endsWith("Name") ? field.slice(0, -4) : field + "Name");
+      const want = [value, pair].map((x) => x?.trim().toLowerCase());
+      v = [...element.options].find((o) => want.includes(o.value.toLowerCase()) || want.includes(o.text.trim().toLowerCase()))?.value;
+      if (v == null) continue;
+    }
+    changes.push({ field, element, value: v });
   }
   return { changes, empty };
 }
@@ -208,10 +323,18 @@ export function fillTargets(record: ChurchRecord, targets: Targets, opts: { over
   return plan;
 }
 
-/** Fields tagged data-hmc-field inside a scope (a form, by default the whole document). */
-export function findTargets(scope: ParentNode = document): Map<string, FieldTarget> {
+/**
+ * The fields a church fills inside a scope (a form, by default the whole document): inputs tagged
+ * data-hmc-field ("none" leaves one out), plus untagged ones `match` recognizes, such as matchField
+ * from @heresmychurch/lookup/fields. A tag wins over a match, and the first match for a field wins.
+ */
+export function findTargets(scope: ParentNode = document, match?: (el: FieldTarget) => string | null): Map<string, FieldTarget> {
   const out = new Map<string, FieldTarget>();
-  scope.querySelectorAll<FieldTarget>("[data-hmc-field]").forEach((el) => out.set(el.dataset.hmcField!, el));
+  if (match) scope.querySelectorAll<FieldTarget>("input:not([data-hmc-field]),select:not([data-hmc-field]),textarea:not([data-hmc-field])").forEach((el) => {
+    const f = match(el);
+    if (f && !out.has(f)) out.set(f, el);
+  });
+  scope.querySelectorAll<FieldTarget>("[data-hmc-field]").forEach((el) => { if (el.dataset.hmcField !== "none") out.set(el.dataset.hmcField!, el); });
   return out;
 }
 

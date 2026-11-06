@@ -31,6 +31,17 @@ describe("client", () => {
     const err = await createLookup({ fetch }).search("grace").catch((e) => e);
     expect(err).toMatchObject({ status: 502, message: "Bad Gateway", code: undefined });
   });
+  it("follows a church that moved, unless asked not to", async () => {
+    const calls: string[] = [];
+    const fetch = (async (url: string) => {
+      calls.push(url);
+      return Response.json(url.endsWith("/OLD") ? { id: "OLD", movedTo: "NEW" } : { id: "NEW", fields: { name: "Grace" } });
+    }) as unknown as typeof globalThis.fetch;
+    const lookup = createLookup({ fetch });
+    expect(await lookup.getChurch("OLD")).toMatchObject({ id: "NEW", movedFrom: "OLD", fields: { name: "Grace" } });
+    expect(await lookup.getChurch("OLD", { follow: false })).toEqual({ id: "OLD", movedTo: "NEW" });
+    expect(calls).toHaveLength(3);
+  });
   it("sends lat and lng", async () => {
     const f = fake({ results: [] });
     await createLookup({ fetch: f.fetch }).search("grace", { lat: 32.78, lng: -96.8 });
