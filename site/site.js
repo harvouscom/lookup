@@ -163,7 +163,6 @@ if (demoFrame?.contentDocument?.readyState === "complete") fitFrame();
 
 // ── Nav: dark over the header, solid once the docs scroll in ──
 const nav = $("#nav");
-new IntersectionObserver(([e]) => nav.classList.toggle("solid", !e.isIntersecting), { rootMargin: "-64px 0px 0px 0px" }).observe($(".hdr"));
 
 // ── Docs theme: light by default, dark on request, remembered ──
 const themeBtn = $("#theme");

@@ -20,7 +20,7 @@
 <body>
 <a class="skip" href="#docs">Skip to the docs</a>
 
-<nav class="nav" id="nav" aria-label="Site">
+<nav class="nav solid" id="nav" aria-label="Site">
   <a class="brand" href="/" aria-label="Lookup home"><img src="/brand/mark.svg" alt="" width="24" height="24"><span>lookup</span></a>
   <ul class="nav-links">
     <li><a href="#quickstart">docs</a></li>
@@ -280,7 +280,7 @@ npm install @heresmychurch/lookup</code></pre>
       <li><b>Meaning, only when words fail.</b> If no result matches every word, a settled query also asks semantic search (bge-m3 in Cloudflare Vectorize). Those results always rank below real name matches.</li>
     </ol>
     <p>78 held-out test queries we didn't tune on, against Here's My Church's search today:</p>
-    <div class="frame"><div class="frame-in table"><table>
+    <div class="frame"><div class="frame-in table" tabindex="0" role="region" aria-label="Search results compared"><table>
       <thead><tr><th>system</th><th class="num">top result right</th><th class="num">in top 5</th><th class="num">no results</th><th class="num">typical time</th></tr></thead>
       <tbody>
         <tr><td>Today's search</td><td class="num">28%</td><td class="num">31%</td><td class="num">41%</td><td class="num">20 s</td></tr>
