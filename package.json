@@ -6,14 +6,15 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "test": "vitest run --config worker/vitest.config.ts && pnpm --filter @heresmychurch/lookup test",
+    "test": "node scripts/build-registry.mjs --check && vitest run --config worker/vitest.config.ts && pnpm --filter @heresmychurch/lookup test",
     "typecheck": "tsc -p worker/tsconfig.json --noEmit",
     "deploy": "pnpm run build:sdk && pnpm run build:registry && pnpm run build:docs && wrangler deploy --config worker/wrangler.jsonc",
     "build:docs": "node scripts/build-docs.mjs",
     "build:registry": "node scripts/build-registry.mjs",
     "build:shadcn-demo": "npm --prefix examples/shadcn-demo run build",
     "eval": "node eval/run.mjs",
-    "build:sdk": "pnpm --filter @heresmychurch/lookup build && node scripts/copy-assets.mjs"
+    "build:sdk": "pnpm --filter @heresmychurch/lookup build && node scripts/copy-assets.mjs",
+    "build:registry:lib": "node scripts/build-registry.mjs --lib"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.8.0",

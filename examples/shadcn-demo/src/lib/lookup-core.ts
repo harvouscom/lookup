@@ -1,3 +1,10 @@
+// Lookup by Here's My Church, headless core v0.2.0. Generated from @heresmychurch/lookup
+// (packages/sdk/src) by scripts/build-registry.mjs. MIT. https://lookup.heresmychurch.com/docs
+/* eslint-disable */
+
+// ── client.ts ──
+// @heresmychurch/lookup core client. No dependencies.
+
 export interface SearchOptions {
   near?: string;
   lat?: number;
@@ -36,14 +43,25 @@ export interface SearchResult {
 export interface SearchResponse {
   query: string;
   results: SearchResult[];
+  /** More churches ranked past `limit`. Ask again with a higher limit to get them. */
+  hasMore?: boolean;
+  /** The place understood from the query or `near`, such as Dallas, TX. */
+  place: { name: string; region: string; country: string } | null;
+  /** The spelling searched instead of what was typed, or null. */
   corrected: string | null;
+  /** A fallback answer: part of the search didn't run. */
   degraded: boolean;
+  /** Whether semantic search ran. */
+  semantic?: "used" | "skipped" | "off" | "failed";
   attribution: string;
 }
 
 export interface ChurchRecord {
   id: string;
+  /** Only with { follow: false }: this listing merged into another. Load that ID instead. */
   movedTo?: string;
+  /** The ID you asked for, when it merged into this church. Store this record's `id` instead. */
+  movedFrom?: string;
   fields: Record<string, unknown> & { name: string; serviceTimes: { raw: string | null } };
   missing: string[];
   completeness: number;
@@ -68,11 +86,16 @@ export interface Meta {
 
 export class LookupError extends Error {
   status: number;
+  /** Seconds to wait before trying again, on a 429 or 503. */
   retryAfter?: number;
-  constructor(status: number, message: string, retryAfter?: number) {
+  /** A stable reason: invalid, not_found, rate_limited, overloaded, unavailable, … */
+  code?: string;
+  constructor(status: number, message: string, retryAfter?: number, code?: string) {
     super(message);
+    this.name = "LookupError";
     this.status = status;
     this.retryAfter = retryAfter;
+    this.code = code;
   }
 }
 
@@ -90,7 +113,7 @@ export function createLookup(opts: LookupOptions = {}) {
   async function get<T>(path: string, signal?: AbortSignal, init?: RequestInit): Promise<T> {
     const res = await f(base + path, { signal, ...init });
     const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined);
+    if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined, body.code);
     return body;
   }
 
@@ -106,8 +129,11 @@ export function createLookup(opts: LookupOptions = {}) {
       if (opts.client) p.set("client", opts.client);
       return get(`/search?${p}`, o.signal);
     },
-    getChurch(id: string, o: { signal?: AbortSignal } = {}): Promise<ChurchRecord> {
-      return get(`/churches/${encodeURIComponent(id)}`, o.signal);
+    /** The autofill record. An ID whose listing merged into another loads that church, with `movedFrom`. */
+    async getChurch(id: string, o: { signal?: AbortSignal; follow?: boolean } = {}): Promise<ChurchRecord> {
+      const one = (i: string) => get<ChurchRecord>(`/churches/${encodeURIComponent(i)}`, o.signal);
+      const rec = await one(id);
+      return rec.movedTo && o.follow !== false ? { ...(await one(rec.movedTo)), movedFrom: id } : rec;
     },
     /** Field names, which fields can be contributed and how each is reviewed. */
     meta(): Promise<Meta> {
@@ -152,6 +178,14 @@ export interface Strings {
   noneShort: string;
   error: string;
   found: (n: number) => string;
+  /** The row after the results that loads more, and its text while loading. */
+  more: string;
+  loading: string;
+  /** Announced when more results are added. */
+  moreFound: (n: number) => string;
+  /** Shown above the results when a misspelling was searched as something else. */
+  corrected: (q: string) => string;
+  retry: string;
   filled: (n: number, missing: string[]) => string;
   loadFail: string;
   dataFrom: string;
@@ -179,7 +213,7 @@ export interface Strings {
 
 /** Shared across separately loaded bundles, so a language file can register into the element. */
 const REG_KEY = "__hmcLookupStrings";
-type Registry = Record<string, Strings>;
+type Registry = Record<string, Partial<Strings>>;
 export const registry = (): Registry => ((globalThis as unknown as Record<string, Registry>)[REG_KEY] ??= {});
 
 const list = (m: string[], label: string) => (m.length ? ` ${label} ${m.join(", ")}.` : "");
@@ -192,6 +226,11 @@ export const EN: Strings = {
     noneShort: "No matching church.",
     error: "Search isn't available right now. You can keep typing your church's details.",
     found: (n) => `${n} ${n === 1 ? "church" : "churches"} found. Use up and down arrows to choose.`,
+    more: "Show more results",
+    loading: "Loading…",
+    moreFound: (n) => `${n} more ${n === 1 ? "church" : "churches"}.`,
+    corrected: (q) => `Showing results for “${q}”`,
+    retry: "Try again",
     filled: (n, m) => `Filled ${n} ${n === 1 ? "field" : "fields"}.${list(m, "Not available:")}`,
     loadFail: "Couldn't load that church's details. You can type them in.",
     dataFrom: "Data from",
@@ -219,15 +258,48 @@ export const EN: Strings = {
 export const LANGS = ["es", "fr", "de", "pt", "pl"];
 
 /** Add or replace a language. Elements already on the page pick it up. */
-export function registerStrings(lang: string, strings: Strings): void {
+export function registerStrings(lang: string, strings: Partial<Strings>): void {
   registry()[lang] = strings;
   if (typeof document !== "undefined") document.dispatchEvent(new Event("hmc-strings"));
 }
 
-/** The strings for a language tag such as "es-MX", falling back to English. */
+/** The strings for a language tag such as "es-MX". Anything a language leaves out is English. */
 export function stringsFor(lang: string | null | undefined): Strings {
   const base = (lang ?? "").toLowerCase().split("-")[0]!;
-  return registry()[base] ?? EN;
+  return { ...EN, ...registry()[base] };
+}
+
+// ── fields.ts ──
+// @heresmychurch/lookup/fields: find the form fields a church fills by their name, id or autocomplete,
+// so a form works without data-hmc-field tags. Pass matchField to findTargets.
+
+// Words (and word pairs) in a field's name, id or autocomplete, and the record field each means.
+const WORDS: Record<string, string> = {
+  name: "name", organization: "name", id: "id",
+  street: "street", address: "street", "street-address": "street", "address-line1": "street",
+  city: "city", town: "city", "address-level2": "city",
+  state: "region", province: "region", region: "region", "address-level1": "region",
+  zip: "postalCode", postal: "postalCode", postcode: "postalCode", "postal-code": "postalCode",
+  country: "country", "country-name": "countryName",
+  phone: "phone", tel: "phone", telephone: "phone", email: "email",
+  website: "website", url: "website", web: "website", denomination: "denomination", pastor: "pastorName",
+};
+
+/**
+ * The record field an untagged input is for, or null. Only the church's own fields match, named like
+ * church_city, churchWebsite or autocomplete="section-church tel". With `generic`, plain ones match too
+ * (city, zip, tel), but never name or id, which on most forms are the person's. Address line 2 and
+ * hidden, password, checkbox and similar inputs never match, nor does anything inside the widget.
+ */
+export function matchField(el: FieldTarget, generic = false): string | null {
+  if (/^(hidden|submit|button|reset|checkbox|radio|file|password|image)$/.test(el.type) || el.closest("church-lookup,[data-slot=church-lookup]")) return null;
+  const t = [el.name, el.id, el.getAttribute("autocomplete")].join(" ").replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase().split(/[^a-z0-9]+/)
+    .flatMap((w) => (w.startsWith("church") && w.length > 6 ? ["church", w.slice(6)] : [w]));
+  const ours = t.includes("church");
+  if ((!ours && !generic) || t.some((w) => /^(address|line|street)?[2-9]$/.test(w))) return null;
+  const pair = t.slice(1).map((w, i) => WORDS[`${t[i]}-${w}`]).find(Boolean);
+  const hits = t.map((w) => WORDS[w]);
+  return pair ?? hits.filter((f) => f && f !== "name" && f !== "id").pop() ?? (ours ? hits.find(Boolean) : null) ?? null;
 }
 
 // ── core.ts ──
@@ -241,6 +313,10 @@ export const SETTLE_MS = 700;
 /** Queries this long or longer also get a settled search, which may use semantic search. */
 export const SETTLED_MIN = 4;
 export const MIN_QUERY = 2;
+/** Results on the first page, and each "Show more" after it. */
+export const PAGE_SIZE = 8;
+/** The most results "Show more" reaches: the API's highest limit. */
+export const MAX_RESULTS = 50;
 
 /** A record field as the text a form field should hold, or null when the directory has nothing. */
 export function fieldValue(record: ChurchRecord, field: string): string | null {
@@ -253,13 +329,33 @@ export function fieldValue(record: ChurchRecord, field: string): string | null {
 
 // ── Search state ──
 
-export interface SearchParams { region?: string; country?: string; near?: string; limit?: number; geo?: boolean }
+export interface SearchParams {
+  region?: string;
+  country?: string;
+  /** Rank near a place, such as "Dallas". */
+  near?: string;
+  /** Rank near a point, such as the device's location. Send both. */
+  lat?: number;
+  lng?: number;
+  /** Results per page: the first page and each "Show more". Defaults to 8. */
+  limit?: number;
+  /** The most results "Show more" can reach. Defaults to 50, the most the API returns. */
+  maxResults?: number;
+  /** Characters typed before searching. Defaults to 2. */
+  minChars?: number;
+  /** Milliseconds to wait after typing before searching. Defaults to 150. */
+  debounce?: number;
+  /** Set false to skip the search after a pause, which may use semantic search. */
+  semantic?: boolean;
+  /** Set false to stop the API using the visitor's approximate location. */
+  geo?: boolean;
+}
 
 export interface ControllerState {
   /** The text being searched, trimmed. */
   query: string;
   results: SearchResult[];
-  /** Index of the highlighted result, or -1. */
+  /** Index of the highlighted result, or -1. Equals results.length when the "Show more" row is highlighted. */
   active: number;
   open: boolean;
   /** True while a search for the current query is in flight. */
@@ -268,6 +364,12 @@ export interface ControllerState {
   error: boolean;
   /** The chosen church, or null. */
   selected: SearchResult | null;
+  /** More results can be shown with more(). Show a "Show more" row after the results. */
+  hasMore: boolean;
+  /** True while more() is loading. */
+  loadingMore: boolean;
+  /** The spelling searched instead of what was typed, such as "grace" for "gracee", or null. */
+  corrected: string | null;
 }
 
 export interface ControllerOptions {
@@ -280,10 +382,12 @@ export interface ControllerOptions {
   /** The text currently in the box. Results for anything else are dropped. Defaults to the last input(). */
   text?: () => string;
   onChange?: (state: ControllerState) => void;
-  /** New results (or an error) are ready to render. Called before onChange opens the list. */
-  onShow?: (state: ControllerState) => void;
-  /** Results arrived and are shown. */
-  onResults?: (detail: { query: string; results: SearchResult[]; settled: boolean }) => void;
+  /** New results (or an error) are ready to render, with the rows more() added. Called before onChange. */
+  onShow?: (state: ControllerState, added?: SearchResult[]) => void;
+  /** Results arrived and are shown. `more` is true when they came from more(). */
+  onResults?: (detail: { query: string; results: SearchResult[]; settled: boolean; more: boolean }) => void;
+  /** A search or a "Show more" failed. */
+  onError?: (error: unknown, query: string) => void;
   /** A church is about to be chosen. Return false to cancel. */
   onSelect?: (result: SearchResult) => boolean | void;
 }
@@ -296,45 +400,106 @@ export function createLookupController(opts: ControllerOptions = {}) {
     const l = typeof opts.lookup === "function" ? opts.lookup() : opts.lookup;
     return l ?? (own ??= createLookup({ client: opts.client, baseUrl: opts.baseUrl }));
   };
-  const state: ControllerState = { query: "", results: [], active: -1, open: false, loading: false, error: false, selected: null };
+  const state: ControllerState = { query: "", results: [], active: -1, open: false, loading: false, error: false, selected: null, hasMore: false, loadingMore: false, corrected: null };
   let timers: ReturnType<typeof setTimeout>[] = [];
   let ctrl: AbortController | null = null;
   let seq = 0;
+  /** The query the shown results belong to, and the ranked rows more() hasn't revealed yet. */
+  let shown = "";
+  let rest: SearchResult[] = [];
   const emit = () => opts.onChange?.(state);
   const clearTimers = () => { for (const t of timers) clearTimeout(t); timers = []; };
+  const params = (): SearchParams => (typeof opts.params === "function" ? opts.params() : opts.params) ?? {};
+  const most = (p: SearchParams) => Math.min(p.maxResults || MAX_RESULTS, MAX_RESULTS);
+  const page = (p: SearchParams) => Math.max(1, Math.min(p.limit || PAGE_SIZE, most(p)));
+  const current = () => (opts.text ? opts.text().trim() : state.query);
+  const isAbort = (e: unknown, n: number) => (e as Error).name === "AbortError" || n !== seq;
 
-  async function run(q: string, settled: boolean): Promise<void> {
+  function request(q: string, settled: boolean, limit: number) {
     ctrl?.abort();
     const mine = (ctrl = new AbortController());
-    const n = ++seq;
-    const p = (typeof opts.params === "function" ? opts.params() : opts.params) ?? {};
-    state.loading = true;
+    const p = params();
+    return { n: ++seq, res: client().search(q, { settled, signal: mine.signal, region: p.region, country: p.country, near: p.near, lat: p.lat, lng: p.lng, limit, geo: p.geo !== false }) };
+  }
+
+  async function run(q: string, settled: boolean, retried = false): Promise<void> {
+    const p = params();
+    const { n, res } = request(q, settled, page(p));
+    if (!state.loading) { state.loading = true; emit(); }
     try {
-      const res = await client().search(q, { settled, signal: mine.signal, region: p.region, country: p.country, near: p.near, limit: p.limit || 8, geo: p.geo !== false });
-      if (n !== seq || (opts.text ? opts.text().trim() : state.query) !== q) return;
-      show(res.results, false);
-      opts.onResults?.({ query: q, results: state.results, settled });
+      const r = await res;
+      if (n !== seq || current() !== q) return;
+      rest = [];
+      shown = q;
+      show(r.results, false, (r.hasMore ?? r.results.length >= page(p)) && r.results.length < most(p), r.corrected);
+      opts.onResults?.({ query: q, results: state.results, settled, more: false });
     } catch (e) {
-      if ((e as Error).name === "AbortError" || n !== seq) return;
-      show([], true);
+      if (isAbort(e, n)) return;
+      const wait = (e as LookupError).retryAfter;
+      // A busy database asks for a short pause: wait once, quietly, then try again.
+      if (!retried && (e as LookupError).status === 503 && wait && wait <= 5) {
+        timers.push(setTimeout(() => void run(q, settled, true), wait * 1000));
+        return;
+      }
+      opts.onError?.(e, q);
+      show([], true, false, null);
     }
   }
 
   /** The highlighted church keeps its place when settled results arrive. */
-  function show(next: SearchResult[], error: boolean): void {
+  function show(next: SearchResult[], error: boolean, hasMore: boolean, corrected: string | null): void {
+    const onMore = state.hasMore && state.active === state.results.length;
     const pinned = state.results[state.active];
     if (pinned) {
       const at = state.active;
       next = next.filter((r) => r.id !== pinned.id);
       next.splice(Math.min(at, next.length), 0, pinned);
       state.active = Math.min(at, next.length - 1);
-    } else state.active = -1;
-    state.results = next;
-    state.error = error;
-    state.loading = false;
-    state.open = true;
+    } else state.active = onMore && hasMore ? next.length : -1;
+    Object.assign(state, { results: next, error, hasMore, corrected, loading: false, loadingMore: false, open: true });
     opts.onShow?.(state);
     emit();
+  }
+
+  /** Append the next page from the rows already loaded. The rows already shown never move. */
+  function reveal(): SearchResult[] {
+    const p = params();
+    const added = rest.splice(0, Math.min(page(p), most(p) - state.results.length));
+    const wasOnMore = state.active === state.results.length;
+    state.results = state.results.concat(added);
+    state.hasMore = rest.length > 0 && state.results.length < most(p);
+    if (wasOnMore) state.active = state.results.length - (added.length || 1);
+    opts.onShow?.(state, added);
+    emit();
+    opts.onResults?.({ query: shown, results: state.results, settled: true, more: true });
+    return added;
+  }
+
+  /** Show the next page of results. Resolves to the rows it added. */
+  async function more(): Promise<SearchResult[]> {
+    const q = shown;
+    if (!state.hasMore || state.loadingMore || current() !== q) return [];
+    if (rest.length) return reveal();
+    // One request for every row "Show more" can reach. It replaces any pending settled search.
+    clearTimers();
+    const p = params();
+    const { n, res } = request(q, q.length >= SETTLED_MIN && p.semantic !== false, most(p));
+    state.loadingMore = true;
+    emit();
+    try {
+      const r = await res;
+      if (n !== seq || current() !== q) return [];
+      const seen = new Set(state.results.map((x) => x.id));
+      rest = r.results.filter((x) => !seen.has(x.id));
+      state.loadingMore = false;
+      return reveal();
+    } catch (e) {
+      if (isAbort(e, n)) return [];
+      state.loadingMore = false;
+      opts.onError?.(e, q);
+      emit();
+      return [];
+    }
   }
 
   return {
@@ -344,27 +509,34 @@ export function createLookupController(opts: ControllerOptions = {}) {
     input(text: string): void {
       clearTimers();
       const q = text.trim();
+      const p = params();
       state.query = q;
       // Typing after a pick starts over: the old choice no longer matches what's in the box.
       if (state.selected && q !== state.selected.name) state.selected = null;
-      if (q.length < MIN_QUERY) {
+      if (q.length < (p.minChars ?? MIN_QUERY)) {
         ctrl?.abort();
-        state.results = [];
-        state.loading = false;
-        state.open = false;
-        state.active = -1;
+        Object.assign(state, { results: [], loading: false, loadingMore: false, open: false, active: -1, hasMore: false, corrected: null });
         emit();
         return;
       }
       emit();
-      timers.push(setTimeout(() => void run(q, false), DEBOUNCE_MS));
-      if (q.length >= SETTLED_MIN) timers.push(setTimeout(() => void run(q, true), SETTLE_MS));
+      const wait = p.debounce ?? DEBOUNCE_MS;
+      const settle = q.length >= SETTLED_MIN && p.semantic !== false;
+      if (!settle || wait < SETTLE_MS) timers.push(setTimeout(() => void run(q, false), wait));
+      if (settle) timers.push(setTimeout(() => void run(q, true), Math.max(SETTLE_MS, wait)));
     },
-    /** Move the highlight by one, wrapping. Opens the list if it has results. */
+    /** Search the current text again, such as after an error. */
+    retry(): void {
+      clearTimers();
+      if (state.query) void run(state.query, false);
+    },
+    more,
+    /** Move the highlight by one, wrapping, through the results and the "Show more" row. Down on that row shows more. */
     move(dir: 1 | -1): void {
-      const n = state.results.length;
-      if (!state.open && n) state.open = true;
+      const n = state.results.length + (state.hasMore ? 1 : 0);
+      if (!state.open && state.results.length) state.open = true;
       if (!n) return emit();
+      if (dir === 1 && state.hasMore && state.active === state.results.length) { void more(); return; }
       state.active = dir === 1 ? (state.active + 1) % n : state.active <= 0 ? n - 1 : state.active - 1;
       emit();
     },
@@ -372,23 +544,28 @@ export function createLookupController(opts: ControllerOptions = {}) {
     open(): void { if (state.results.length) { state.open = true; emit(); } },
     close(): void { if (state.open) { state.open = false; emit(); } },
     /**
-     * Choose a result (the highlighted one by default) and load its record. Resolves to the record,
-     * or null when cancelled by onSelect. Rejects when the record can't load.
+     * Choose a result (the highlighted one by default) and load its record. Resolves to the record, or
+     * null when cancelled by onSelect, when the index is the "Show more" row (which shows more instead),
+     * or when the text changed while it loaded. Rejects when the record can't load.
      */
     async choose(i = state.active): Promise<ChurchRecord | null> {
+      if (i === state.results.length && state.hasMore) { await more(); return null; }
       const result = state.results[i];
       if (!result) return null;
       clearTimers();
-      state.open = false;
+      ctrl?.abort();
       // A new search after choosing starts fresh, with nothing pinned.
-      state.results = [];
-      state.active = -1;
+      Object.assign(state, { open: false, results: [], active: -1, loading: false, loadingMore: false, hasMore: false, corrected: null });
+      rest = [];
       emit();
       if (opts.onSelect?.(result) === false) return null;
-      state.selected = result;
       state.query = result.name;
       emit();
-      return client().getChurch(result.id);
+      const record = await client().getChurch(result.id);
+      if (state.query !== result.name) return null;
+      state.selected = record.id === result.id ? result : { ...result, id: record.id };
+      emit();
+      return record;
     },
     /** Mark a church as chosen without searching, such as one saved earlier. */
     select(result: SearchResult | null): void { state.selected = result; if (result) state.query = result.name; emit(); },
@@ -396,7 +573,9 @@ export function createLookupController(opts: ControllerOptions = {}) {
     reset(): void {
       clearTimers();
       ctrl?.abort();
-      Object.assign(state, { query: "", results: [], active: -1, open: false, loading: false, error: false, selected: null });
+      rest = [];
+      shown = "";
+      Object.assign(state, { query: "", results: [], active: -1, open: false, loading: false, error: false, selected: null, hasMore: false, loadingMore: false, corrected: null });
       emit();
     },
     /** Stop pending searches, such as when the UI unmounts. */
@@ -418,8 +597,15 @@ export function planFill(record: ChurchRecord, targets: Targets, { overwrite = f
     const value = fieldValue(record, field);
     if (value == null) { empty.push(field); continue; }
     if (!overwrite && element.value.trim()) continue;
-    if (element instanceof HTMLSelectElement && ![...element.options].some((o) => o.value === value)) continue;
-    changes.push({ field, element, value });
+    let v: string | undefined = value;
+    if (element instanceof HTMLSelectElement) {
+      // An option whose value or text is the code or the name: "TX" or "Texas", "US" or "United States".
+      const pair = fieldValue(record, field.endsWith("Name") ? field.slice(0, -4) : field + "Name");
+      const want = [value, pair].map((x) => x?.trim().toLowerCase());
+      v = [...element.options].find((o) => want.includes(o.value.toLowerCase()) || want.includes(o.text.trim().toLowerCase()))?.value;
+      if (v == null) continue;
+    }
+    changes.push({ field, element, value: v });
   }
   return { changes, empty };
 }
@@ -436,10 +622,18 @@ export function fillTargets(record: ChurchRecord, targets: Targets, opts: { over
   return plan;
 }
 
-/** Fields tagged data-hmc-field inside a scope (a form, by default the whole document). */
-export function findTargets(scope: ParentNode = document): Map<string, FieldTarget> {
+/**
+ * The fields a church fills inside a scope (a form, by default the whole document): inputs tagged
+ * data-hmc-field ("none" leaves one out), plus untagged ones `match` recognizes, such as matchField
+ * from @heresmychurch/lookup/fields. A tag wins over a match, and the first match for a field wins.
+ */
+export function findTargets(scope: ParentNode = document, match?: (el: FieldTarget) => string | null): Map<string, FieldTarget> {
   const out = new Map<string, FieldTarget>();
-  scope.querySelectorAll<FieldTarget>("[data-hmc-field]").forEach((el) => out.set(el.dataset.hmcField!, el));
+  if (match) scope.querySelectorAll<FieldTarget>("input:not([data-hmc-field]),select:not([data-hmc-field]),textarea:not([data-hmc-field])").forEach((el) => {
+    const f = match(el);
+    if (f && !out.has(f)) out.set(f, el);
+  });
+  scope.querySelectorAll<FieldTarget>("[data-hmc-field]").forEach((el) => { if (el.dataset.hmcField !== "none") out.set(el.dataset.hmcField!, el); });
   return out;
 }
 
