@@ -15,3 +15,5 @@
   Cache-Control: public, max-age=300
 /globe.js
   Cache-Control: public, max-age=300
+/sky.js
+  Cache-Control: public, max-age=300

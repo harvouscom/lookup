@@ -1,6 +1,7 @@
 // Lookup site behavior: the header globe and record card, nav and theme, copy buttons, tabs,
 // the section index, and the API playground. No dependencies.
 import { createGlobe } from "/globe.js";
+import { createSky } from "/sky.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -20,7 +21,9 @@ fetch("/data/globe.json")
     get pinOffset() {
       const W = $("#globe").clientWidth, R = Math.min(W * 0.66, 1300);
       return Math.asin(Math.min(1, Math.max(-1, 1 - ((small() ? 156 : 124) - 36) / R))) * 180 / Math.PI;
-    } }); startDemo(); })
+    } });
+    startSky();
+    startDemo(); })
   .catch(() => { $(".horizon").hidden = true; });
 
 fetch("/v1/meta")
@@ -117,6 +120,20 @@ function showFill(changes, quiet = false, record = null) {
     if (!quiet) logEvent("church-fill", `${changes.length} fields`);
     if (!quiet) logEvent("input/change", `fired on ${changes.length} fields`);
   });
+}
+
+// ── The sky: stars and constellations that turn with the globe, and the odd shooting star ──
+function startSky() {
+  const hdr = $(".hdr");
+  const sky = createSky($("#sky"), {
+    view: () => globe.view(),
+    horizon: () => $(".horizon").getBoundingClientRect().top - hdr.getBoundingClientRect().top,
+  });
+  let inView = true;
+  const sync = () => sky.setRunning(inView && !document.hidden);
+  new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); }).observe(hdr);
+  document.addEventListener("visibilitychange", sync);
+  sync();
 }
 
 // ── Idle demo: while nobody is searching, real churches light up on the globe and flow through

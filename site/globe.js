@@ -247,6 +247,8 @@ export function createGlobe(canvas, data, opts = {}) {
   return {
     particles: n,
     screen,
+    /** The current view center, for layers that turn with the globe. */
+    view: () => ({ lat: lat0, lng: lng0 }),
     setPins(list) {
       pins = list.filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
       if (!selected && pins.length && !dragging) this.flyTo(pins[0].lat, pins[0].lng, { soft: true });
