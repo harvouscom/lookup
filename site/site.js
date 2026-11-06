@@ -14,7 +14,7 @@ let globe = null;
 fetch("/data/globe.json")
   .then((r) => r.json())
   // A pick is aimed south of the church, so its pin rises into the visible top of the globe.
-  .then((data) => { globe = createGlobe($("#globe"), data, { lat: 10, lng: -45, pinOffset: small() ? 40 : 48, onFrame: placeTags }); })
+  .then((data) => { globe = createGlobe($("#globe"), data, { lat: 10, lng: -45, pinOffset: small() ? 40 : 46, onFrame: placeTags }); })
   .catch(() => { $(".horizon").hidden = true; });
 
 fetch("/v1/meta")
@@ -56,16 +56,17 @@ hero.addEventListener("church-results", (e) => {
   globe?.setPins(results.map((r) => ({ lat: r.latitude, lng: r.longitude })));
   showTags(results.slice(0, 4).map((r) => ({ lat: r.latitude, lng: r.longitude, text: r.name })));
   hud.textContent = `"${query}" → ${results.length} ${results.length === 1 ? "church" : "churches"}`;
+  logEvent("church-results", `${results.length} for "${query}"`, true);
 });
 hero.addEventListener("church-select", (e) => {
   const r = e.detail.result;
   globe?.setPins([]);
   globe?.select({ lat: r.latitude, lng: r.longitude });
-  $("#result-name").textContent = r.name;
-  $("#result-loc").textContent = r.locationLabel;
-  $$("input", card).forEach((i) => { i.value = ""; i.placeholder = "…"; });
-  $("#result-foot").textContent = "";
-  card.hidden = false;
+  setMode("wire");
+  logEvent("church-select", r.name);
+  $$("input", card).forEach((i) => { i.value = ""; i.placeholder = "…"; i.classList.toggle("on", false); });
+  $("#result-foot").classList.toggle("done", false);
+  $("#result-foot").textContent = `looking up ${r.name}…`;
   showTags([{ lat: r.latitude, lng: r.longitude, text: r.name, sub: r.locationLabel, big: true }]);
   hud.textContent = `flying to ${r.city || r.nearestPlace || r.regionName}…`;
 });
@@ -73,16 +74,63 @@ hero.addEventListener("church-fill", (e) => {
   const { changes } = e.detail;
   const filled = new Set(changes.map((c) => c.field));
   requestAnimationFrame(() => {
-    $$("input", card).forEach((i) => { if (!filled.has(i.dataset.hmcField)) { i.value = ""; i.placeholder = "not listed yet"; } });
-    card.classList.toggle("go", false);
-    void card.offsetWidth;
-    card.classList.add("go");
-    $("#result-foot").textContent = `filled ${changes.length} fields from here's my church`;
+    $$("input", card).forEach((i) => {
+      const on = filled.has(i.dataset.hmcField);
+      if (!on) { i.value = ""; i.placeholder = "not listed yet"; }
+      i.classList.toggle("on", on);
+    });
+    $("#result-foot").classList.add("done");
+    $("#result-foot").textContent = `filled ${changes.length} of ${$$("input", card).length} fields from here's my church`;
     const big = $(".tag.big small", tagLayer);
     if (big) big.textContent = `${changes.length} fields filled`;
     hud.textContent = `filled ${changes.length} fields`;
+    logEvent("church-fill", `${changes.length} fields → form#result-form`);
+    logEvent("input/change", `fired on ${changes.length} fields, so framework forms update`);
+    modeTimer = setTimeout(() => setMode("app"), 1600);
   });
 });
+
+// ── The scaffold: a wireframe that becomes your app once it's filled ──
+let modeTimer;
+function setMode(mode) {
+  clearTimeout(modeTimer);
+  const app = mode === "app";
+  card.classList.toggle("app", app);
+  $$(".sc-mode button", card).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  for (const [sel, show] of [[".sc-chrome", app], [".sc-app", app], [".sc-wire", !app]]) {
+    const el = $(sel, card);
+    el.classList.toggle("open", show);
+    el.inert = !show;
+  }
+  $("#scaffold-h").textContent = app ? "Add your church" : "Your app's form";
+}
+$$(".sc-mode button", card).forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+$$(".looks button", card).forEach((b) => b.addEventListener("click", () => {
+  card.dataset.look = b.dataset.look;
+  $$(".looks button", card).forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+}));
+$("#sc-save").addEventListener("click", (e) => {
+  const b = e.currentTarget;
+  b.textContent = "Saved (demo)";
+  setTimeout(() => { b.textContent = "Save church"; }, 1800);
+});
+
+const log = $("#sc-log");
+function logEvent(name, text, replace = false) {
+  $(".idle", log)?.remove();
+  const last = log.lastElementChild;
+  if (replace && last?.dataset.name === name) last.remove();
+  const li = document.createElement("li");
+  li.className = "new";
+  li.dataset.name = name;
+  const b = document.createElement("b");
+  b.textContent = name;
+  const t = document.createElement("span");
+  t.textContent = text;
+  li.append(b, t);
+  log.append(li);
+  while (log.children.length > 4) log.firstElementChild.remove();
+}
 
 // ── Nav: dark over the header, solid once the docs scroll in ──
 const nav = $("#nav");
