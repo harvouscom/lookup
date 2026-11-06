@@ -339,6 +339,42 @@ demoFrame?.addEventListener("load", () => {
 });
 if (demoFrame?.contentDocument?.readyState === "complete") fitFrame();
 
+// ── Thanks: if an avatar can't load, show initials instead of a broken image ──
+for (const img of $$(".thanks img")) {
+  const swap = () => {
+    const tile = document.createElement("span");
+    tile.className = "th-ic th-initials";
+    tile.textContent = "CP";
+    img.replaceWith(tile);
+  };
+  if (img.complete && !img.naturalWidth) swap();
+  else img.addEventListener("error", swap, { once: true });
+}
+
+// ── GitHub stars on the repo buttons, shown once a repo has some ──
+async function repoStars(repo) {
+  const key = `lookup-stars:${repo}`;
+  try { const hit = sessionStorage.getItem(key); if (hit != null) return JSON.parse(hit); } catch { /* storage off */ }
+  let n = null;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${repo}`);
+    if (r.ok) n = (await r.json()).stargazers_count ?? null;
+  } catch { /* offline or rate limited */ }
+  try { sessionStorage.setItem(key, JSON.stringify(n)); } catch { /* storage off */ }
+  return n;
+}
+for (const repo of new Set($$("[data-stars-for]").map((el) => el.dataset.starsFor))) {
+  repoStars(repo).then((n) => {
+    if (typeof n !== "number" || n < 1) return;
+    for (const el of $$(`[data-stars-for="${repo}"]`)) {
+      $("span", el).textContent = n.toLocaleString("en-US");
+      el.hidden = false;
+      const label = el.parentElement.querySelector(":scope > span")?.textContent.replace(/\s+/g, " ").trim();
+      el.parentElement.setAttribute("aria-label", `${label}, ${n} ${n === 1 ? "star" : "stars"}`);
+    }
+  });
+}
+
 // ── Nav: dark over the header, solid once the docs scroll in ──
 const nav = $("#nav");
 

@@ -549,3 +549,62 @@ th { background: var(--frame); }
 .aurora { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 13px; }
 @media (max-width: 640px) { .aurora { border-radius: 11px; } }
 p.num::after { margin-left: 2px; }
+
+/* ── Thanks ── */
+.thanks { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 10px; }
+.thanks li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(180deg, var(--panel), var(--frame)); }
+.th-ic { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; overflow: hidden; object-fit: cover; box-shadow: 0 1px 2px rgba(17,12,34,.08); }
+.th-ic svg { width: 100%; height: 100%; }
+.th-osm { color: #fff; background: linear-gradient(135deg, #7EBC6F, #4A8C3F); }
+.th-osm svg { width: 20px; height: 20px; }
+.thanks b { display: block; font-weight: 600; color: var(--text); }
+.thanks div span { display: block; font-size: .875rem; color: var(--text-2); }
+.thanks li > a { font-size: .8125rem; white-space: nowrap; text-decoration: none; }
+.thanks li > a:hover { text-decoration: underline; }
+@media (max-width: 560px) { .thanks li { grid-template-columns: 40px minmax(0, 1fr); } .thanks li > a { grid-column: 2; } }
+
+/* ── Footer: Here's My Church on the left, GitHub on the right ── */
+.foot { background: var(--page); }
+.foot-in { max-width: 1120px; padding: 28px 24px 36px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.foot-hmc { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+.foot-hmc svg { width: 32px; height: 32px; flex: none; }
+.foot-hmc small { display: block; font-family: var(--mono); font-size: .625rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.foot-hmc b { display: block; font-weight: 600; font-size: .9375rem; }
+.foot-hmc:hover b { color: var(--brand); }
+.gh { display: inline-flex; align-items: stretch; min-height: 36px; border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; text-decoration: none; color: var(--text); font-size: .875rem; font-weight: 500; background: var(--panel); }
+.gh > svg { align-self: center; margin-left: 12px; }
+.gh > span { display: flex; align-items: center; padding: 0 12px 0 8px; }
+.gh b { display: flex; align-items: center; gap: 5px; padding: 0 12px; border-left: 1px solid var(--line-2); font-weight: 500; font-variant-numeric: tabular-nums; color: var(--text-2); background: var(--frame); }
+.gh b[hidden] { display: none; }
+.gh b svg { color: #E3B341; }
+.gh:hover { border-color: var(--muted); }
+.th-initials { font-size: .8125rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #F59E0B, #EC4899); }
+.foot-hmc b, .gh > span { white-space: nowrap; }
+.gh > span i { font-style: normal; }
+@media (max-width: 480px) { .gh > span i { display: none; } .foot-in { padding: 24px 16px 32px; } }
+.th-ic[src] { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+
+/* ── Made in the open (matches harvous.com/open-source) ── */
+.oss { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+.oss-card { display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(180deg, var(--panel), var(--frame)); }
+.oss-main { grid-column: 1 / -1; background: radial-gradient(120% 140% at 100% 0%, color-mix(in oklab, var(--brand) 9%, transparent), transparent 60%), linear-gradient(180deg, var(--panel), var(--frame)); }
+.oss-top { display: flex; align-items: center; gap: 12px; }
+.oss-ic { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; overflow: hidden; box-shadow: 0 1px 2px rgba(17,12,34,.1); }
+.oss-ic svg { width: 100%; height: 100%; }
+.oss-harvous { font-weight: 700; color: #fff; background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+.oss-card h3 { margin: 0; font-size: 1rem; font-weight: 600; }
+.oss-card h3::before { display: none; }
+.oss-card code { display: block; margin-top: 2px; padding: 0; background: none; font-size: .75rem; color: var(--muted); }
+.oss-card > p { margin: 0; font-size: .9375rem; color: var(--text-2); }
+.oss-facts { margin: 0; display: grid; gap: 8px; }
+.oss-facts div { display: grid; gap: 2px; }
+.oss-main .oss-facts { grid-template-columns: 1fr 1fr; gap: 16px; }
+.oss-facts dt { font-family: var(--mono); font-size: .625rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.oss-facts dd { margin: 0; font-size: .875rem; color: var(--text-2); }
+.oss-actions { margin-top: auto; padding-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.oss-link { font-size: .875rem; text-decoration: none; }
+.oss-link:hover { text-decoration: underline; }
+.oss-gh { min-height: 34px; font-size: .8125rem; }
+.oss-more { margin-top: 18px; font-size: .9375rem; }
+@media (max-width: 720px) { .oss { grid-template-columns: 1fr; } .oss-main .oss-facts { grid-template-columns: 1fr; } }
+.oss-facts div { align-content: start; }
