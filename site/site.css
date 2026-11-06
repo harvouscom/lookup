@@ -461,3 +461,22 @@ th { background: var(--frame); }
 .hdr { margin-top: 0; }
 .hero { padding-top: 88px; }
 @media (max-width: 640px) { .nav { height: 58px; padding: 0 14px; } .hdr { margin-top: 0; } .hero { padding-top: 64px; } }
+
+/* ── Hero, refined: fewer pieces, a stronger headline, the search as the focal point ── */
+.hero { max-width: 44rem; }
+.badge { gap: 9px; margin-bottom: 28px; padding: 0; border: 0; background: none; font-size: .75rem; color: rgba(239,237,253,.55); letter-spacing: .01em; }
+.badge i { width: 6px; height: 6px; border-radius: 999px; background: #A78BFA; box-shadow: 0 0 0 4px rgba(167,139,250,.16), 0 0 12px rgba(167,139,250,.8); }
+.hero h1 { margin-bottom: 18px; font-size: clamp(2.75rem, 6.4vw, 4.75rem); font-weight: 600; line-height: 1.02; letter-spacing: -0.035em;
+  background: linear-gradient(180deg, #FFFFFF 30%, #CFC3F5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lede { max-width: 31rem; margin-bottom: 40px; font-size: 1.125rem; line-height: 1.55; color: rgba(239,237,253,.6); }
+.lede span { color: rgba(239,237,253,.9); }
+.try { max-width: 36rem; margin: 0 auto; }
+.try church-lookup::part(label) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.try church-lookup::part(input) { min-height: 60px; font-size: 1.0625rem; box-shadow: 0 0 0 6px rgba(124,58,237,.10), 0 24px 60px -24px rgba(124,58,237,.75); }
+.chips { margin-top: 18px; gap: 4px 16px; font-size: .75rem; color: rgba(239,237,253,.38); }
+.chips button { min-height: 24px; padding: 0; border: 0; border-radius: 4px; color: rgba(239,237,253,.7); text-decoration: underline; text-decoration-color: rgba(196,181,253,.35); text-underline-offset: 4px; }
+.chips button:hover { color: #fff; text-decoration-color: #C4B5FD; }
+.horizon { margin-top: 28px; }
+.hud-r { transition: opacity .3s; }
+.hud-r:empty { opacity: 0; }
+.lede { text-wrap: balance; }
