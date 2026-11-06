@@ -23,7 +23,7 @@ The response has `results`, plus `hasMore` when more churches ranked past `limit
 
 ## GET /v1/churches/:id
 
-The autofill record. Every key in `fields` is always present, with `null` or `[]` when empty, plus `missing`, `completeness` and `hints`.
+The autofill record. Every key in `fields` is always present, with `null` or `[]` when empty, plus `missing`, `completeness`, `hints`, `freshness.lastVerified` (when someone last confirmed it, in milliseconds, or `null`) and `links.heresMyChurch` (the church's page; add `?suggest=1` to open its fix form). Records are cached for a minute, and a change that goes live through Lookup refreshes it at once.
 
 ```bash
 curl https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145
@@ -31,17 +31,17 @@ curl https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145
 
 ## GET /v1/meta
 
-Field names, what can be contributed and how it's reviewed, completeness weights, counts and attribution.
+Field names, what can be contributed and how it's reviewed (`contributableFields`), whether adding churches is on (`addEnabled`), completeness weights, counts and attribution.
 
 ## POST /v1/churches/:id/contributions
 
-Send corrections as `{ client, changes: [{ field, value }] }`. Each field comes back with its own status:
+Send corrections as `{ client, changes: [{ field, value }] }`. Fields are `serviceTimes`, `denomination`, `languages`, `ministries`, `phone`, `website`, `email`, `pastorName`, the address, and the reports `reportClosed`, `reportDuplicate` and `reportRelocated`. Send an address as `{ "field": "address", "value": { "street", "city", "postalCode" } }` (any of the three), or as separate `street`, `city` and `postalCode` changes; either way it goes to Here's My Church as one change, and parts you leave out keep their listed values. Up to 8 changes at once. Each field comes back with its own status:
 
 | Status | Meaning |
 |---|---|
 | `live` | Applied now. These fields go live on one vote. |
 | `in_review` | Waits for a Here's My Church moderator. |
-| `not_applied` | Accepted, but the listed value didn't change, such as when it was already the same. |
+| `not_applied` | Not changed: the listed value was already the same, or Here's My Church kept it. |
 | `rejected` | Not accepted, with a `message` saying why. |
 | `try_again` | A temporary problem, such as maintenance or a rate limit. Nothing was refused. |
 | `coming_soon` | A field Lookup will accept soon. Name is coming soon. |
@@ -54,9 +54,30 @@ curl -X POST https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145/contrib
 
 > **Sandbox:** Test with `client: "lookup-demo"`. Changes are checked the same way but never sent, and responses say `sandbox: true`.
 
+When a change goes live, the response has `updated: true` and the record and search already show it.
+
 ## POST /v1/churches/:id/confirm
 
-"Still correct." Send `{ client }` to mark a listing as checked today.
+"Still correct." Send `{ client }` to mark a listing as checked today. The response has the new `lastVerified`.
+
+## POST /v1/churches
+
+Add a church that isn't listed. Send `{ client, church }`, where `church` has `name`, `city` and `region` (a code like `TX` or a name like `Texas`), and optionally `street`, `postalCode`, `country` (code or name), `phone`, `email`, `website`, `denomination`, `serviceTimes`, `languages`, `ministries`, `pastorName`, `latitude` and `longitude`.
+
+| Status | Meaning |
+|---|---|
+| `live` | Added. `id` is its new church ID, already searchable. |
+| `similar` | It may already be listed. `similar` holds candidates shaped like search results. Send again with `confirmAdd: true` to add it anyway. |
+| `rejected` | Not accepted, with a `message`. |
+| `try_again` | A temporary problem. Nothing was added. |
+
+```bash
+curl -X POST https://lookup.heresmychurch.com/v1/churches \
+  -H "content-type: application/json" \
+  -d '{"client":"lookup-demo","church":{"name":"New Hope Fellowship","city":"Dallas","region":"TX"}}'
+```
+
+With `lookup-demo`, the duplicate check runs against Lookup's own index and nothing is added: a `live` answer has `id: null` and `sandbox: true`.
 
 ## POST /v1/ask
 
@@ -78,4 +99,4 @@ Errors are JSON with a readable `error` and a stable `code` to check in your cod
 
 ## Limits
 
-120 requests and 30 semantic searches a minute per visitor, 5 contributions and 10 docs questions a minute. Over the limit returns `429`, a busy database returns `503`, and both send `Retry-After`, which browsers on any origin can read.
+120 requests and 30 semantic searches a minute per visitor, 5 contributions (adds included) and 10 docs questions a minute. Over the limit returns `429`, a busy database returns `503`, and both send `Retry-After`, which browsers on any origin can read.
