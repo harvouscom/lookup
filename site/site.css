@@ -1110,3 +1110,17 @@ p.num::after { margin-left: 2px; }
 .lede { max-width: 40rem; }
 .lede .nw { white-space: nowrap; }
 @media (max-width: 720px) { .lede-br { display: none; } }
+
+/* Example apps open in a window over the site, not a takeover: centered, framed, the page still visible around it */
+.exm { width: min(1240px, calc(100vw - 96px)); height: min(860px, calc(100dvh - 96px)); margin: auto; border-radius: 18px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1); box-shadow: 0 40px 120px -30px rgba(5,2,15,.75), 0 0 0 1px rgba(5,2,15,.2), inset 0 1px 0 rgba(255,255,255,.06);
+  background: linear-gradient(180deg, #160F2A, #0B0816 120px); }
+.exm::backdrop { background: rgba(11,8,22,.42); backdrop-filter: blur(6px) saturate(1.1); -webkit-backdrop-filter: blur(6px) saturate(1.1); }
+.exm-win { box-shadow: 0 0 0 1px rgba(255,255,255,.06); }
+@media (prefers-reduced-motion: no-preference) {
+  .exm[open] { animation: exm-in .32s cubic-bezier(.33,1,.68,1); }
+  .exm[open]::backdrop { animation: exm-fade .32s ease-out; }
+  @keyframes exm-in { from { opacity: 0; transform: translateY(14px) scale(.985); } }
+  @keyframes exm-fade { from { opacity: 0; } }
+}
+@media (max-width: 720px) { .exm { width: calc(100vw - 16px); height: calc(100dvh - 16px); border-radius: 14px; } }

@@ -518,6 +518,8 @@ markScrolled();
   $("#exm-prev").addEventListener("click", () => show(at - 1));
   $("#exm-next").addEventListener("click", () => show(at + 1));
   $("#exm-close").addEventListener("click", close);
+  // A click on the dimmed page around the window closes it, like any modal.
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) close(); });
   addEventListener("popstate", () => {
     const m = location.hash.match(/^#example\/([a-z]+)(?:\/([a-z]+))?$/);
     if (dlg.open && !m) { pushed = false; close(); }
