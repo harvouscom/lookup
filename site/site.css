@@ -676,3 +676,8 @@ p.num::after { margin-left: 2px; }
 .oss-also .oss-actions { margin: 0; padding: 0; flex-wrap: nowrap; }
 @media (max-width: 720px) { .oss-also { grid-template-columns: 32px minmax(0, 1fr); } .oss-also .oss-actions { grid-column: 1 / -1; flex-wrap: wrap; } }
 .oss-card > p .oss-link { font-size: inherit; white-space: nowrap; }
+/* Wordmark with its maker. */
+.brand-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand-by { padding-left: 10px; border-left: 1px solid var(--line-2); font-size: .8125rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.brand-by:hover { color: var(--brand); }
+@media (max-width: 420px) { .brand-by { display: none; } }
