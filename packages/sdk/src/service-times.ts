@@ -65,6 +65,7 @@ const CSS = `
 @container (max-width:340px){.row{grid-template-columns:repeat(3,minmax(0,1fr)) 44px}.row [data-k=day]{grid-column:1/-2}.row input{grid-column:1/-1;grid-row:3}}
 select,input,button{font:inherit;font-size:1rem;color:inherit;min-height:44px;box-sizing:border-box;border:1px solid var(--_input);border-radius:calc(var(--_r) - 2px);background:var(--_bg);padding:0 10px}
 input,select{min-width:0;width:100%}
+select{appearance:none;-webkit-appearance:none;padding-right:30px;background-image:linear-gradient(45deg,transparent 50%,var(--_muted) 50%),linear-gradient(135deg,var(--_muted) 50%,transparent 50%);background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%;background-size:5px 5px;background-repeat:no-repeat}
 select:focus-visible,input:focus-visible,button:focus-visible{outline:none;border-color:var(--_ring);box-shadow:0 0 0 4px color-mix(in oklab,var(--_ring) 22%,transparent)}
 button{cursor:pointer;font-weight:500}
 .x{border-color:transparent;background:none;color:var(--_muted);font-size:1.375rem;line-height:1;padding:0}
@@ -76,7 +77,7 @@ button{cursor:pointer;font-weight:500}
 .presets button{margin:0 8px 8px 0;border-radius:999px;padding:0 16px;color:inherit}
 .presets button:hover{border-color:var(--_ring);color:var(--_ring)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (forced-colors:active){.row,select,input,button{border:1px solid CanvasText}}
+@media (forced-colors:active){.row,select,input,button{border:1px solid CanvasText}select{appearance:auto;-webkit-appearance:auto;background-image:none;padding-right:10px}}
 `;
 
 const opt = (values: [string, string][], selected: string) =>
@@ -104,7 +105,7 @@ export class ChurchServiceTimes extends HTMLElement {
     new MutationObserver(() => this.bind()).observe(this, { childList: true, subtree: true, characterData: true });
     this.box.addEventListener("change", (e) => this.edit(e.target as HTMLElement));
     this.box.addEventListener("input", (e) => { if ((e.target as HTMLElement).dataset.k === "label") this.edit(e.target as HTMLElement); });
-    this.box.addEventListener("click", (e) => this.click(e.target as HTMLElement));
+    this.box.addEventListener("click", (e) => this.onBoxClick(e.target as HTMLElement));
     if (!this.field) this.render();
   }
 
@@ -177,7 +178,7 @@ export class ChurchServiceTimes extends HTMLElement {
     }
   }
 
-  private click(t: HTMLElement): void {
+  private onBoxClick(t: HTMLElement): void {
     const a = t.closest<HTMLElement>("[data-a]")?.dataset.a;
     if (!a) return;
     if (a === "add") {

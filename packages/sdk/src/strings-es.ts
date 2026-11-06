@@ -1,0 +1,39 @@
+// es strings for <church-lookup>. Script tag: loads by itself when lang="es". Bundlers:
+// import "@heresmychurch/lookup/strings/es";
+import { registerStrings, type Strings } from "./strings.ts";
+
+const list = (m: string[], label: string) => (m.length ? ` ${label} ${m.join(", ")}.` : "");
+
+const strings: Strings = {
+    label: "Iglesia",
+    placeholder: "Escribe el nombre de tu iglesia",
+    none: "No encontramos esa iglesia. Lo que escribiste se queda en el formulario. ",
+    add: "Agrégala en Here's My Church",
+    noneShort: "No hay iglesias que coincidan.",
+    error: "La búsqueda no está disponible ahora. Puedes seguir escribiendo los datos de tu iglesia.",
+    found: (n) => `${n} ${n === 1 ? "iglesia encontrada" : "iglesias encontradas"}. Usa las flechas arriba y abajo para elegir.`,
+    filled: (n, m) => `${n} ${n === 1 ? "campo completado" : "campos completados"}.${list(m, "No disponible:")}`,
+    loadFail: "No pudimos cargar los datos de esa iglesia. Puedes escribirlos.",
+    dataFrom: "Datos de",
+    clear: "Borrar iglesia",
+    required: "Elige tu iglesia de la lista.",
+    shareTitle: "¿Compartir tus correcciones con Here's My Church?",
+    shareBody: "Los cambios marcados ayudan a todas las apps de iglesias. No se envía nada hasta que elijas Compartir.",
+    share: "Compartir",
+    notNow: "Ahora no",
+    goesLive: "Se publica",
+    reviewed: "Lo revisa un moderador",
+    soon: "Próximamente",
+    st: { live: "Publicado", in_review: "Enviado a revisión", not_applied: "Ya estaba al día", rejected: "No aceptado", try_again: "No se pudo enviar. Inténtalo en un momento.", coming_soon: "Próximamente" },
+    shared: (n) => `${n} ${n === 1 ? "cambio compartido" : "cambios compartidos"}.`,
+    sending: "Enviando…",
+    sandbox: "Solo demostración: no se envió nada.",
+    confirmQ: "Datos de Here's My Church. ¿Siguen siendo correctos?",
+    stillCorrect: "Siguen correctos",
+    done: "Listo",
+    thanks: "Gracias por confirmar.",
+    changedNote: (n) => `Cambiaste ${n} ${n === 1 ? "dato" : "datos"}. Puedes compartirlos con Here's My Church debajo del campo de iglesia.`,
+  };
+
+registerStrings("es", strings);
+export default strings;

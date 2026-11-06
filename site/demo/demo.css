@@ -1,0 +1,31 @@
+/* Example apps. Each is a made-up product with its own look; this file has the shared bits:
+   the "Lookup example" banner (hidden when embedded in the homepage modal) and the demo-mode pill. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+img, svg { display: block; }
+button, input, select, textarea { font: inherit; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 12px; top: -48px; z-index: 100; padding: 8px 12px; border-radius: 8px; background: #fff; color: #000; }
+.skip:focus { top: 12px; }
+
+.demo-banner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px; padding: 8px 16px; background: #0B0816; color: rgba(239,237,253,.75); font: 500 13px/1.4 "Google Sans Flex", ui-sans-serif, system-ui, sans-serif; }
+.demo-banner b { color: #fff; font-weight: 600; }
+.demo-banner a { color: #C4B5FD; }
+.embed .demo-banner { display: none; }
+
+.demo-pill { position: fixed; z-index: 60; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 28px); padding: 7px 12px 7px 8px; border-radius: 999px; background: rgba(17,12,34,.92); color: #fff; font: 500 12px/1.3 "Google Sans Flex", ui-sans-serif, system-ui, sans-serif; box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); }
+.demo-pill img { width: 18px; height: 18px; }
+.demo-pill span { color: rgba(239,237,253,.75); }
+.demo-pill button { margin-left: 4px; padding: 3px 9px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); background: none; color: #fff; font: inherit; cursor: pointer; }
+.demo-pill button:hover { background: rgba(255,255,255,.1); }
+
+/* A dev drawer: what the app's own code sees (React state, the posted form, the fill events). */
+.dev { position: fixed; z-index: 61; right: 14px; bottom: 14px; width: min(380px, calc(100vw - 28px)); max-height: min(60vh, 520px); display: flex; flex-direction: column; border-radius: 14px; background: #16151C; color: #ECEBF2; box-shadow: 0 24px 60px -16px rgba(0,0,0,.6); overflow: hidden; }
+.dev[hidden] { display: none; }
+.dev header { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px 10px 14px; border-bottom: 1px solid rgba(255,255,255,.08); font: 600 12px/1.3 "Geist Mono", ui-monospace, monospace; letter-spacing: .02em; }
+.dev header button { width: 28px; height: 28px; border-radius: 7px; border: 0; background: rgba(255,255,255,.06); color: #fff; cursor: pointer; }
+.dev pre { margin: 0; padding: 12px 14px; overflow: auto; font: 12px/1.6 "Geist Mono", ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dev .k { color: #C4B5FD; } .dev .s { color: #7DD3C0; } .dev .c { color: #8A8799; }
+
+@media (max-width: 640px) { .demo-pill span { display: none; } }

@@ -36,3 +36,21 @@ const lookup = createLookup({ client: "my-tool" });
 const { results } = await lookup.search("grace comm");
 const church = await lookup.getChurch(results[0].id);
 ```
+
+Headless core, at most 4 KB gzipped, for building your own UI. No side effects on import: nothing is registered.
+
+```js
+import { createLookupController, findTargets, fillTargets } from "@heresmychurch/lookup/core";
+const ctl = createLookupController({ client: "my-tool", onChange: (state) => render(state) });
+input.addEventListener("input", () => ctl.input(input.value));
+const record = await ctl.choose(0);
+fillTargets(record, findTargets(form));
+```
+
+React and shadcn/ui: add the registry component instead of the element. It copies `ChurchLookup` (Command and Popover), `useChurchLookup` and this core into your app, and works with React Hook Form.
+
+```bash
+pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/church-lookup.json
+```
+
+Docs: https://lookup.heresmychurch.com/docs/react

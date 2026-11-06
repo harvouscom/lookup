@@ -123,6 +123,8 @@
   .tune input[type=range] { width: 100%; }
   .tune pre { margin: 16px 0 0; font-size: .8125rem; white-space: pre-wrap; }
   .tune .copy { margin-top: 8px; }
+  select { appearance:none; -webkit-appearance:none; padding-right:30px; background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%); background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%; background-size:5px 5px; background-repeat:no-repeat; }
+  @media (forced-colors: active) { select { appearance: auto; -webkit-appearance: auto; background-image: none; } }
 </style>
 </head>
 <body>

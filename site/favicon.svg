@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lookup">
+  <defs>
+    <clipPath id="lk-sq"><rect width="64" height="64" rx="15"/></clipPath>
+    <linearGradient id="lk-bg" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#43218A"/>
+      <stop offset="1" stop-color="#160B30"/>
+    </linearGradient>
+    <radialGradient id="lk-hi" cx="0.3" cy="0.05" r="0.75">
+      <stop offset="0" stop-color="#fff" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lk-ink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F5EDFF"/>
+      <stop offset=".55" stop-color="#D8B4FE"/>
+      <stop offset="1" stop-color="#B98AD6"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#lk-sq)">
+    <rect width="64" height="64" fill="url(#lk-bg)"/>
+    <rect width="64" height="64" fill="url(#lk-hi)"/>
+    <!-- A cursive "l" in one stroke, like the Here's My Church "h": in from the left edge, an open loop,
+         and out the right edge. Every join is tangent, so the line has no corners. -->
+    <path d="M -6 52 C 12 51, 33 43, 45 28 C 52 19, 52 8, 41 7.5 C 30 7, 19.5 16, 19.5 30 C 19.5 42, 24.5 52, 34 55.5 C 44 59, 56 55, 70 48"
+          fill="none" stroke="url(#lk-ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x=".5" y=".5" width="63" height="63" rx="14.5" fill="none" stroke="#fff" stroke-opacity=".14"/>
+  </g>
+</svg>

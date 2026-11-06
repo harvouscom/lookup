@@ -15,3 +15,42 @@
   Cache-Control: public, max-age=300
 /globe.js
   Cache-Control: public, max-age=300
+/sky.js
+  Cache-Control: public, max-age=300
+/aurora.js
+  Cache-Control: public, max-age=300
+/strings-*.js
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300
+/demo/*
+  Cache-Control: public, max-age=300
+/common.js
+  Cache-Control: public, max-age=300
+/docs.css
+  Cache-Control: public, max-age=300
+/docs.js
+  Cache-Control: public, max-age=300
+/docs/*.md
+  Access-Control-Allow-Origin: *
+  Content-Type: text/markdown; charset=utf-8
+  Cache-Control: public, max-age=300
+/docs/search-index.json
+  Cache-Control: public, max-age=300
+/SKILL.md
+  Access-Control-Allow-Origin: *
+  Content-Type: text/markdown; charset=utf-8
+  Cache-Control: public, max-age=300
+/r/*
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=300
+/demo/shadcn/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+/llms.txt
+  Access-Control-Allow-Origin: *
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=300
+/llms-full.txt
+  Access-Control-Allow-Origin: *
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=300

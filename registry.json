@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "heresmychurch",
+  "homepage": "https://lookup.heresmychurch.com/docs/react",
+  "items": [
+    {
+      "name": "church-lookup",
+      "type": "registry:component",
+      "title": "Church Lookup",
+      "description": "A church search box that fills your form from Here's My Church. Built on Command and Popover; works with React Hook Form.",
+      "dependencies": ["lucide-react", "cmdk"],
+      "registryDependencies": ["command", "popover"],
+      "files": [
+        { "path": "registry/components/church-lookup.tsx", "type": "registry:component" },
+        { "path": "registry/hooks/use-church-lookup.ts", "type": "registry:hook" },
+        { "path": "registry/lib/lookup-core.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "use-church-lookup",
+      "type": "registry:hook",
+      "title": "useChurchLookup",
+      "description": "Lookup's search engine as a React hook, for building your own church picker.",
+      "files": [
+        { "path": "registry/hooks/use-church-lookup.ts", "type": "registry:hook" },
+        { "path": "registry/lib/lookup-core.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "church-consent",
+      "type": "registry:component",
+      "title": "Church Consent",
+      "description": "Offer to share corrections back to Here's My Church after a fill. Every change starts unchecked.",
+      "registryDependencies": ["checkbox", "badge", "button"],
+      "files": [
+        { "path": "registry/components/church-consent.tsx", "type": "registry:component" },
+        { "path": "registry/lib/lookup-core.ts", "type": "registry:lib" }
+      ]
+    }
+  ]
+}

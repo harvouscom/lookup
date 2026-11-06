@@ -1,12 +1,15 @@
-// <church-lookup>: an ARIA 1.2 combobox that searches Here's My Church and autofills a form.
-import { createLookup, type ChurchRecord, type Lookup, type SearchResult } from "./client.ts";
+// <church-lookup>: an ARIA 1.2 combobox that searches Here's My Church and autofills a form. It's a
+// form-associated element: with a `name`, the chosen church's ID submits like any input.
+/// <reference path="./jsx.d.ts" />
+import { createLookup, type ChurchRecord, type FieldStatus, type Lookup, type Meta, type SearchResult } from "./client.ts";
+import { applyFill, consentDiff, contributable, createLookupController, fieldValue, findTargets, planFill, type ControllerState, type FillChange } from "./core.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
+import { LANGS, registry, stringsFor, type Strings } from "./strings.ts";
 
-export { setNativeValue };
+export type { Strings, FillChange };
 
-const DEBOUNCE_MS = 150;
-const SETTLE_MS = 700;
-const SETTLED_MIN = 4;
+export { setNativeValue, fieldValue };
+
 const ADD_URL = "https://heresmychurch.com";
 
 // Each token falls back to the shadcn/ui names that Sensible UI (sensibleui.com, by Cam Pak) uses, so a
@@ -19,9 +22,10 @@ const CSS = `
 --_muted:var(--hmc-muted,var(--muted-foreground,#52525b));--_r:var(--hmc-radius,var(--radius,10px))}
 label{display:block;margin-bottom:8px;font-weight:600;font-size:.9375rem}
 .field{position:relative}
-.field svg{position:absolute;left:14px;top:50%;width:20px;height:20px;margin-top:-10px;color:var(--_muted);pointer-events:none}
+.field svg{position:absolute;z-index:1;left:14px;top:50%;width:20px;height:20px;margin-top:-10px;color:var(--_muted);pointer-events:none}
 input{box-sizing:border-box;width:100%;min-height:52px;padding:12px 16px 12px 44px;font:inherit;font-size:1.0625rem;color:inherit;background:var(--_bg);border:1px solid var(--_input);border-radius:var(--_r);outline:none;transition:border-color .15s,box-shadow .15s}
-input::placeholder{color:var(--_muted);opacity:.85}
+input::placeholder{color:var(--_muted);opacity:.85}:host([data-chosen]) input{padding-right:48px}
+.x{position:absolute;z-index:1;right:10px;top:50%;width:32px;height:32px;margin-top:-16px;display:grid;place-items:center;padding:0;border:0;border-radius:calc(var(--_r) - 2px);background:none;color:var(--_muted);cursor:pointer}.x:hover{background:var(--_active);color:inherit}.x:focus-visible{outline:2px solid var(--_ring);outline-offset:1px}.x[hidden]{display:none}.x svg{width:16px;height:16px}
 input:focus-visible{border-color:var(--_ring);box-shadow:0 0 0 4px color-mix(in oklab,var(--_ring) 22%,transparent)}
 .pop{position:absolute;z-index:var(--hmc-z,1000);left:0;right:0;margin-top:8px;padding:6px;background:var(--_pop);color:var(--_pop-fg);border:1px solid var(--_line);border-radius:calc(var(--_r) + 4px);box-shadow:0 20px 40px -12px rgb(24 24 27/.25),0 4px 10px -4px rgb(24 24 27/.1)}
 .pop[hidden]{display:none}
@@ -29,62 +33,128 @@ ul{list-style:none;margin:0;padding:0;max-height:min(60vh,400px);overflow:auto;d
 li{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;min-height:56px;padding:8px 10px;border-radius:var(--_r);cursor:pointer}
 li:hover,li[aria-selected=true]{background:var(--_active);color:var(--_active-fg)}
 .ic{display:grid;place-items:center;width:40px;height:40px;border-radius:calc(var(--_r) - 2px);background:color-mix(in oklab,var(--_ring) 12%,transparent);color:var(--_ring)}
-.ic svg{width:20px;height:20px}
+.ic svg{width:20px;height:20px}.ic ::slotted(*){display:grid;place-items:center;width:20px;height:20px;font-size:20px;line-height:1}.field ::slotted([slot=search-icon]){position:absolute;z-index:1;left:14px;top:50%;display:grid;place-items:center;width:20px;height:20px;margin-top:-10px;font-size:20px;line-height:1;color:var(--_muted);pointer-events:none}:host([icons=none]) .ic{display:none}:host([icons=none]) li{grid-template-columns:1fr auto}
 .t{display:grid;gap:2px;min-width:0}
 .n{font-weight:600;line-height:1.3}
 .sub{color:var(--_muted);font-size:.875rem;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .d{font-size:.8125rem;color:var(--_muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .note{padding:14px 12px;font-size:.9375rem;color:var(--_muted)}
-.foot{margin-top:6px;padding:10px 12px 6px;border-top:1px solid var(--_line);font-size:.75rem;color:var(--_muted)}
+.foot{display:flex;align-items:center;gap:8px;margin-top:6px;padding:10px 10px 4px;border-top:1px solid var(--_line);font-size:.75rem;color:var(--_muted)}.foot svg{flex:none;width:20px;height:20px}.foot span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.foot i{font-style:normal}.foot b a{color:inherit;font-weight:600;text-decoration:none}.foot b a:hover{text-decoration:underline}.foot .osm{margin-left:auto;font-size:.6875rem;font-weight:400;color:var(--_muted);text-decoration:none;white-space:nowrap}.foot .osm:hover{text-decoration:underline}
 a{color:var(--_ring);font-weight:500;text-underline-offset:3px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:480px){.foot i{display:none}li{grid-template-columns:32px 1fr auto;gap:10px;min-height:48px;padding:6px 8px}.ic{width:32px;height:32px}.ic svg{width:16px;height:16px}.n{font-size:.9375rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sub{font-size:.8125rem}.d{font-size:.75rem}input{min-height:48px;font-size:1rem}}
+.cs{margin-top:10px;padding:12px 14px;border:1px solid var(--_line);border-radius:var(--_r);background:color-mix(in oklab,var(--_ring) 5%,var(--_bg));font-size:.875rem}.cs[hidden]{display:none}
+.cs h3{margin:0;font-size:.9375rem;font-weight:600}.cs>p{margin:4px 0 10px;font-size:.8125rem}.cs .q{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}.cs .q p{margin:0;flex:1;min-width:12em}
+.cs ul{max-height:none;overflow:visible;gap:4px;margin:0 0 10px}.cs li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;min-height:44px;padding:6px 4px;cursor:default;align-items:start}.cs li:hover{background:none}
+.cs input[type=checkbox]{width:20px;height:20px;min-height:0;margin:2px 0 0;padding:0;accent-color:var(--_ring)}.cs label{font-weight:600}.cs .v{grid-column:2;display:flex;flex-wrap:wrap;gap:4px 8px;color:var(--_muted);overflow-wrap:anywhere}.cs s{opacity:.75}.cs ins{text-decoration:none;color:inherit}
+.cs .b{grid-column:2;justify-self:start;padding:1px 8px;border-radius:999px;font-size:.75rem;background:color-mix(in oklab,var(--_ring) 12%,transparent);color:var(--_ring)}.cs .b.m{background:color-mix(in oklab,var(--_muted) 14%,transparent);color:inherit}
+.cs .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.cs .bt{min-height:40px;padding:0 14px;border-radius:calc(var(--_r) - 2px);font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--_ring);background:var(--_ring);color:#fff}.cs .bt.g{background:transparent;color:inherit;border-color:var(--_input)}.cs .bt:disabled{opacity:.6;cursor:default}.cs .bt:focus-visible,.cs input:focus-visible{outline:2px solid var(--_ring);outline-offset:2px}.cs .note{padding:0;margin:8px 0 0}
 @media (prefers-reduced-motion:reduce){input{transition:none}}
 @media (forced-colors:active){li[aria-selected=true]{background:Highlight;color:HighlightText;forced-color-adjust:none}input,.pop{border:1px solid CanvasText}input:focus-visible{outline:2px solid Highlight}}
 `;
 const SEARCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`;
+// Here's My Church's mark: a lilac cursive "h" on a plum tile.
+const HMC = `<svg viewBox="0 0 20 20" aria-hidden="true"><defs><clipPath id="hmc-t"><rect width="20" height="20" rx="5"/></clipPath></defs><g clip-path="url(#hmc-t)"><rect width="20" height="20" fill="#3B1D6E"/><path d="M-1 16C3 14 6 9 7.4 5.2 8.4 2.4 6.3 1.7 5.8 4.6 5.3 8 5.5 13 5.7 21M5.9 15.2C7.1 11.4 9.9 9.4 11.9 10.2 13.8 11 13.3 14.6 13.8 16.8 14.2 18.6 17 18.2 21 15.4" fill="none" stroke="#D2B4FB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`;
+const CLEAR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>`;
 const CHURCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v5M10 4h4M6 21V11l6-4 6 4v10M3 21h18M10 21v-4a2 2 0 0 1 4 0v4"/></svg>`;
 
 let uid = 0;
 
-export interface FillChange { field: string; element: FieldTarget; value: string }
-
-export function fieldValue(record: ChurchRecord, field: string): string | null {
-  const v = field === "id" ? record.id : record.fields[field];
-  if (v == null) return null;
-  if (Array.isArray(v)) return v.length ? v.join(", ") : null;
-  if (typeof v === "object") return (v as { raw?: string | null }).raw ?? null;
-  return String(v);
-}
+interface WatchRow { field: string; el: FieldTarget; label: string; was: string; review: "live" | "moderated"; soon: boolean }
+interface Snapshot { id: string; rows: WatchRow[]; sent: Map<string, string>; dismissed: string; confirmed: boolean; off: () => void }
 
 export class ChurchLookup extends HTMLElement {
+  static formAssociated = true;
   /** Map of record field to an element or selector. Merged over data-hmc-field elements. */
   fieldMap: Record<string, FieldTarget | string> = {};
   lookup: Lookup | null = null;
+  private internals: ElementInternals | null = null;
+  private fallback: HTMLInputElement | null = null;
+  private current = "";
+  private overrides: Partial<Strings> = {};
+  private clearBtn!: HTMLButtonElement;
+  private panel!: HTMLDivElement;
+  private meta: Promise<Meta | null> | null = null;
+  private snap: Snapshot | null = null;
   private input!: HTMLInputElement;
   private list!: HTMLUListElement;
   private pop!: HTMLDivElement;
   private note!: HTMLDivElement;
   private live!: HTMLDivElement;
-  private results: SearchResult[] = [];
-  private active = -1;
   private composing = false;
-  private timers: ReturnType<typeof setTimeout>[] = [];
-  private ctrl: AbortController | null = null;
-  private seq = 0;
-  private id = `hmc-${++uid}`;
+  private key = `hmc-${++uid}`;
+  /** The search engine; this element only renders it. See @heresmychurch/lookup/core. */
+  private ctl = createLookupController({
+    lookup: () => this.client(),
+    params: () => {
+      const a = (n: string) => this.getAttribute(n) ?? undefined;
+      return { region: a("region"), country: a("country"), near: a("near"), limit: Number(a("limit")) || 8, geo: a("geo") !== "off" };
+    },
+    text: () => this.input?.value ?? "",
+    onShow: (st) => this.show(st),
+    onChange: (st) => this.sync(st),
+    // For hosts that want to show results elsewhere too, such as pins on a map.
+    onResults: (detail) => this.dispatchEvent(new CustomEvent("church-results", { detail, bubbles: true, composed: true })),
+    onSelect: (result) => {
+      if (!this.dispatchEvent(new CustomEvent("church-select", { detail: { result }, cancelable: true, bubbles: true, composed: true }))) return false;
+      this.input.value = result.name;
+      this.setValue(result.id);
+    },
+  });
+
+  constructor() {
+    super();
+    try { this.internals = this.attachInternals?.() ?? null; } catch { this.internals = null; }
+  }
+
+  /** The chosen church's ID, or "". Setting an ID shows that church, as on an edit screen. */
+  get value(): string { return this.current; }
+  set value(id: string) { void this.prefill(id); }
+  /** The chosen church as a search result, or null. */
+  get selected(): SearchResult | null { return this.ctl.state.selected; }
+  /** Override any text, such as { label: "Your parish" }. */
+  get strings(): Partial<Strings> { return this.overrides; }
+  set strings(v: Partial<Strings>) { this.overrides = v ?? {}; this.applyText(); }
+  get form(): HTMLFormElement | null { return this.internals?.form ?? this.closest("form"); }
+  get validity(): ValidityState | undefined { return this.internals?.validity; }
+  checkValidity(): boolean { return this.internals?.checkValidity() ?? true; }
+  reportValidity(): boolean { return this.internals?.reportValidity() ?? true; }
+
+  private get uiLang(): string {
+    return (this.getAttribute("lang") ?? this.closest("[lang]")?.getAttribute("lang") ?? "en").toLowerCase().split("-")[0]!;
+  }
+  private get t(): Strings {
+    return { ...stringsFor(this.uiLang), ...this.overrides };
+  }
+  private onStrings = () => this.applyText();
+
+  /** Load a language file that sits next to element.js, unless it's already registered. */
+  private loadLang(): void {
+    const lang = this.uiLang;
+    if (!LANGS.includes(lang) || registry()[lang]) return;
+    import(/* @vite-ignore */ new URL(`./strings-${lang}.js`, import.meta.url).href).catch(() => { /* stay in English */ });
+  }
+
+  disconnectedCallback(): void {
+    document.removeEventListener("hmc-strings", this.onStrings);
+  }
 
   connectedCallback(): void {
     if (this.shadowRoot) return;
     const root = this.attachShadow({ mode: "open" });
-    const id = this.id;
-    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field">${SEARCH}<input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">Church data from OpenStreetMap contributors and <a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></div></div><div class="sr" role="status" aria-live="polite"></div>`;
+    const id = this.key;
+    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field"><slot name="search-icon">${SEARCH}</slot><input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"><button class="x" part="clear" type="button" hidden>${CLEAR}</button></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">${HMC}<span><i class="df"></i><b><a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></b></span><a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div></div><div class="cs" part="consent" role="region" hidden></div><div class="sr" role="status" aria-live="polite"></div>`;
     this.input = root.querySelector("input")!;
     this.list = root.querySelector("ul")!;
     this.pop = root.querySelector(".pop")!;
     this.note = root.querySelector(".note")!;
     this.live = root.querySelector("[role=status]")!;
-    root.querySelector("label")!.textContent = this.getAttribute("label") ?? "Church";
-    this.input.placeholder = this.getAttribute("placeholder") ?? "Start typing your church's name";
+    this.clearBtn = root.querySelector(".x")!;
+    this.panel = root.querySelector(".cs")!;
+    this.clearBtn.addEventListener("click", () => { this.clear(); this.input.focus(); });
+    this.applyText();
+    document.addEventListener("hmc-strings", this.onStrings);
+    this.loadLang();
     this.input.addEventListener("input", () => this.onInput());
     this.input.addEventListener("compositionstart", () => (this.composing = true));
     this.input.addEventListener("compositionend", () => { this.composing = false; this.onInput(); });
@@ -95,64 +165,108 @@ export class ChurchLookup extends HTMLElement {
       const li = (e.target as Element).closest("li");
       if (li) this.choose(Number(li.dataset.i));
     });
+    // Without ElementInternals (older browsers), a hidden input carries the value instead.
+    const name = this.getAttribute("name");
+    if (!this.internals && name && !this.fallback) {
+      this.fallback = Object.assign(document.createElement("input"), { type: "hidden", name });
+      this.append(this.fallback);
+    }
+    this.setValue("");
+    const initial = this.getAttribute("value");
+    // After a microtask, so a lookup client or strings set right after creation are used.
+    if (initial) queueMicrotask(() => void this.prefill(initial));
+  }
+
+  private applyText(): void {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const t = this.t;
+    root.querySelector("label")!.textContent = this.getAttribute("label") ?? this.overrides.label ?? t.label;
+    this.input.placeholder = this.getAttribute("placeholder") ?? this.overrides.placeholder ?? t.placeholder;
+    this.clearBtn.setAttribute("aria-label", t.clear);
+    root.querySelector(".df")!.textContent = `${t.dataFrom} `;
+  }
+
+  /** Set the submitted value and keep validity, the clear button and the fallback input in step. */
+  private setValue(id: string): void {
+    this.current = id;
+    this.internals?.setFormValue(id || null);
+    if (this.fallback) this.fallback.value = id;
+    this.toggleAttribute("data-chosen", Boolean(id));
+    if (this.clearBtn) this.clearBtn.hidden = !id;
+    if (this.internals && this.input) {
+      if (this.hasAttribute("required") && !id) this.internals.setValidity({ valueMissing: true }, this.t.required, this.input);
+      else this.internals.setValidity({});
+    }
+  }
+
+  /** Forget the chosen church. Fields it filled keep their values. */
+  clear(): void {
+    const had = Boolean(this.current);
+    this.unwatch();
+    this.ctl.reset();
+    this.input.value = "";
+    this.close();
+    this.setValue("");
+    if (had) this.dispatchEvent(new CustomEvent("church-clear", { bubbles: true, composed: true }));
+  }
+
+  /** Show a church by ID without searching, such as one saved earlier. Fills only with fill-on-load. */
+  private async prefill(id: string): Promise<void> {
+    if (!this.shadowRoot) { if (id) this.setAttribute("value", id); return; }
+    if (!id) { this.clear(); return; }
+    try {
+      const record = await this.client().getChurch(id);
+      const name = String(record.fields.name ?? "");
+      this.input.value = name;
+      this.ctl.select({ id: record.id, name, label: name, locationLabel: "" } as SearchResult);
+      this.setValue(record.id);
+      if (this.hasAttribute("fill-on-load")) this.fillFrom(record);
+    } catch {
+      this.say(this.t.loadFail);
+    }
+  }
+
+  formResetCallback(): void { this.clear(); }
+  formStateRestoreCallback(state: unknown): void { if (typeof state === "string" && state) void this.prefill(state); }
+  formDisabledCallback(disabled: boolean): void {
+    if (this.input) this.input.disabled = disabled;
+    if (this.clearBtn) this.clearBtn.disabled = disabled;
   }
 
   private client(): Lookup {
     return this.lookup ??= createLookup({ baseUrl: this.getAttribute("base-url") ?? undefined, client: this.getAttribute("client") ?? undefined });
   }
 
-  private clearTimers(): void {
-    for (const t of this.timers) clearTimeout(t);
-    this.timers = [];
-  }
-
   private onInput(): void {
     if (this.composing) return;
-    this.clearTimers();
-    const q = this.input.value.trim();
-    if (q.length < 2) { this.ctrl?.abort(); this.results = []; this.close(); return; }
-    this.timers.push(setTimeout(() => this.run(q, false), DEBOUNCE_MS));
-    if (q.length >= SETTLED_MIN) this.timers.push(setTimeout(() => this.run(q, true), SETTLE_MS));
+    this.ctl.input(this.input.value);
+    // Typing after a pick starts over: the old choice no longer matches what's in the box.
+    if (this.current && !this.ctl.state.selected) this.setValue("");
   }
 
-  private async run(q: string, settled: boolean): Promise<void> {
-    this.ctrl?.abort();
-    const ctrl = (this.ctrl = new AbortController());
-    const seq = ++this.seq;
-    const a = (n: string) => this.getAttribute(n) ?? undefined;
-    try {
-      const res = await this.client().search(q, {
-        settled, signal: ctrl.signal, region: a("region"), country: a("country"), near: a("near"),
-        limit: Number(a("limit")) || 8, geo: a("geo") !== "off",
-      });
-      if (seq !== this.seq || this.input.value.trim() !== q) return;
-      this.show(res.results);
-      // For hosts that want to show results elsewhere too, such as pins on a map.
-      this.dispatchEvent(new CustomEvent("church-results", { detail: { query: q, results: this.results, settled }, bubbles: true, composed: true }));
-    } catch (e) {
-      if ((e as Error).name === "AbortError" || seq !== this.seq) return;
-      this.show([], "Search isn't available right now. You can keep typing your church's details.");
-    }
+  /** Keep the popup's open state and the highlighted option in step with the controller. */
+  private sync(st: Readonly<ControllerState>): void {
+    if (!this.pop) return;
+    this.pop.hidden = !st.open;
+    this.input.setAttribute("aria-expanded", String(st.open));
+    if (st.open) this.mark();
+    else this.input.removeAttribute("aria-activedescendant");
   }
 
-  /** Render results. The highlighted church keeps its place when settled results arrive. */
-  private show(next: SearchResult[], error?: string): void {
-    const pinned = this.results[this.active];
-    if (pinned) {
-      const at = this.active;
-      next = next.filter((r) => r.id !== pinned.id);
-      next.splice(Math.min(at, next.length), 0, pinned);
-      this.active = Math.min(at, next.length - 1);
-    } else this.active = -1;
-    this.results = next;
+  /** Render results. The controller has already kept the highlighted church in its place. */
+  private show(st: Readonly<ControllerState>): void {
+    const next = st.results;
+    const error = st.error ? this.t.error : undefined;
+    this.placeIcons(next.length);
     this.list.replaceChildren(...next.map((r, i) => {
       const li = document.createElement("li");
-      li.id = `${this.id}-o${i}`;
+      li.id = `${this.key}-o${i}`;
       li.setAttribute("role", "option");
       li.setAttribute("part", "option");
-      li.setAttribute("aria-selected", String(i === this.active));
+      li.setAttribute("aria-selected", String(i === st.active));
       li.dataset.i = String(i);
-      li.innerHTML = `<span class="ic">${CHURCH}</span><span class="t"><span class="n"></span><span class="sub"></span></span><span class="d"></span>`;
+      li.innerHTML = `<span class="ic"><slot name="hmc-ic-${i}">${CHURCH}</slot></span><span class="t"><span class="n"></span><span class="sub"></span></span><span class="d"></span>`;
       li.querySelector(".n")!.textContent = r.name;
       li.querySelector(".sub")!.textContent = r.locationLabel;
       li.querySelector(".d")!.textContent = r.distanceKm == null ? "" : r.distanceKm < 10 ? `${r.distanceKm} km` : `${Math.round(r.distanceKm)} km`;
@@ -161,35 +275,31 @@ export class ChurchLookup extends HTMLElement {
     this.note.hidden = Boolean(next.length);
     if (!next.length) {
       this.note.innerHTML = "";
-      this.note.append(error ?? "No matching church. What you typed stays in the form. ");
+      this.note.append(error ?? this.t.none);
       if (!error) {
         const link = document.createElement("a");
         link.href = ADD_URL;
         link.target = "_blank";
         link.rel = "noopener";
-        link.textContent = "Add it on Here's My Church";
+        link.textContent = this.t.add;
         this.note.append(link);
       }
     }
-    this.open();
-    this.say(error ?? (next.length ? `${next.length} ${next.length === 1 ? "church" : "churches"} found. Use up and down arrows to choose.` : "No matching church."));
-    this.mark();
-  }
-
-  private open(): void {
-    this.pop.hidden = false;
-    this.input.setAttribute("aria-expanded", "true");
+    this.say(error ?? (next.length ? this.t.found(next.length) : this.t.noneShort));
   }
 
   close(): void {
+    this.ctl.close();
+    if (!this.pop) return;
     this.pop.hidden = true;
     this.input.setAttribute("aria-expanded", "false");
     this.input.removeAttribute("aria-activedescendant");
   }
 
   private mark(): void {
-    this.list.querySelectorAll("li").forEach((li, i) => li.setAttribute("aria-selected", String(i === this.active)));
-    const li = this.active >= 0 ? this.list.children[this.active] : null;
+    const active = this.ctl.state.active;
+    this.list.querySelectorAll("li").forEach((li, i) => li.setAttribute("aria-selected", String(i === active)));
+    const li = active >= 0 ? this.list.children[active] : null;
     if (li) {
       this.input.setAttribute("aria-activedescendant", li.id);
       li.scrollIntoView?.({ block: "nearest" });
@@ -197,17 +307,17 @@ export class ChurchLookup extends HTMLElement {
   }
 
   private onKey(e: KeyboardEvent): void {
-    const n = this.results.length;
+    const { results, active } = this.ctl.state;
+    const n = results.length;
     const isOpen = !this.pop.hidden;
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
-      if (!isOpen) { if (n) this.open(); if (e.altKey) return; }
+      if (!isOpen) { if (n) this.ctl.open(); if (e.altKey) return; }
       if (!n) return;
-      this.active = e.key === "ArrowDown" ? (this.active + 1) % n : this.active <= 0 ? n - 1 : this.active - 1;
-      this.mark();
-    } else if (e.key === "Enter" && isOpen && this.active >= 0) {
+      this.ctl.move(e.key === "ArrowDown" ? 1 : -1);
+    } else if (e.key === "Enter" && isOpen && active >= 0) {
       e.preventDefault();
-      this.choose(this.active);
+      void this.choose(active);
     } else if (e.key === "Escape" && isOpen) {
       e.preventDefault();
       this.close();
@@ -219,11 +329,33 @@ export class ChurchLookup extends HTMLElement {
     setTimeout(() => (this.live.textContent = text), 50);
   }
 
+  /**
+   * Your own result icon, from any icon library: a child with slot="result-icon" (an element or a
+   * <template>). It's copied once per result into the light DOM and slotted into that row, so page
+   * CSS still styles it, which icon fonts need. Without one, the built-in church icon shows.
+   */
+  private placeIcons(n: number): void {
+    const kids = [...this.children];
+    kids.filter((el) => el.hasAttribute("data-hmc-icon")).forEach((el) => el.remove());
+    const src = kids.find((el) => el.getAttribute("slot") === "result-icon");
+    if (!src) return;
+    for (let i = 0; i < n; i++) {
+      let copy: Element;
+      if (src instanceof HTMLTemplateElement) {
+        copy = document.createElement("span");
+        copy.append(src.content.cloneNode(true));
+      } else copy = src.cloneNode(true) as Element;
+      copy.setAttribute("slot", `hmc-ic-${i}`);
+      copy.setAttribute("aria-hidden", "true");
+      copy.setAttribute("data-hmc-icon", "");
+      copy.removeAttribute("id");
+      this.append(copy);
+    }
+  }
+
   private targets(): Map<string, FieldTarget> {
     const scopeId = this.getAttribute("form");
-    const scope: ParentNode = (scopeId && document.getElementById(scopeId)) || this.closest("form") || document;
-    const out = new Map<string, FieldTarget>();
-    scope.querySelectorAll<FieldTarget>("[data-hmc-field]").forEach((el) => out.set(el.dataset.hmcField!, el));
+    const out = findTargets((scopeId && document.getElementById(scopeId)) || this.closest("form") || document);
     for (const [field, t] of Object.entries(this.fieldMap)) {
       const el = typeof t === "string" ? document.querySelector<FieldTarget>(t) : t;
       if (el) out.set(field, el);
@@ -232,35 +364,152 @@ export class ChurchLookup extends HTMLElement {
   }
 
   private async choose(i: number): Promise<void> {
-    const result = this.results[i];
-    if (!result) return;
-    this.clearTimers();
-    this.close();
-    // A new search after choosing starts fresh, with nothing pinned.
-    this.results = [];
-    this.active = -1;
-    if (!this.dispatchEvent(new CustomEvent("church-select", { detail: { result }, cancelable: true, bubbles: true, composed: true }))) return;
-    this.input.value = result.name;
-    let record: ChurchRecord;
+    let record: ChurchRecord | null;
     try {
-      record = await this.client().getChurch(result.id);
+      record = await this.ctl.choose(i);
     } catch {
-      this.say("Couldn't load that church's details. You can type them in.");
+      this.say(this.t.loadFail);
       return;
     }
-    const overwrite = this.hasAttribute("overwrite");
-    const changes: FillChange[] = [];
-    const empty: string[] = [];
-    for (const [field, element] of this.targets()) {
-      const value = fieldValue(record, field);
-      if (value == null) { empty.push(field); continue; }
-      if (!overwrite && element.value.trim()) continue;
-      if (element instanceof HTMLSelectElement && ![...element.options].some((o) => o.value === value)) continue;
-      changes.push({ field, element, value });
-    }
+    if (record) this.fillFrom(record);
+  }
+
+  private fillFrom(record: ChurchRecord): void {
+    const { changes, empty } = planFill(record, this.targets(), { overwrite: this.hasAttribute("overwrite") });
     if (!this.dispatchEvent(new CustomEvent("church-fill", { detail: { record, changes }, cancelable: true, bubbles: true, composed: true }))) return;
-    for (const c of changes) setNativeValue(c.element, c.value);
-    this.say(`Filled ${changes.length} ${changes.length === 1 ? "field" : "fields"}.${empty.length ? ` Not available: ${empty.join(", ")}.` : ""}`);
+    applyFill(changes);
+    this.say(this.t.filled(changes.length, empty));
+    void this.watch(record);
+  }
+
+  // ── Consent: share corrections back to Here's My Church, only when the person chooses to ──
+
+  private unwatch(): void {
+    this.snap?.off();
+    this.snap = null;
+    if (this.panel) this.panel.hidden = true;
+  }
+
+  /** After a fill, watch the mapped fields Lookup can contribute, against what the record said. */
+  private async watch(record: ChurchRecord): Promise<void> {
+    this.unwatch();
+    if (this.getAttribute("contribute") === "off") return;
+    const meta = await (this.meta ??= this.client().meta().catch(() => null));
+    if (!meta?.contributableFields) return;
+    const country = String(record.fields.country ?? "");
+    const rows: WatchRow[] = [];
+    for (const [field, el] of this.targets()) {
+      const rule = contributable(meta, field, country);
+      if (!rule) continue;
+      const label = (el.labels?.[0]?.textContent ?? el.getAttribute("aria-label") ?? field).trim();
+      rows.push({ field, el, label, was: (fieldValue(record, field) ?? "").trim(), review: rule.review, soon: rule.status === "coming_soon" });
+    }
+    const render = () => this.renderPanel();
+    rows.forEach((r) => r.el.addEventListener("change", render));
+    this.snap = { id: record.id, rows, sent: new Map(), dismissed: "", confirmed: false, off: () => rows.forEach((r) => r.el.removeEventListener("change", render)) };
+    this.renderPanel();
+  }
+
+  private changed(): WatchRow[] {
+    const s = this.snap!;
+    return consentDiff(s.rows.map((r) => ({ ...r, value: r.el.value })), s.sent);
+  }
+
+  private renderPanel(result?: Map<string, { status: FieldStatus; message?: string }>, sandbox?: boolean): void {
+    const s = this.snap;
+    const p = this.panel;
+    if (!s) { p.hidden = true; return; }
+    const t = this.t;
+    const changed = this.changed();
+    const sig = changed.map((r) => `${r.field}=${r.el.value.trim()}`).join("|");
+    const h = `${this.key}-cs`;
+    p.setAttribute("aria-labelledby", h);
+    if (!changed.length && !result) {
+      // Nothing changed: offer "Still correct" once per pick.
+      if (s.confirmed || s.dismissed === "confirm") { p.hidden = true; return; }
+      p.innerHTML = `<div class="q"><p id="${h}"></p><span class="row"><button type="button" class="bt">${""}</button><button type="button" class="bt g"></button></span></div>`;
+      p.querySelector("p")!.textContent = t.confirmQ;
+      const [yes, no] = p.querySelectorAll<HTMLButtonElement>("button");
+      yes!.textContent = t.stillCorrect;
+      no!.textContent = t.notNow;
+      yes!.onclick = () => void this.sendConfirm();
+      no!.onclick = () => { s.dismissed = "confirm"; p.hidden = true; };
+      p.hidden = false;
+      return;
+    }
+    if (!result && s.dismissed === sig) { p.hidden = true; return; }
+    const wasHidden = p.hidden || !p.querySelector("ul");
+    p.innerHTML = `<h3 id="${h}"></h3><p></p><ul></ul><div class="row"><button type="button" class="bt"></button><button type="button" class="bt g"></button></div>`;
+    p.querySelector("h3")!.textContent = t.shareTitle;
+    p.querySelector("p")!.textContent = t.shareBody;
+    const ul = p.querySelector("ul")!;
+    const shown = result ? s.rows.filter((r) => result.has(r.field)).concat(changed.filter((r) => !result.has(r.field))) : changed;
+    shown.forEach((r, i) => {
+      const li = document.createElement("li");
+      const id = `${h}-${i}`;
+      const res = result?.get(r.field);
+      li.innerHTML = `<input type="checkbox" id="${id}"><label for="${id}"></label><span class="v"><s></s><span aria-hidden="true">→</span><ins></ins></span><span class="b"></span>`;
+      const box = li.querySelector("input")!;
+      box.dataset.field = r.field;
+      box.disabled = r.soon || (Boolean(res) && res!.status !== "try_again");
+      li.querySelector("label")!.textContent = r.label;
+      li.querySelector("s")!.textContent = r.was || "—";
+      li.querySelector("ins")!.textContent = res ? (s.sent.get(r.field) ?? r.el.value.trim()) : r.el.value.trim();
+      const b = li.querySelector<HTMLElement>(".b")!;
+      b.textContent = res ? (res.message && res.status === "rejected" ? `${t.st.rejected}: ${res.message}` : t.st[res.status]) : r.soon ? t.soon : r.review === "moderated" ? t.reviewed : t.goesLive;
+      b.classList.toggle("m", r.soon || r.review === "moderated" || (Boolean(res) && res!.status !== "live"));
+      ul.append(li);
+    });
+    const [share, later] = p.querySelectorAll<HTMLButtonElement>(".row button");
+    share!.textContent = t.share;
+    later!.textContent = t.notNow;
+    share!.onclick = () => void this.sendShare();
+    later!.onclick = () => { s.dismissed = sig; p.hidden = true; };
+    // After a share with nothing left to send, one button closes the panel.
+    if (result && !p.querySelector("input[type=checkbox]:not(:disabled)")) { share!.hidden = true; later!.textContent = t.done; }
+    if (sandbox) {
+      const n = document.createElement("p");
+      n.className = "note";
+      n.textContent = t.sandbox;
+      p.append(n);
+    }
+    p.hidden = false;
+    if (wasHidden && !result) this.say(t.changedNote(changed.length));
+  }
+
+  private async sendShare(): Promise<void> {
+    const s = this.snap!;
+    const p = this.panel;
+    const picked = [...p.querySelectorAll<HTMLInputElement>("input[type=checkbox]:checked:not(:disabled)")]
+      .map((b) => s.rows.find((r) => r.field === b.dataset.field)!).filter(Boolean);
+    if (!picked.length) return;
+    const changes = picked.map((r) => ({ field: r.field, value: r.el.value.trim() }));
+    if (!this.dispatchEvent(new CustomEvent("church-contribute", { detail: { churchId: s.id, changes }, cancelable: true, bubbles: true, composed: true }))) return;
+    const btn = p.querySelector<HTMLButtonElement>(".row .bt")!;
+    btn.disabled = true;
+    btn.textContent = this.t.sending;
+    let out: { sandbox?: boolean; results: { field: string; status: FieldStatus; message?: string }[] };
+    try { out = await this.client().contribute(s.id, changes); }
+    catch { out = { results: changes.map((c) => ({ field: c.field, status: "try_again" as const })) }; }
+    if (this.snap !== s) return;
+    const result = new Map(out.results.map((r) => [r.field, r]));
+    for (const c of changes) if (result.get(c.field)?.status !== "try_again") s.sent.set(c.field, c.value);
+    this.renderPanel(result, out.sandbox);
+    const done = out.results.filter((r) => r.status === "live" || r.status === "in_review").length;
+    this.say(`${this.t.shared(done)} ${out.results.map((r) => `${r.field}: ${this.t.st[r.status]}`).join(". ")}.`);
+  }
+
+  private async sendConfirm(): Promise<void> {
+    const s = this.snap!;
+    if (!this.dispatchEvent(new CustomEvent("church-confirm", { detail: { churchId: s.id }, cancelable: true, bubbles: true, composed: true }))) return;
+    let ok = false;
+    try { ok = (await this.client().confirm(s.id)).status === "confirmed"; } catch { ok = false; }
+    if (this.snap !== s) return;
+    s.confirmed = ok;
+    const msg = ok ? this.t.thanks : this.t.st.try_again;
+    this.panel.querySelector("p")!.textContent = msg;
+    this.panel.querySelectorAll("button").forEach((b) => { b.hidden = ok; });
+    this.say(msg);
   }
 }
 

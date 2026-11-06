@@ -1,16 +1,46 @@
 {
   "name": "@heresmychurch/lookup",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Church typeahead and autofill from the Here's My Church directory: a small client and a <church-lookup> element.",
   "license": "MIT",
   "type": "module",
-  "sideEffects": ["./dist/element.js", "./dist/service-times.js"],
+  "sideEffects": [
+    "./dist/element.js",
+    "./dist/service-times.js",
+    "./dist/strings-*.js"
+  ],
   "exports": {
-    ".": { "types": "./src/client.ts", "default": "./dist/index.js" },
-    "./element": { "types": "./src/element.ts", "default": "./dist/element.js" },
-    "./service-times": { "types": "./src/service-times.ts", "default": "./dist/service-times.js" }
+    ".": {
+      "types": "./src/client.ts",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./src/core.ts",
+      "default": "./dist/core.js"
+    },
+    "./element": {
+      "types": "./src/element.ts",
+      "default": "./dist/element.js"
+    },
+    "./service-times": {
+      "types": "./src/service-times.ts",
+      "default": "./dist/service-times.js"
+    },
+    "./react": {
+      "types": "./src/react.d.ts"
+    },
+    "./vue": {
+      "types": "./src/vue.d.ts"
+    },
+    "./strings/*": {
+      "types": "./src/strings-*.ts",
+      "default": "./dist/strings-*.js"
+    }
   },
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node scripts/build.mjs && vitest run"
