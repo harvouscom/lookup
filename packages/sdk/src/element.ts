@@ -35,13 +35,16 @@ li:hover,li[aria-selected=true]{background:var(--_active);color:var(--_active-fg
 .sub{color:var(--_muted);font-size:.875rem;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .d{font-size:.8125rem;color:var(--_muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .note{padding:14px 12px;font-size:.9375rem;color:var(--_muted)}
-.foot{margin-top:6px;padding:10px 12px 6px;border-top:1px solid var(--_line);font-size:.75rem;color:var(--_muted)}
+.foot{display:flex;align-items:center;gap:8px;margin-top:6px;padding:10px 10px 4px;border-top:1px solid var(--_line);font-size:.75rem;color:var(--_muted)}.foot svg{flex:none;width:20px;height:20px}.foot span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.foot i{font-style:normal}.foot b a{color:inherit;font-weight:600;text-decoration:none}.foot b a:hover{text-decoration:underline}.foot .osm{margin-left:auto;font-size:.6875rem;font-weight:400;color:var(--_muted);text-decoration:none;white-space:nowrap}.foot .osm:hover{text-decoration:underline}
 a{color:var(--_ring);font-weight:500;text-underline-offset:3px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:480px){.foot i{display:none}li{grid-template-columns:32px 1fr auto;gap:10px;min-height:48px;padding:6px 8px}.ic{width:32px;height:32px}.ic svg{width:16px;height:16px}.n{font-size:.9375rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sub{font-size:.8125rem}.d{font-size:.75rem}input{min-height:48px;font-size:1rem}}
 @media (prefers-reduced-motion:reduce){input{transition:none}}
 @media (forced-colors:active){li[aria-selected=true]{background:Highlight;color:HighlightText;forced-color-adjust:none}input,.pop{border:1px solid CanvasText}input:focus-visible{outline:2px solid Highlight}}
 `;
 const SEARCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`;
+// Here's My Church's mark: a lilac cursive "h" on a plum tile.
+const HMC = `<svg viewBox="0 0 20 20" aria-hidden="true"><defs><clipPath id="hmc-t"><rect width="20" height="20" rx="5"/></clipPath></defs><g clip-path="url(#hmc-t)"><rect width="20" height="20" fill="#3B1D6E"/><path d="M-1 16C3 14 6 9 7.4 5.2 8.4 2.4 6.3 1.7 5.8 4.6 5.3 8 5.5 13 5.7 21M5.9 15.2C7.1 11.4 9.9 9.4 11.9 10.2 13.8 11 13.3 14.6 13.8 16.8 14.2 18.6 17 18.2 21 15.4" fill="none" stroke="#D2B4FB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`;
 const CHURCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v5M10 4h4M6 21V11l6-4 6 4v10M3 21h18M10 21v-4a2 2 0 0 1 4 0v4"/></svg>`;
 
 let uid = 0;
@@ -77,7 +80,7 @@ export class ChurchLookup extends HTMLElement {
     if (this.shadowRoot) return;
     const root = this.attachShadow({ mode: "open" });
     const id = this.id;
-    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field">${SEARCH}<input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">Church data from OpenStreetMap contributors and <a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></div></div><div class="sr" role="status" aria-live="polite"></div>`;
+    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field">${SEARCH}<input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">${HMC}<span><i>Data from </i><b><a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></b></span><a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div></div><div class="sr" role="status" aria-live="polite"></div>`;
     this.input = root.querySelector("input")!;
     this.list = root.querySelector("ul")!;
     this.pop = root.querySelector(".pop")!;

@@ -532,3 +532,17 @@ th { background: var(--frame); }
 .ws-t b { display: block; font-weight: 600; color: var(--text); }
 .ws-t small { display: block; margin-top: 1px; font-size: .6875rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tag.big { background: linear-gradient(180deg, #221A3D, #100C20); border-color: rgba(196,181,253,.3); backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* ── Layering: the search results and the church card always sit above the form stack (z 6).
+   The header and horizon stop forming their own layers so these can rise past it, while the
+   globe itself stays below. ── */
+.hdr { isolation: auto; }
+.horizon { z-index: auto; }
+.hero { z-index: 10; }
+.tags { z-index: 9; }
+/* Clip the globe area, not the whole header, so the results list can extend past the card. */
+.hdr { overflow: visible; }
+.horizon { overflow: hidden; border-radius: 0 0 13px 13px; }
+.sky { border-radius: 13px; }
+@media (max-width: 640px) { .horizon { border-radius: 0 0 11px 11px; } .sky { border-radius: 11px; } }
+@media (max-width: 640px) { .tag:not(.big) { display: none; } }

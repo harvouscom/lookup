@@ -141,7 +141,21 @@ function startSky() {
 const DEMO_QUERIES = ["grace community", "first baptist", "st mary", "trinity", "calvary chapel", "kosciol", "saint paul", "eglise", "methodist", "lutheran", "presbyterian", "catholic"];
 let demoOn = !matchMedia("(prefers-reduced-motion: reduce)").matches;
 let demoTimer = 0, demoSeen = false, demoPool = [], demoAt = 0;
-function stopDemo() { demoOn = false; clearTimeout(demoTimer); }
+let demoPending = false;
+function stopDemo() {
+  if (!demoOn) return;
+  demoOn = false;
+  clearTimeout(demoTimer);
+  // A demo pick caught mid-flight would leave the form stuck on "Looking up…": reset it.
+  if (demoPending) {
+    demoPending = false;
+    $$("input", card).forEach((i) => { i.value = ""; i.placeholder = "—"; i.classList.remove("on"); });
+    $$(".ly-row", card).forEach((row) => { row.classList.remove("on", "off"); $("b", row).textContent = "·"; });
+    status.classList.remove("done");
+    status.textContent = "Pick a church above and Lookup fills this in.";
+    showTags([]);
+  }
+}
 hero.addEventListener("focusin", stopDemo);
 hero.addEventListener("church-results", stopDemo);
 new IntersectionObserver(([e]) => { demoSeen = e.isIntersecting; }).observe(card);
@@ -172,6 +186,7 @@ async function demoTick() {
   if (!hit) { demoTimer = setTimeout(demoTick, 3000); return; }
   const { r, rec } = hit;
   beginPick(r, true);
+  demoPending = true;
   await new Promise((ok) => setTimeout(ok, 1300));
   if (!demoOn) return;
   {
@@ -181,6 +196,7 @@ async function demoTick() {
       i.value = v ?? "";
       if (v != null) changes.push({ field: i.dataset.hmcField, element: i, value: v });
     }
+    demoPending = false;
     showFill(changes, true, rec);
   }
   demoTimer = setTimeout(demoTick, 5200);
