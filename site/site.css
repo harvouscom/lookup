@@ -846,3 +846,43 @@ p.num::after { margin-left: 2px; }
   .exm-win { margin: 0; border-radius: 0; }
   .exm-addr { min-width: 0; }
 }
+
+/* Example cards and modal: each app's own icon and palette. */
+.exm-logo { width: 32px; height: 32px; border-radius: 9px; overflow: hidden; background: none; box-shadow: 0 4px 12px -4px rgba(0,0,0,.6); }
+.exm-logo svg { width: 100%; height: 100%; }
+.ex-txt { grid-template-columns: 36px minmax(0, 1fr); column-gap: 12px; align-items: center; }
+.ex-txt > :not(.ex-icon) { grid-column: 2; }
+.ex-icon { grid-row: 1 / span 2; width: 36px; height: 36px; border-radius: 10px; overflow: hidden; box-shadow: 0 6px 14px -8px rgba(0,0,0,.55); }
+.ex-icon svg { width: 100%; height: 100%; }
+.ex-txt > span:not(.ex-icon):not(.ex-go) { grid-column: 1 / -1; margin-top: 6px; }
+.ex-txt .ex-go { grid-column: 1 / -1; }
+/* Kinship thumbnail: warm paper, ink active nav, coral action */
+.ex-kinship .ext-body { background: #F7F3EC; }
+.ex-kinship .ext-side { background: #FFFDF9; border-right: 1px solid #E7DFD2; }
+.ex-kinship .ext-side i { background: #E7DFD2; }
+.ex-kinship .ext-side i.on { background: #1F1B16; }
+.ex-kinship .ext-main b { background: #1F1B16; }
+.ex-kinship .ext-main em { background: #E7DFD2; }
+.ex-kinship .ext-fields i { background: #fff; border-color: #E7DFD2; }
+.ex-kinship .ext-fields i:first-child { border-color: #D9472B; box-shadow: 0 0 0 2px rgba(217,71,43,.18); }
+.ex-kinship .ext-btn { background: #D9472B; }
+/* Harvest thumbnail: cream, tomato, leaf */
+.ex-harvest .ext-body { background: #F6EEDC; }
+.ex-harvest .ext-steps i { background: #E4D6BC; }
+.ex-harvest .ext-steps i.on { background: #C8371D; }
+.ex-harvest .ext-main b { background: #2B1D12; height: 10px; }
+.ex-harvest .ext-main em { background: #E9A520; height: 4px; width: 46%; }
+.ex-harvest .ext-fields i { background: #FFFBF1; border-color: #E4D6BC; }
+.ex-harvest .ext-fields i:first-child { border-color: #C8371D; box-shadow: 0 0 0 2px rgba(200,55,29,.16); }
+.ex-harvest .ext-btn { background: #C8371D; border-radius: 99px; }
+/* Steeple thumbnail: ink chrome, lime, green sunset site */
+.ex-steeple .ext-bar { background: #1A1A17; border-bottom-color: rgba(255,255,255,.08); }
+.ex-steeple .ext-bar i { background: #3A3A35; }
+.ex-steeple .ext-body { background: #0E0E0C; }
+.ex-steeple .ext-main { background: #1A1A17; }
+.ex-steeple .ext-main b { background: #EDEBE4; }
+.ex-steeple .ext-fields i { background: #0E0E0C; border-color: rgba(255,255,255,.12); }
+.ex-steeple .ext-fields i:first-child { border-color: #D2F25C; box-shadow: 0 0 0 2px rgba(210,242,92,.2); }
+.ex-steeple .ext-site { background: #1A1A17; border-left-color: rgba(255,255,255,.08); background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px); background-size: 8px 8px; }
+.ex-steeple .ext-hero { height: 56px; background: radial-gradient(circle at 72% 78%, #E8A64B 0 14px, transparent 15px), linear-gradient(180deg, #0F2A1F, #1F4D3A 60%, #B5864A); }
+.ex-steeple .ext-site i { background: #FBF8F2; opacity: .8; }

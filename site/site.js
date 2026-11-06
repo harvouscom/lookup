@@ -422,12 +422,9 @@ markScrolled();
   const dlg = $("#exm");
   if (!dlg) return;
   const LIST = [
-    { key: "kinship", name: "Kinship", kind: "Church management · React", addr: "app.kinship.church/churches/new", color: "#6D28D9",
-      logo: '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="6" cy="8" r="3.6"/><circle cx="10" cy="8" r="3.6"/></svg>' },
-    { key: "harvest", name: "Harvest Table", kind: "Food pantry network · plain HTML form", addr: "partners.harvesttable.org/join", color: "#C2410C",
-      logo: '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 14V6M8 6c0-2.5 2-4 4.5-4C12.5 4.5 10.5 6 8 6zM8 9C8 6.5 6 5 3.5 5 3.5 7.5 5.5 9 8 9z"/></svg>' },
-    { key: "steeple", name: "Steeple", kind: "Church website builder · live preview", addr: "build.steeple.site/setup", color: "#2F5D46",
-      logo: '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v3M6.5 3h3M4 14V8l4-3 4 3v6M2.5 14h11M7 14v-2.5h2V14"/></svg>' },
+    { key: "kinship", name: "Kinship", kind: "Church management · React", addr: "app.kinship.church/churches/new" },
+    { key: "harvest", name: "Harvest Table", kind: "Food pantry network · plain HTML form", addr: "partners.harvesttable.org/join" },
+    { key: "steeple", name: "Steeple", kind: "Church website builder · live preview", addr: "build.steeple.site/setup" },
   ];
   const frame = $("#exm-frame");
   // Load without adding history entries, so Back closes the modal instead of stepping through the frame.
@@ -441,9 +438,8 @@ markScrolled();
     $("#exm-addr").textContent = ex.addr;
     $("#exm-count").textContent = `${at + 1} of ${LIST.length}`;
     $("#exm-open").href = `/demo/${ex.key}`;
-    const logo = $("#exm-logo");
-    logo.innerHTML = ex.logo;
-    logo.style.background = ex.color;
+    // The same app icon the card shows.
+    $("#exm-logo").innerHTML = $(`.ex-card[data-ex="${ex.key}"] .ex-icon`)?.innerHTML ?? "";
     frame.title = `${ex.name} example app`;
     load(`/demo/${ex.key}?embed=1`);
     const hash = `#example/${ex.key}`;

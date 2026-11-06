@@ -9,70 +9,106 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Google+Sans+Flex:opsz,wght@6..144,400..700&family=Geist+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400..700&family=Google+Sans+Flex:opsz,wght@6..144,400..700&family=Geist+Mono:wght@400..600&display=swap">
 <link rel="stylesheet" href="/demo/demo.css">
 <style>
-  body { background: #F6F6F8; color: #18181B; }
-  .shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: 100vh; }
-  .embed .shell { min-height: 100vh; }
-  .side { display: flex; flex-direction: column; gap: 18px; padding: 14px 12px; background: #17142A; color: #CFCBE0; }
-  .ws { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 10px; background: rgba(255,255,255,.05); }
-  .ws-logo { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: #6D28D9; }
-  .ws b { display: block; color: #fff; font-size: 14px; }
-  .ws small { display: block; font-size: 12px; color: #9C97B4; }
-  .side nav { display: grid; gap: 2px; }
-  .side nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: #CFCBE0; text-decoration: none; font-size: 14px; }
-  .side nav a:hover { background: rgba(255,255,255,.06); color: #fff; }
-  .side nav a[aria-current] { background: rgba(167,139,250,.18); color: #fff; }
+  /* Kinship: warm paper, ink, coral for action, sage for "this came from somewhere trusted". */
+  :root { --paper: #F7F3EC; --card: #FFFDF9; --ink: #1F1B16; --ink-2: #4A433A; --mute: #6E655A; --line: #E7DFD2; --coral: #C23F20; --coral-2: #F8E1DA; --sage: #2F6A55; --sage-2: #E1EEE7; --head: "Bricolage Grotesque", "Inter", sans-serif; }
+  body { background: var(--paper); color: var(--ink); background-image: radial-gradient(rgba(31,27,22,.035) 1px, transparent 1px); background-size: 4px 4px; }
+  .shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+  .side { display: flex; flex-direction: column; gap: 16px; padding: 16px 12px; border-right: 1px solid var(--line); background: rgba(255,253,249,.7); }
+  .ws { display: flex; align-items: center; gap: 10px; padding: 6px 8px 14px; border-bottom: 1px dashed var(--line); }
+  .ws-logo { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; background: linear-gradient(160deg, #2E2822, #15120F); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 2px 6px -2px rgba(31,27,22,.5); }
+  .ws b { display: block; font: 700 17px/1.1 var(--head); letter-spacing: -.01em; }
+  .ws small { display: block; font-size: 12px; color: var(--mute); }
+  .side nav { display: grid; gap: 1px; }
+  .side nav a { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 9px; color: var(--ink-2); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .side nav a:hover { background: rgba(31,27,22,.05); }
+  .side nav a[aria-current] { background: var(--ink); color: #FFFDF9; }
   .side nav a svg { width: 16px; height: 16px; flex: none; }
-  .side-h { margin: 0 0 4px; padding: 0 10px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #8A85A3; }
-  .me { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 8px; font-size: 13px; }
-  .av { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 99px; background: #B45309; color: #fff; font-weight: 600; font-size: 12px; }
-  .me small { display: block; color: #8A85A3; font-size: 12px; }
+  .side nav a em { margin-left: auto; font: 500 11px/1 "Geist Mono", monospace; font-style: normal; color: var(--mute); }
+  .side nav a[aria-current] em { color: #CFC6B8; }
+  .side-h { margin: 6px 0 4px; padding: 0 10px; font: 600 11px/1 "Geist Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+  .campus { display: flex; align-items: center; gap: 9px; padding: 5px 10px; font-size: 13px; color: var(--ink-2); }
+  .campus i { width: 8px; height: 8px; border-radius: 3px; }
+  .promo { margin-top: auto; padding: 12px; border-radius: 12px; background: var(--ink); color: #F1EBE2; font-size: 13px; }
+  .promo b { display: block; font: 700 15px/1.2 var(--head); margin-bottom: 6px; color: #fff; }
+  .promo .bar { height: 6px; margin: 10px 0 6px; border-radius: 9px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .promo .bar i { display: block; width: 68%; height: 100%; border-radius: 9px; background: linear-gradient(90deg, var(--coral), #F59E0B); }
+  .promo small { color: #B9AFA1; }
+  .me { display: flex; align-items: center; gap: 10px; padding: 4px 8px; font-size: 13px; font-weight: 500; }
+  .av { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 99px; color: #fff; font-weight: 700; font-size: 11px; letter-spacing: .02em; }
+  .me small { display: block; color: var(--mute); font-size: 12px; font-weight: 400; }
   .main { display: flex; flex-direction: column; min-width: 0; }
-  .top { display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 24px; background: #fff; border-bottom: 1px solid #E7E6EC; }
-  .top .find { display: flex; align-items: center; gap: 8px; width: min(340px, 40vw); height: 36px; padding: 0 12px; border-radius: 9px; background: #F4F4F6; color: #5F5F69; font-size: 14px; }
-  .top .icons { margin-left: auto; display: flex; gap: 6px; color: #52525B; }
-  .top .icons span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; }
+  .top { display: flex; align-items: center; gap: 12px; height: 58px; padding: 0 28px; border-bottom: 1px solid var(--line); }
+  .top .find { display: flex; align-items: center; gap: 8px; width: min(360px, 42vw); height: 36px; padding: 0 10px 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: #5F574D; font-size: 14px; white-space: nowrap; overflow: hidden; }
+  .top .find kbd { margin-left: auto; padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); font: 11px "Geist Mono", monospace; color: var(--mute); }
   .top svg { width: 16px; height: 16px; flex: none; }
-  .top .icons svg { width: 18px; height: 18px; }
-  .top .find { white-space: nowrap; overflow: hidden; }
-  .ci svg { width: 16px; height: 16px; }
-  .page { padding: 24px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; max-width: 1180px; width: 100%; }
-  .crumbs { grid-column: 1 / -1; margin: 0 0 -6px; font-size: 13px; color: #5F5F69; }
+  .top .icons { margin-left: auto; display: flex; gap: 8px; align-items: center; color: var(--ink-2); }
+  .top .icons span { position: relative; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; }
+  .top .icons span.dot::after { content: ""; position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 99px; background: var(--coral); box-shadow: 0 0 0 2px var(--paper); }
+  .page { padding: 26px 28px 80px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; max-width: 1220px; width: 100%; }
+  .head { grid-column: 1 / -1; display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .crumbs { margin: 0 0 6px; font-size: 13px; color: #5F574D; }
   .crumbs span { margin: 0 6px; }
-  h1 { grid-column: 1 / -1; margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -.01em; }
-  .card { background: #fff; border: 1px solid #E7E6EC; border-radius: 14px; }
-  form.card { padding: 22px; }
-  .card h2 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
-  .card > p { margin: 0 0 18px; font-size: 13px; color: #71717A; }
+  h1 { margin: 0; font: 750 32px/1.05 var(--head); letter-spacing: -.025em; }
+  h1 em { font-style: normal; color: var(--coral); }
+  .tabs { margin-left: auto; display: flex; gap: 4px; padding: 4px; border-radius: 11px; background: rgba(31,27,22,.06); font-size: 13px; font-weight: 600; }
+  .tabs span { padding: 6px 12px; border-radius: 8px; color: var(--ink-2); }
+  .tabs span.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(31,27,22,.12); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 0 rgba(31,27,22,.04), 0 12px 30px -24px rgba(31,27,22,.35); }
+  form.card { padding: 0; overflow: hidden; }
+  .f-head { display: flex; align-items: center; gap: 12px; padding: 18px 22px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #FFFDF9, #FBF7F0); }
+  .f-ic { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--coral-2); color: var(--coral); }
+  .f-ic svg { width: 20px; height: 20px; }
+  .f-head h2 { margin: 0; font: 700 18px/1.2 var(--head); }
+  .f-head p { margin: 2px 0 0; font-size: 13px; color: var(--mute); }
+  .f-body { padding: 20px 22px 22px; }
+  .from { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; padding: 8px 12px; border-radius: 10px; background: var(--sage-2); color: var(--sage); font-size: 13px; font-weight: 500; }
+  .from svg { width: 15px; height: 15px; flex: none; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin-top: 18px; }
   .grid .wide { grid-column: 1 / -1; }
-  label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; color: #3F3F46; }
-  input, select, textarea { width: 100%; min-height: 40px; padding: 0 12px; border: 1px solid #DCDBE3; border-radius: 9px; background: #fff; color: #18181B; font-size: 14px; }
-  textarea { min-height: 72px; padding: 10px 12px; resize: vertical; }
-  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,.2); }
-  .sec { margin: 22px 0 0; padding-top: 18px; border-top: 1px solid #EFEEF3; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #8A879A; }
-  .actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 22px; }
-  .actions output { margin-right: auto; font-size: 13px; color: #6D28D9; }
-  .btn { min-height: 38px; padding: 0 16px; border-radius: 9px; border: 1px solid #DCDBE3; background: #fff; color: #18181B; font-weight: 600; font-size: 14px; cursor: pointer; }
-  .btn.primary { border-color: #6D28D9; background: #6D28D9; color: #fff; }
-  .btn.primary:hover { background: #5B21B6; }
-  .btn:focus-visible { outline: 2px solid #8B5CF6; outline-offset: 2px; }
+  label { display: grid; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--ink-2); }
+  input, select, textarea { width: 100%; min-height: 42px; padding: 0 12px; border: 1px solid #DDD3C4; border-radius: 10px; background: #fff; color: var(--ink); font-size: 14px; font-weight: 400; letter-spacing: 0; transition: border-color .2s, box-shadow .2s, background .4s; }
+  textarea { min-height: 76px; padding: 10px 12px; resize: vertical; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: var(--coral); box-shadow: 0 0 0 3px rgba(217,71,43,.16); }
+  .sec { display: flex; align-items: center; gap: 10px; margin: 24px 0 0; font: 600 11px/1 "Geist Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+  .sec::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .rels { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .rels label { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #DDD3C4; border-radius: 99px; font-size: 13px; letter-spacing: 0; cursor: pointer; background: #fff; }
+  .rels label:has(input:checked) { border-color: var(--ink); background: var(--ink); color: #fff; }
+  .rels input { width: 14px; height: 14px; min-height: 0; margin: 0; accent-color: var(--coral); }
+  .actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--line); }
+  .actions output { margin-right: auto; font-size: 13px; font-weight: 500; color: var(--sage); }
+  .btn { min-height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid #DDD3C4; background: #fff; color: var(--ink); font-weight: 600; font-size: 14px; cursor: pointer; }
+  .btn.primary { border-color: var(--coral); background: var(--coral); color: #fff; box-shadow: 0 1px 0 rgba(255,255,255,.3) inset, 0 6px 14px -8px rgba(217,71,43,.8); }
+  .btn.primary:hover { background: #A8341A; }
+  .btn:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+  .col { display: grid; gap: 16px; }
+  .map { position: relative; height: 150px; padding: 14px 16px; overflow: hidden; background: #1F1B16; color: #F1EBE2; border-color: #1F1B16; }
+  .map h2 { position: relative; z-index: 1; margin: 0; font: 700 15px/1.2 var(--head); }
+  .map p { position: relative; z-index: 1; margin: 2px 0 0; font-size: 12px; color: #B9AFA1; }
+  .map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
   .list { padding: 16px; }
-  .list ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; }
-  .list li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: center; padding: 8px; border-radius: 10px; }
-  .list li.new { background: #F5F0FF; animation: pop .5s ease-out; }
-  @keyframes pop { from { transform: scale(.97); opacity: 0; } }
+  .list h2, .feed h2 { margin: 0; font: 700 15px/1.2 var(--head); }
+  .list ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 2px; }
+  .list li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px; border-radius: 11px; }
+  .list li.new { background: var(--coral-2); animation: pop .5s ease-out; }
+  @keyframes pop { from { transform: translateY(-4px); opacity: 0; } }
   .list li b { display: block; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .list li small { display: block; font-size: 12px; color: #71717A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .ci { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; background: #EFE9FE; color: #6D28D9; }
-  .tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 99px; background: #ECFDF5; color: #047857; font-size: 11px; font-weight: 600; vertical-align: 1px; }
-  church-lookup { --hmc-accent: #7C3AED; --hmc-active-bg: #F3EEFF; --hmc-radius: 10px; --hmc-input-border: #DCDBE3; --hmc-border: #E7E6EC; }
-  church-lookup::part(label) { font-size: 13px; font-weight: 500; color: #3F3F46; }
-  church-lookup::part(input) { min-height: 44px; font-size: 15px; }
-  @media (max-width: 960px) { .page { grid-template-columns: 1fr; } }
-  @media (max-width: 760px) { .shell { grid-template-columns: 1fr; } .side { display: none; } .grid { grid-template-columns: 1fr; } .top { padding: 0 14px; } .page { padding: 16px; } }
+  .list li small { display: block; font-size: 12px; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mono { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; color: #fff; font: 700 13px/1 var(--head); }
+  .pill { padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; background: var(--sage-2); color: var(--sage); }
+  .feed { padding: 16px; }
+  .feed ol { list-style: none; margin: 12px 0 0; padding: 0 0 0 14px; border-left: 2px solid var(--line); display: grid; gap: 12px; font-size: 13px; color: var(--ink-2); }
+  .feed li { position: relative; }
+  .feed li::before { content: ""; position: absolute; left: -20px; top: 5px; width: 10px; height: 10px; border-radius: 99px; background: var(--card); border: 2px solid var(--coral); }
+  .feed li small { display: block; color: var(--mute); font-size: 12px; }
+  church-lookup { --hmc-accent: #D9472B; --hmc-active-bg: #FBEAE4; --hmc-active-text: #1F1B16; --hmc-radius: 12px; --hmc-input-border: #CDBFAC; --hmc-border: #E7DFD2; --hmc-bg: #fff; --hmc-popover: #FFFDF9; --hmc-text: #1F1B16; --hmc-muted: #6E655A; }
+  church-lookup::part(label) { font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--ink-2); }
+  church-lookup::part(input) { min-height: 48px; font-size: 15px; }
+  @media (max-width: 1000px) { .page { grid-template-columns: 1fr; } .tabs { margin-left: 0; } }
+  @media (max-width: 760px) { .shell { grid-template-columns: 1fr; } .side { display: none; } .grid { grid-template-columns: 1fr; } .top { padding: 0 14px; } .page { padding: 18px 14px 80px; } h1 { font-size: 26px; } .top .find kbd { display: none; } }
   @media (prefers-reduced-motion: reduce) { .list li.new { animation: none; } }
 </style>
 </head>
@@ -83,7 +119,6 @@
 <aside class="demo-pill" aria-label="Demo mode"><img src="/brand/mark.svg" alt=""><span>Demo mode: nothing you share is sent</span><button type="button" id="dev-open" aria-expanded="false" aria-controls="dev">React state</button></aside>
 <aside class="dev" id="dev" hidden aria-label="React state"><header>React state<button type="button" id="dev-close" aria-label="Close">×</button></header><pre id="state" aria-live="off">{}</pre></aside>
 <script type="module" src="/element.js"></script>
-<script type="module" src="/service-times.js"></script>
 <script type="module">
 import React, { useEffect, useRef, useState } from "https://esm.sh/react@18.3.1";
 import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
@@ -92,13 +127,15 @@ const html = htm.bind(React.createElement);
 
 const icon = (d) => html`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${d} /></svg>`;
 const NAV = [
-  ["Home", "M2.5 7.5 8 3l5.5 4.5V13a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5z"],
-  ["People", "M6 7.5a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5zM2 13.5c0-2.2 1.8-4 4-4s4 1.8 4 4M11 3.2a2.2 2.2 0 0 1 0 4.2M12 9.7c1.2.5 2 1.9 2 3.8"],
-  ["Groups", "M2.5 4.5h11v8h-11zM5.5 2.5v2M10.5 2.5v2"],
-  ["Check-ins", "M3 8.5l3 3 7-7"],
-  ["Giving", "M8 13.5S2.5 10.3 2.5 6.4A2.9 2.9 0 0 1 8 5a2.9 2.9 0 0 1 5.5 1.4C13.5 10.3 8 13.5 8 13.5z"],
-  ["Partner churches", "M8 1.5v3M6.5 3h3M3.5 14V8L8 5l4.5 3v6M6.5 14v-3a1.5 1.5 0 0 1 3 0v3M2 14h12"],
+  ["Home", "M2.5 7.5 8 3l5.5 4.5V13a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5z", ""],
+  ["People", "M6 7.5a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5zM2 13.5c0-2.2 1.8-4 4-4s4 1.8 4 4M11 3.2a2.2 2.2 0 0 1 0 4.2M12 9.7c1.2.5 2 1.9 2 3.8", "1,284"],
+  ["Groups", "M2.5 4.5h11v8h-11zM5.5 2.5v2M10.5 2.5v2", "46"],
+  ["Check-ins", "M3 8.5l3 3 7-7", ""],
+  ["Giving", "M8 13.5S2.5 10.3 2.5 6.4A2.9 2.9 0 0 1 8 5a2.9 2.9 0 0 1 5.5 1.4C13.5 10.3 8 13.5 8 13.5z", ""],
+  ["Partner churches", "M8 1.5v3M6.5 3h3M3.5 14V8L8 5l4.5 3v6M6.5 14v-3a1.5 1.5 0 0 1 3 0v3M2 14h12", "18"],
 ];
+const COLORS = ["#2F6A55", "#7A4E9C", "#9A5420", "#2B5C8A", "#9C3D54"];
+const initials = (s) => s.replace(/^(the|st\.?|saint)\s+/i, "").split(/\s+/).filter((w) => /^[A-Z]/.test(w)).slice(0, 2).map((w) => w[0]).join("") || "C";
 const empty = { church_id: "", name: "", street: "", city: "", regionName: "", postalCode: "", website: "", phone: "", denomination: "", serviceTimes: "", relationship: "Partner", notes: "" };
 const START = [
   { name: "Hope Community Church", where: "Austin, Texas", rel: "Church plant" },
@@ -106,50 +143,58 @@ const START = [
   { name: "St. Andrew's Parish", where: "Columbus, Ohio", rel: "Sister church" },
 ];
 
-function Field({ k, label, form, set, wide, ...rest }) {
-  return html`<label class=${wide ? "wide" : ""}>${label}<input data-hmc-field=${k} name=${k} value=${form[k]} onChange=${(e) => set(k, e.target.value)} autocomplete="off" ...${rest} /></label>`;
+function Field({ k, label, form, set, wide }) {
+  return html`<label class=${wide ? "wide" : ""}>${label}<input data-hmc-field=${k} name=${k} value=${form[k]} onChange=${(e) => set(k, e.target.value)} autocomplete="off" /></label>`;
 }
 
 function App() {
   const [form, setForm] = useState(empty);
   const [list, setList] = useState(START);
   const [saved, setSaved] = useState("");
+  const [filled, setFilled] = useState(0);
   const ref = useRef(null);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   useEffect(() => {
     const el = ref.current;
     const pick = (e) => set("church_id", e.detail.result.id);
-    const clear = () => set("church_id", "");
+    const clear = () => { set("church_id", ""); setFilled(0); };
+    const fill = (e) => setFilled(e.detail.changes?.length ?? 0);
     el.addEventListener("church-select", pick);
     el.addEventListener("church-clear", clear);
-    return () => { el.removeEventListener("church-select", pick); el.removeEventListener("church-clear", clear); };
+    el.addEventListener("church-fill", fill);
+    return () => { el.removeEventListener("church-select", pick); el.removeEventListener("church-clear", clear); el.removeEventListener("church-fill", fill); };
   }, []);
   useEffect(() => { document.getElementById("state").textContent = JSON.stringify(form, null, 2); }, [form]);
   const submit = (e) => {
     e.preventDefault();
     if (!form.church_id) { setSaved("Choose a church from the list first."); ref.current.shadowRoot?.querySelector("input")?.focus(); return; }
     setList((l) => [{ name: form.name || "New church", where: [form.city, form.regionName].filter(Boolean).join(", "), rel: form.relationship, isNew: true }, ...l.map((x) => ({ ...x, isNew: false }))]);
-    setSaved(`Saved ${form.name || "the church"} (${form.church_id}).`);
+    setSaved(`Saved. ${form.name || "The church"} is now a ${form.relationship.toLowerCase()}.`);
   };
   return html`<div class="shell">
     <aside class="side" aria-label="Kinship">
-      <div class="ws"><span class="ws-logo"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true"><circle cx="6" cy="8" r="3.6"/><circle cx="10" cy="8" r="3.6"/></svg></span><span><b>Kinship</b><small>Westside Network</small></span></div>
+      <div class="ws"><span class="ws-logo"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><defs><clipPath id="k-l"><circle cx="9" cy="12" r="6.2"/></clipPath></defs><circle cx="9" cy="12" r="6.2" fill="#D9472B"/><circle cx="15" cy="12" r="6.2" fill="#F1EBE2"/><circle cx="15" cy="12" r="6.2" fill="#7FC4A4" clip-path="url(#k-l)"/></svg></span><span><b>Kinship</b><small>Westside Network</small></span></div>
       <nav aria-label="Main">
-        <p class="side-h">Workspace</p>
-        ${NAV.map(([n, d], i) => html`<a href="#" key=${n} aria-current=${i === 5 ? "page" : undefined} onClick=${(e) => e.preventDefault()}>${icon(d)}${n}</a>`)}
+        ${NAV.map(([n, d, c], i) => html`<a href="#" key=${n} aria-current=${i === 5 ? "page" : undefined} onClick=${(e) => e.preventDefault()}>${icon(d)}${n}${c ? html`<em>${c}</em>` : null}</a>`)}
       </nav>
-      <div class="me"><span class="av">JD</span><span>Jordan Diaz<small>Network admin</small></span></div>
+      <div><p class="side-h">Campuses</p>
+        <div class="campus"><i style=${{ background: "#D9472B" }}></i>Westside</div>
+        <div class="campus"><i style=${{ background: "#2F6A55" }}></i>Riverbend</div>
+        <div class="campus"><i style=${{ background: "#9A5420" }}></i>Downtown</div></div>
+      <div class="promo"><b>Spring Outreach</b>12 of 18 partner churches signed on.<div class="bar"><i></i></div><small>Ends in 12 days</small></div>
+      <div class="me"><span class="av" style=${{ background: "#2B5C8A" }}>JD</span><span>Jordan Diaz<small>Network admin</small></span></div>
     </aside>
     <div class="main">
-      <header class="top"><span class="find">${icon("M7 12.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM14.5 14.5l-3.6-3.6")}Search people, groups, churches</span>
-        <span class="icons" aria-hidden="true"><span>${icon("M8 2a4 4 0 0 0-4 4v3l-1.5 2.5h11L12 9V6a4 4 0 0 0-4-4zM6.5 13.5a1.5 1.5 0 0 0 3 0")}</span><span>${icon("M8 5.5v5M5.5 8h5")}</span></span></header>
+      <header class="top"><span class="find">${icon("M7 12.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM14.5 14.5l-3.6-3.6")}Search people, groups, churches<kbd>⌘K</kbd></span>
+        <span class="icons" aria-hidden="true"><span class="dot">${icon("M8 2a4 4 0 0 0-4 4v3l-1.5 2.5h11L12 9V6a4 4 0 0 0-4-4zM6.5 13.5a1.5 1.5 0 0 0 3 0")}</span><span class="av" style=${{ background: "#9C3D54", width: "28px", height: "28px" }}>MR</span></span></header>
       <main class="page" id="main">
-        <p class="crumbs">Partner churches<span aria-hidden="true">/</span>New</p>
-        <h1>Add a partner church</h1>
+        <div class="head"><div><p class="crumbs">Partner churches<span aria-hidden="true">/</span>New</p><h1>Bring a church <em>into the family</em></h1></div>
+          <div class="tabs" aria-hidden="true"><span class="on">Details</span><span>Contacts</span><span>Giving</span></div></div>
         <form class="card" onSubmit=${submit} noValidate>
-          <h2>Church</h2>
-          <p>Find the church and its details fill in from Here’s My Church. Anything you type is kept.</p>
+          <div class="f-head"><span class="f-ic">${icon("M8 1.5v3M6.5 3h3M3.5 14V8L8 5l4.5 3v6M6.5 14v-3a1.5 1.5 0 0 1 3 0v3M2 14h12")}</span><div><h2>Church details</h2><p>Find the church and we’ll fill in what Here’s My Church knows. Anything you type is kept.</p></div></div>
+          <div class="f-body">
           <church-lookup ref=${ref} name="church_id" client="lookup-demo" label="Find the church" placeholder="Search by name or city"></church-lookup>
+          ${filled ? html`<p class="from" role="status">${icon("M3 8.5l3 3 7-7")}Filled ${filled} ${filled === 1 ? "field" : "fields"} from Here’s My Church</p>` : null}
           <div class="grid">
             <${Field} k="name" label="Church name" form=${form} set=${set} wide />
             <${Field} k="street" label="Street" form=${form} set=${set} wide />
@@ -159,19 +204,26 @@ function App() {
             <${Field} k="phone" label="Phone" form=${form} set=${set} />
             <${Field} k="denomination" label="Denomination" form=${form} set=${set} />
             <${Field} k="postalCode" label="Postal code" form=${form} set=${set} />
-            <label class="wide">Service times<input data-hmc-field="serviceTimes" name="serviceTimes" value=${form.serviceTimes} onChange=${(e) => set("serviceTimes", e.target.value)} /></label>
+            <${Field} k="serviceTimes" label="Service times" form=${form} set=${set} wide />
           </div>
           <p class="sec">Relationship</p>
-          <div class="grid">
-            <label>Type<select value=${form.relationship} onChange=${(e) => set("relationship", e.target.value)}><option>Partner</option><option>Church plant</option><option>Sister church</option><option>Mission partner</option></select></label>
-            <label class="wide">Notes<textarea value=${form.notes} onChange=${(e) => set("notes", e.target.value)} placeholder="How you work together"></textarea></label>
+          <div class="rels" role="radiogroup" aria-label="Relationship">
+            ${["Partner", "Church plant", "Sister church", "Mission partner"].map((r) => html`<label key=${r}><input type="radio" name="relationship" value=${r} checked=${form.relationship === r} onChange=${() => set("relationship", r)} />${r}</label>`)}
           </div>
-          <div class="actions"><output aria-live="polite">${saved}</output><button type="button" class="btn" onClick=${() => { setForm(empty); setSaved(""); ref.current.clear?.(); }}>Cancel</button><button class="btn primary">Save church</button></div>
+          <div class="grid"><label class="wide">Notes<textarea value=${form.notes} onChange=${(e) => set("notes", e.target.value)} placeholder="How you work together"></textarea></label></div>
+          <div class="actions"><output aria-live="polite">${saved}</output><button type="button" class="btn" onClick=${() => { setForm(empty); setSaved(""); setFilled(0); ref.current.clear?.(); }}>Cancel</button><button class="btn primary">Add to network</button></div>
+          </div>
         </form>
-        <section class="card list" aria-labelledby="list-h">
-          <h2 id="list-h">Partner churches</h2>
-          <ul>${list.map((c) => html`<li key=${c.name + c.where} class=${c.isNew ? "new" : ""}><span class="ci">${icon("M8 1.5v3M6.5 3h3M3.5 14V8L8 5l4.5 3v6M2 14h12")}</span><span><b>${c.name}${c.isNew ? html`<span class="tag">New</span>` : null}</b><small>${c.rel} · ${c.where || "—"}</small></span></li>`)}</ul>
-        </section>
+        <div class="col">
+          <section class="card map" aria-label="Network map"><h2>Westside Network</h2><p>18 churches in 6 states</p>
+            <svg viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 C60 90 110 130 170 100 S260 70 320 90" stroke="rgba(241,235,226,.12)" fill="none" stroke-width="18"/><g fill="none" stroke="rgba(217,71,43,.5)" stroke-width="1" stroke-dasharray="3 3"><path d="M70 92 L150 70 L230 104"/><path d="M150 70 L250 50"/><path d="M150 70 L110 120"/></g><g fill="#D9472B"><circle cx="150" cy="70" r="6"/></g><g fill="#F1EBE2"><circle cx="70" cy="92" r="3.5"/><circle cx="230" cy="104" r="3.5"/><circle cx="250" cy="50" r="3.5"/><circle cx="110" cy="120" r="3.5"/><circle cx="290" cy="80" r="2.5" opacity=".5"/><circle cx="30" cy="60" r="2.5" opacity=".5"/></g></svg></section>
+          <section class="card list" aria-labelledby="list-h">
+            <h2 id="list-h">Recently added</h2>
+            <ul>${list.slice(0, 5).map((c, i) => html`<li key=${c.name + c.where} class=${c.isNew ? "new" : ""}><span class="mono" style=${{ background: COLORS[i % COLORS.length] }}>${initials(c.name)}</span><span><b>${c.name}</b><small>${c.where || "—"}</small></span><span class="pill">${c.isNew ? "New" : c.rel.split(" ")[0]}</span></li>`)}</ul>
+          </section>
+          <section class="card feed" aria-labelledby="feed-h"><h2 id="feed-h">Activity</h2>
+            <ol><li>Maya added New Life Fellowship<small>2 days ago</small></li><li>Spring Outreach reached 12 churches<small>Last week</small></li><li>Hope Community planted in Austin<small>March</small></li></ol></section>
+        </div>
       </main>
     </div>
   </div>`;

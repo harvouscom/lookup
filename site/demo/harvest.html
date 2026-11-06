@@ -9,97 +9,132 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=Google+Sans+Flex:opsz,wght@6..144,400..700&family=Geist+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500..700&family=Work+Sans:wght@400..700&family=Google+Sans+Flex:opsz,wght@6..144,400..700&family=Geist+Mono:wght@400..600&display=swap">
 <link rel="stylesheet" href="/demo/demo.css">
 <style>
-  body { background: #FBF6EC; color: #2B2118; }
-  .hdr { display: flex; align-items: center; gap: 12px; padding: 14px 28px; background: #FFFDF8; border-bottom: 1px solid #EDE3D1; }
-  .logo { display: flex; align-items: center; gap: 10px; color: #2B2118; text-decoration: none; font: 700 19px/1 "Fraunces", Georgia, serif; }
-  .logo span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #C2410C; }
-  .hdr nav { margin-left: auto; display: flex; gap: 20px; font-size: 14px; }
-  .hdr nav a { color: #6B5B4A; text-decoration: none; }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 36px 24px 96px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start; }
-  .intro { grid-column: 1 / -1; }
-  .intro small { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #C2410C; }
-  .intro h1 { margin: 6px 0 6px; font: 650 34px/1.15 "Fraunces", Georgia, serif; letter-spacing: -.01em; }
-  .intro p { margin: 0; max-width: 40rem; color: #6B5B4A; }
-  .steps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 0 22px; padding: 0; counter-reset: s; }
-  .steps li { counter-increment: s; display: grid; gap: 8px; font-size: 13px; font-weight: 600; color: #7A6A57; }
-  .steps li::before { content: ""; height: 4px; border-radius: 3px; background: #EADFC8; }
-  .steps li[data-on]::before { background: #C2410C; }
-  .steps li[aria-current] { color: #2B2118; }
-  .steps li span::before { content: counter(s) ". "; }
-  .card { background: #fff; border: 1px solid #EDE3D1; border-radius: 18px; padding: 26px; box-shadow: 0 1px 2px rgba(43,33,24,.04); }
+  /* Harvest Table: a scrappy, warm nonprofit. Tomato, leaf and cream on grainy paper, with a chunky serif. */
+  :root { --cream: #F6EEDC; --paper: #FFFBF1; --ink: #2B1D12; --ink-2: #4E3B2B; --mute: #6D5844; --line: #E4D6BC; --tomato: #C8371D; --tomato-2: #FBE3D9; --leaf: #2F6B2F; --leaf-2: #E3EEDA; --mustard: #E9A520; --serif: "Fraunces", Georgia, serif; }
+  body { font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif; background: var(--cream); color: var(--ink);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.17 0 0 0 0 0.11 0 0 0 0 0.07 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .hdr { display: flex; align-items: center; gap: 14px; padding: 14px 32px; border-bottom: 1px solid var(--line); background: rgba(255,251,241,.85); backdrop-filter: blur(8px); }
+  .logo { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 800 21px/1 var(--serif); letter-spacing: -.01em; }
+  .logo svg { flex: none; filter: drop-shadow(0 2px 3px rgba(200,55,29,.25)); }
+  .logo b { font-weight: 800; } .logo i { font-weight: 500; font-style: italic; color: var(--tomato); margin-right: 1px; }
+  .hdr nav { margin-left: auto; display: flex; align-items: center; gap: 22px; font-size: 15px; font-weight: 500; }
+  .hdr nav a { color: var(--ink-2); text-decoration: none; }
+  .hdr nav a[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; text-decoration-color: var(--tomato); }
+  .donate { padding: 9px 18px; border-radius: 99px; background: var(--ink); color: var(--paper) !important; font-weight: 600; }
+  .hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; align-items: center; max-width: 1080px; margin: 0 auto; padding: 40px 28px 8px; }
+  .kicker { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 99px; background: var(--leaf-2); color: var(--leaf); font: 600 12px/1 "Geist Mono", monospace; letter-spacing: .06em; text-transform: uppercase; }
+  .hero h1 { margin: 14px 0 12px; font: 800 clamp(34px, 5vw, 56px)/.98 var(--serif); letter-spacing: -.025em; }
+  .hero h1 em { font-style: italic; font-weight: 600; color: var(--tomato); }
+  .scrib { position: relative; white-space: nowrap; }
+  .scrib svg { position: absolute; left: 0; right: 0; bottom: -10px; width: 100%; height: 16px; z-index: -1; }
+  .hero h1 { position: relative; z-index: 0; }
+  .hero p { margin: 0; max-width: 32rem; font-size: 17px; line-height: 1.55; color: var(--ink-2); }
+  .crate { width: 100%; max-width: 380px; justify-self: end; filter: drop-shadow(0 18px 24px rgba(43,29,18,.16)); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 28px 110px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start; }
+  .steps { list-style: none; display: flex; gap: 0; margin: 0 0 18px; padding: 0; counter-reset: s; }
+  .steps li { flex: 1; counter-increment: s; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--mute); }
+  .steps li::before { content: counter(s); flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 2px solid currentColor; font: 700 15px/1 var(--serif); }
+  .steps li:not(:last-child)::after { content: ""; flex: 1; height: 2px; margin-right: 8px; background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 10px); }
+  .steps li[data-on] { color: var(--ink); }
+  .steps li[data-on]::before { background: var(--tomato); border-color: var(--tomato); color: #fff; box-shadow: 0 4px 10px -4px rgba(200,55,29,.6); }
+  .steps li[data-done]::before { content: "✓"; background: var(--leaf); }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 22px; padding: 30px; box-shadow: 0 1px 0 rgba(43,29,18,.04), 0 30px 60px -36px rgba(43,29,18,.4); }
   fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
   fieldset[hidden] { display: none; }
-  legend { padding: 0; margin-bottom: 4px; font: 650 22px/1.2 "Fraunces", Georgia, serif; }
-  .hint { margin: 0 0 18px; font-size: 14px; color: #6B5B4A; }
+  legend { padding: 0; margin-bottom: 4px; font: 800 26px/1.15 var(--serif); letter-spacing: -.01em; }
+  .hint { margin: 0 0 18px; font-size: 15px; color: var(--ink-2); }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin-top: 18px; }
   .wide { grid-column: 1 / -1; }
-  label, .lbl { display: grid; gap: 6px; font-size: 14px; font-weight: 500; color: #3D3027; }
-  input, select, textarea { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid #DCCFB8; border-radius: 10px; background: #FFFEFB; color: #2B2118; font-size: 15px; }
-  textarea { min-height: 80px; padding: 10px 12px; }
-  input[readonly] { background: #F7F1E6; color: #5A4B3D; }
-  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: #EA580C; box-shadow: 0 0 0 3px rgba(234,88,12,.18); }
+  label, .lbl { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+  input, select, textarea { width: 100%; min-height: 46px; padding: 0 13px; border: 1.5px solid #DCCBAA; border-radius: 12px; background: #fff; color: var(--ink); font-size: 15px; font-weight: 400; }
+  input[readonly] { background: var(--leaf-2); border-color: #C7DBB8; color: var(--leaf); font-weight: 500; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: var(--tomato); box-shadow: 0 0 0 4px rgba(200,55,29,.14); }
   .checks { display: flex; flex-wrap: wrap; gap: 8px; }
-  .checks label { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #DCCFB8; border-radius: 99px; font-weight: 500; cursor: pointer; }
-  .checks input { width: 16px; height: 16px; min-height: 0; accent-color: #C2410C; }
-  .err { margin: 10px 0 0; font-size: 14px; color: #B91C1C; }
+  .checks label { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1.5px solid #DCCBAA; border-radius: 99px; background: #fff; font-weight: 500; cursor: pointer; }
+  .checks label:has(input:checked) { border-color: var(--leaf); background: var(--leaf-2); color: var(--leaf); }
+  .checks input { width: 16px; height: 16px; min-height: 0; accent-color: var(--ink); }
+  .err { margin: 10px 0 0; font-size: 14px; font-weight: 500; color: #A1271A; }
   .err:empty { display: none; }
-  .nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #F1E8D8; }
-  .btn { min-height: 44px; padding: 0 20px; border-radius: 10px; border: 1px solid #DCCFB8; background: #fff; color: #2B2118; font-weight: 600; cursor: pointer; }
-  .btn.primary { border-color: #C2410C; background: #C2410C; color: #fff; }
-  .btn.primary:hover { background: #9A3412; }
-  .btn:focus-visible { outline: 2px solid #EA580C; outline-offset: 2px; }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 26px; padding-top: 18px; border-top: 2px dashed var(--line); }
+  .nav[hidden] { display: none; }
+  .btn { min-height: 48px; padding: 0 22px; border-radius: 99px; border: 1.5px solid #CDB995; background: var(--paper); color: var(--ink); font-weight: 700; font-size: 15px; cursor: pointer; }
+  .btn.primary { border-color: var(--tomato); background: var(--tomato); color: #fff; box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 10px 20px -10px rgba(200,55,29,.8); }
+  .btn.primary:hover { background: #AF2E17; }
+  .btn:focus-visible { outline: 3px solid var(--mustard); outline-offset: 2px; }
   .btn[hidden] { display: none; }
-  .review { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 18px; }
-  .review dl { margin: 0; display: grid; gap: 10px; }
-  .review dt { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #A0907C; }
-  .review dd { margin: 2px 0 0; overflow-wrap: anywhere; }
-  .pin { position: relative; height: 200px; border-radius: 14px; overflow: hidden; background: #EDE6D6; background-image: linear-gradient(#E3D9C4 1px, transparent 1px), linear-gradient(90deg, #E3D9C4 1px, transparent 1px); background-size: 28px 28px; }
-  .pin::before { content: ""; position: absolute; left: -20%; top: 58%; width: 140%; height: 14px; background: #F8F3E8; transform: rotate(-12deg); }
-  .pin::after { content: ""; position: absolute; left: 38%; top: -10%; width: 12px; height: 120%; background: #F8F3E8; transform: rotate(8deg); }
-  .pin svg { position: absolute; z-index: 1; left: 50%; top: 50%; width: 34px; height: 34px; margin: -30px 0 0 -17px; color: #C2410C; filter: drop-shadow(0 4px 6px rgba(0,0,0,.2)); }
-  .pin small { position: absolute; z-index: 1; left: 8px; bottom: 8px; padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,.85); font: 11px "Geist Mono", monospace; color: #6B5B4A; }
+  .review { display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 18px; }
+  .review dl { margin: 0; display: grid; gap: 12px; }
+  .review dt { font: 600 11px/1 "Geist Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+  .review dd { margin: 4px 0 0; font-size: 15px; overflow-wrap: anywhere; }
+  .pin { position: relative; height: 210px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: #EAE0C6; background-image: linear-gradient(#DFD2B2 1px, transparent 1px), linear-gradient(90deg, #DFD2B2 1px, transparent 1px); background-size: 26px 26px; }
+  .pin::before { content: ""; position: absolute; left: -20%; top: 58%; width: 140%; height: 16px; background: #FFFBF1; transform: rotate(-12deg); }
+  .pin::after { content: ""; position: absolute; left: 30%; top: -10%; width: 34%; height: 40%; border-radius: 40%; background: #C9DDB4; }
+  .pin svg { position: absolute; z-index: 1; left: 50%; top: 50%; width: 38px; height: 38px; margin: -34px 0 0 -19px; color: var(--tomato); filter: drop-shadow(0 4px 4px rgba(43,29,18,.3)); }
+  .pin small { position: absolute; z-index: 1; left: 8px; bottom: 8px; padding: 3px 8px; border-radius: 7px; background: var(--paper); border: 1px solid var(--ink); font: 11px "Geist Mono", monospace; color: var(--ink-2); }
   .done { text-align: center; padding: 20px 0; }
-  .done h2 { margin: 10px 0 6px; font: 650 26px/1.2 "Fraunces", Georgia, serif; }
-  .done p { margin: 0 auto; max-width: 30rem; color: #6B5B4A; }
-  .aside { display: grid; gap: 14px; }
-  .aside .card { padding: 18px; }
-  .aside h2 { margin: 0 0 8px; font: 650 17px/1.25 "Fraunces", Georgia, serif; }
-  .aside p, .aside li { margin: 0; font-size: 14px; color: #6B5B4A; }
-  .aside ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
-  .stat { display: flex; gap: 18px; }
-  .stat b { display: block; font: 700 24px/1 "Fraunces", Georgia, serif; color: #C2410C; }
-  .stat span { font-size: 12px; color: #6B5B4A; }
-  church-lookup { --hmc-accent: #C2410C; --hmc-active-bg: #FFF1E6; --hmc-radius: 10px; --hmc-input-border: #DCCFB8; --hmc-border: #EDE3D1; --hmc-bg: #FFFEFB; --hmc-text: #2B2118; --hmc-muted: #6B5B4A; }
-  church-lookup::part(label) { font-size: 14px; font-weight: 500; color: #3D3027; }
-  @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } .review { grid-template-columns: 1fr; } }
-  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } .hdr nav { display: none; } .wrap { padding: 24px 16px 96px; } .card { padding: 18px; } .steps li span { font-size: 0; } .steps li span::before { font-size: 13px; } .intro h1 { font-size: 28px; } }
+  .done h2 { margin: 12px 0 8px; font: 800 30px/1.1 var(--serif); }
+  .done p { margin: 0 auto; max-width: 30rem; color: var(--ink-2); }
+  .aside { display: grid; gap: 18px; }
+  .quote { margin: 0; padding: 22px; border-radius: 20px; background: var(--leaf); color: #F3F8EE; position: relative; }
+  .quote::before { content: "“"; position: absolute; top: -8px; left: 16px; font: 800 72px/1 var(--serif); color: var(--mustard); }
+  .quote p { margin: 18px 0 14px; font: italic 500 19px/1.35 var(--serif); }
+  .quote footer { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .quote footer span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--mustard); color: var(--ink); font-weight: 700; }
+  .quote footer small { display: block; color: #E2EED8; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat { padding: 16px; border-radius: 18px; border: 1px solid var(--line); background: var(--paper); }
+  .stat b { display: block; font: 800 30px/1 var(--serif); color: var(--tomato); }
+  .stat span { font-size: 13px; color: var(--ink-2); }
+  .need { padding: 16px 18px; border-radius: 18px; background: var(--tomato-2); border: 1px solid #F2C3B3; font-size: 14px; color: var(--ink-2); }
+  .need b { display: block; margin-bottom: 2px; font: 700 16px/1.2 var(--serif); color: var(--ink); }
+  church-lookup { --hmc-accent: #C8371D; --hmc-active-bg: #FBE3D9; --hmc-active-text: #2B1D12; --hmc-radius: 12px; --hmc-input-border: #CDB995; --hmc-border: #E4D6BC; --hmc-bg: #fff; --hmc-popover: #FFFBF1; --hmc-text: #2B1D12; --hmc-muted: #6D5844; }
+  church-lookup::part(label) { font-size: 14px; font-weight: 600; color: #4E3B2B; }
+  church-lookup::part(input) { min-height: 52px; border-width: 1.5px; font-size: 16px; }
+  @media (max-width: 880px) { .wrap, .hero { grid-template-columns: 1fr; } .crate { justify-self: start; max-width: 260px; } .review { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } .hdr nav a:not(.donate) { display: none; } .hdr { padding: 12px 16px; } .wrap, .hero { padding-left: 16px; padding-right: 16px; } .card { padding: 20px; } .steps li { font-size: 0; gap: 4px; } }
 </style>
 </head>
 <body>
 <a class="skip" href="#join">Skip to the form</a>
 <aside class="demo-banner" aria-label="About this example"><b>Lookup example</b><span>Harvest Table is a made-up food pantry network. A plain HTML form, no framework.</span><a href="/#examples">All examples</a></aside>
 <header class="hdr">
-  <a class="logo" href="#" onclick="return false"><span><svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 14V6M8 6c0-2.5 2-4 4.5-4C12.5 4.5 10.5 6 8 6zM8 9C8 6.5 6 5 3.5 5 3.5 7.5 5.5 9 8 9z"/></svg></span>Harvest Table</a>
-  <nav aria-label="Harvest Table"><a href="#" onclick="return false">Find food</a><a href="#" onclick="return false">Volunteer</a><a href="#" onclick="return false" aria-current="page">Partner with us</a></nav>
+  <a class="logo" href="#" onclick="return false"><svg viewBox="0 0 40 40" width="38" height="38" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#C8371D"/><g fill="none" stroke="#FFFBF1" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 26h22M12 26v6M28 26v6"/><path d="M20 26v-9"/></g><path d="M20 18c0-4.5 3-7.5 8-7.5 0 4.6-3.2 7.5-8 7.5z" fill="#9BD07A"/><path d="M20 20.5c0-3.6-2.5-6-6.5-6 0 3.7 2.6 6 6.5 6z" fill="#E9A520"/></svg><span><i>Harvest</i><b>Table</b></span></a>
+  <nav aria-label="Harvest Table"><a href="#" onclick="return false">Find food</a><a href="#" onclick="return false">Volunteer</a><a href="#" onclick="return false" aria-current="page">Host a pantry</a><a class="donate" href="#" onclick="return false">Donate</a></nav>
 </header>
-<main class="wrap">
-  <div class="intro">
-    <small>Partner sign-up</small>
-    <h1>Host a food pantry at your church</h1>
-    <p>We deliver food, shelving and training. You open your doors a few hours a week. Start with your church and we’ll fill in what we can.</p>
+<section class="hero" aria-labelledby="hero-h">
+  <div>
+    <span class="kicker">Partner sign-up · 10 minutes</span>
+    <h1 id="hero-h">Your church already has the door. <em class="scrib">We’ll bring the food.<svg viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C60 4 130 3 190 7 S270 14 296 6" fill="none" stroke="#E9A520" stroke-width="5" stroke-linecap="round"/></svg></em></h1>
+    <p>Harvest Table delivers groceries, shelving and volunteer training to churches that open a pantry a few hours a week. Start with your church and we’ll fill in what we can.</p>
   </div>
+  <svg class="crate" viewBox="0 0 380 260" aria-hidden="true">
+    <ellipse cx="190" cy="236" rx="160" ry="14" fill="#2B1D12" opacity=".12"/>
+    <g stroke="#2B1D12" stroke-width="3" stroke-linejoin="round">
+      <path d="M150 90c-6-30 4-60 24-70" fill="none" stroke-linecap="round"/><path d="M174 22c14 4 22 16 20 30-14-2-24-14-20-30z" fill="#2F6B2F"/>
+      <circle cx="110" cy="110" r="38" fill="#C8371D"/><path d="M104 74c4-10 12-14 20-12" fill="none" stroke-linecap="round"/>
+      <circle cx="190" cy="104" r="44" fill="#E9A520"/>
+      <path d="M232 112 L330 60 L318 92 Z" fill="#EA7B2C"/><path d="M318 60l20-14M326 70l22-4M314 54l8-20" fill="none" stroke="#2F6B2F" stroke-linecap="round"/>
+      <circle cx="268" cy="118" r="30" fill="#7FB04A"/>
+      <path d="M40 132h300l-22 96H62z" fill="#C88A4A"/>
+      <path d="M48 160h284M56 194h268" fill="none"/>
+      <path d="M150 132v96M230 132v96" fill="none"/>
+    </g>
+    <text x="190" y="184" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="800" font-size="22" fill="#2B1D12">HARVEST TABLE</text>
+  </svg>
+</section>
+<main class="wrap">
   <div>
     <ol class="steps" id="steps" aria-label="Progress">
       <li data-on aria-current="step"><span>Church</span></li><li><span>Pantry</span></li><li><span>Contact</span></li><li><span>Review</span></li>
     </ol>
     <form class="card" id="join" action="/demo/harvest" method="post" novalidate>
       <fieldset data-step="0">
-        <legend>Your church</legend>
-        <p class="hint">Search for your church. Its address and phone fill in from Here’s My Church.</p>
-        <church-lookup name="church_id" required client="lookup-demo" label="Church" placeholder="Search for your church"></church-lookup>
+        <legend>Which church?</legend>
+        <p class="hint">Search for your church. Its address and phone come from Here’s My Church.</p>
+        <church-lookup name="church_id" required client="lookup-demo" label="Your church" placeholder="Search for your church"></church-lookup>
         <p class="err" id="err-0" role="alert"></p>
         <div class="grid">
           <label class="wide">Church name<input name="church_name" data-hmc-field="name" autocomplete="off" required></label>
@@ -113,7 +148,7 @@
       </fieldset>
       <fieldset data-step="1" hidden>
         <legend>Your pantry</legend>
-        <p class="hint">Many partners open right after a service, when people are already there.</p>
+        <p class="hint">Most partners open right after a service, when neighbors are already there.</p>
         <div class="grid">
           <label class="wide">Worship times, from Here’s My Church<input name="worship_times" data-hmc-field="serviceTimes" readonly placeholder="Choose your church first"></label>
           <label class="wide">When could the pantry be open?<input name="pantry_hours" id="hours" placeholder="Such as Sun 12:30 PM to 2:00 PM"></label>
@@ -123,8 +158,8 @@
         </div>
       </fieldset>
       <fieldset data-step="2" hidden>
-        <legend>Pantry contact</legend>
-        <p class="hint">Who should our team call? This stays with Harvest Table and is never shared back.</p>
+        <legend>Who should we call?</legend>
+        <p class="hint">Your pantry lead. This stays with Harvest Table and is never shared back.</p>
         <div class="grid">
           <label class="wide">Name<input name="contact_name" autocomplete="name" required></label>
           <label>Email<input name="contact_email" type="email" autocomplete="email" required></label>
@@ -133,21 +168,22 @@
         <p class="err" id="err-2" role="alert"></p>
       </fieldset>
       <fieldset data-step="3" hidden>
-        <legend>Review</legend>
+        <legend>Look right?</legend>
         <p class="hint">Here’s what we’ll send. Change anything with Back.</p>
         <div class="review"><dl id="summary"></dl><div class="pin" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg><small id="coords">—</small></div></div>
       </fieldset>
       <div class="done" id="done" hidden tabindex="-1">
-        <svg viewBox="0 0 48 48" width="48" height="48" style="margin:0 auto" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#FFF1E6"/><path d="m15 24.5 6 6 12-13" fill="none" stroke="#C2410C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <h2>Thanks, you’re on the list</h2>
+        <svg viewBox="0 0 56 56" width="56" height="56" style="margin:0 auto" aria-hidden="true"><circle cx="28" cy="28" r="25" fill="#E9A520" stroke="#2B1D12" stroke-width="3"/><path d="m17 29 7 7 15-15" fill="none" stroke="#2B1D12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h2>You’re on the list</h2>
         <p>In a real app, the form would post now. It would send <code id="posted-id"></code> as <code>church_id</code>, so Harvest Table can look the church up again later.</p>
       </div>
       <div class="nav" id="nav"><button type="button" class="btn" id="back" hidden>Back</button><span></span><button type="button" class="btn primary" id="next">Continue</button></div>
     </form>
   </div>
-  <aside class="aside">
-    <div class="card"><h2>Why churches host</h2><ul><li>Neighbors already know where you are.</li><li>We bring the food, you bring the welcome.</li><li>Most pantries run on 4 volunteers.</li></ul></div>
-    <div class="card"><div class="stat"><div><b>312</b><span>partner churches</span></div><div><b>41k</b><span>households a month</span></div></div></div>
+  <aside class="aside" aria-label="Why host">
+    <blockquote class="quote"><p>We were already open on Sundays. Now forty families leave with groceries after second service.</p><footer><span>RO</span><div>Rev. Ana Ortega<small>Grace Fellowship · pantry since 2021</small></div></footer></blockquote>
+    <div class="stats"><div class="stat"><b>312</b><span>partner churches</span></div><div class="stat"><b>41k</b><span>households a month</span></div></div>
+    <div class="need"><b>Most needed this month</b>Churches with a freezer in the Midwest. Fresh produce is going unclaimed.</div>
   </aside>
 </main>
 <aside class="demo-pill" aria-label="Demo mode"><img src="/brand/mark.svg" alt=""><span>Demo mode: nothing you share is sent</span><button type="button" id="dev-open" aria-expanded="false" aria-controls="dev">Form data</button></aside>
@@ -163,9 +199,9 @@ let at = 0;
 function go(i) {
   at = i;
   steps.forEach((f, n) => (f.hidden = n !== i));
-  marks.forEach((m, n) => { m.toggleAttribute("data-on", n <= i); if (n === i) m.setAttribute("aria-current", "step"); else m.removeAttribute("aria-current"); });
+  marks.forEach((m, n) => { m.toggleAttribute("data-on", n <= i); m.toggleAttribute("data-done", n < i); if (n === i) m.setAttribute("aria-current", "step"); else m.removeAttribute("aria-current"); });
   $("back").hidden = i === 0;
-  $("next").textContent = i === steps.length - 1 ? "Submit" : "Continue";
+  $("next").textContent = i === steps.length - 1 ? "Send it" : "Continue";
   if (i === 3) review();
   steps[i].querySelector("legend").scrollIntoView({ block: "nearest" });
 }
@@ -178,7 +214,7 @@ function review() {
 }
 function valid(i) {
   if (i === 0) {
-    if (!lookup.value) { $("err-0").textContent = "Choose your church from the list. If it isn’t there, type its name and add it on Here’s My Church."; lookup.shadowRoot?.querySelector("input")?.focus(); return false; }
+    if (!lookup.value) { $("err-0").textContent = "Choose your church from the list. If it isn’t there, add it on Here’s My Church first."; lookup.shadowRoot?.querySelector("input")?.focus(); return false; }
     $("err-0").textContent = "";
   }
   if (i === 2) {
@@ -197,7 +233,7 @@ $("next").addEventListener("click", () => {
   $("posted-id").textContent = lookup.value;
   $("done").hidden = false;
   $("done").focus();
-  marks.forEach((m) => m.setAttribute("data-on", ""));
+  marks.forEach((m) => { m.setAttribute("data-on", ""); m.setAttribute("data-done", ""); });
 });
 $("back").addEventListener("click", () => go(at - 1));
 // Suggest pantry hours right after the last Sunday service.
