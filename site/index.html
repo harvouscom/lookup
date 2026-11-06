@@ -283,7 +283,7 @@ npm install @heresmychurch/lookup</code></pre>
   <section id="theming" aria-labelledby="theme-h">
     <p class="num" aria-hidden="true"><span>05</span></p>
     <h2 id="theme-h">Theming</h2>
-    <p>The widget takes colors, corners and fonts from CSS variables. Drag across to compare the default with your tokens, then tune them below. On a page using <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://cameronpak.com">Cam Pak</a>, or any shadcn/ui-style tokens, it matches with no setup.</p>
+    <p>Theming is built on <a href="https://sensibleui.com">Sensible UI</a>&#8217;s design tokens by <a href="https://cameronpak.com">Cam Pak</a>, the same names shadcn/ui uses. On a page that already has them, the widget matches with no setup. Anywhere else, set a few CSS variables. Pick a design system church apps are often built on, then drag across to compare it with the default.</p>
     <div class="frame"><div class="frame-in flush ba-wrap">
       <div class="ba" id="ba" style="--pos: 50%">
         <div class="ba-layer ba-before" inert>
@@ -291,7 +291,7 @@ npm install @heresmychurch/lookup</code></pre>
           <div class="ba-form"><church-lookup label="Your church" placeholder="Search for a church" geo="off" limit="3"></church-lookup></div>
         </div>
         <div class="ba-layer ba-after" id="ba-after" inert>
-          <span class="ba-tag">your tokens</span>
+          <span class="ba-tag" id="ba-tag">your tokens</span>
           <div class="ba-form"><church-lookup label="Your church" placeholder="Search for a church" geo="off" limit="3"></church-lookup></div>
         </div>
         <div class="ba-line" aria-hidden="true"><span><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5"/></svg></span></div>
@@ -299,34 +299,12 @@ npm install @heresmychurch/lookup</code></pre>
       </div>
       <div class="ba-controls">
         <div class="ba-group" role="group" aria-labelledby="ba-presets-l">
-          <span class="ba-l" id="ba-presets-l">presets</span>
+          <span class="ba-l" id="ba-presets-l">design system</span>
           <button type="button" class="ba-chip" data-preset="hmc" aria-pressed="true">Here's My Church</button>
-          <button type="button" class="ba-chip" data-preset="sensible" aria-pressed="false">Sensible UI</button>
-          <button type="button" class="ba-chip" data-preset="parish" aria-pressed="false">Parish</button>
-        </div>
-        <div class="ba-knobs">
-          <div class="ba-group" role="group" aria-labelledby="ba-accent-l">
-            <span class="ba-l" id="ba-accent-l">accent</span><button type="button" class="ba-sw" data-accent="#8B5CF6" style="--c:#8B5CF6" aria-label="Violet" aria-pressed="false"></button><button type="button" class="ba-sw" data-accent="#2563EB" style="--c:#2563EB" aria-label="Blue" aria-pressed="false"></button><button type="button" class="ba-sw" data-accent="#0F766E" style="--c:#0F766E" aria-label="Teal" aria-pressed="false"></button><button type="button" class="ba-sw" data-accent="#9A3412" style="--c:#9A3412" aria-label="Rust" aria-pressed="false"></button><button type="button" class="ba-sw" data-accent="#171717" style="--c:#171717" aria-label="Ink" aria-pressed="false"></button>
-            <label class="ba-custom"><span class="sr">Custom accent</span><input type="color" id="ba-color" value="#8B5CF6"></label>
-          </div>
-          <label class="ba-group"><span class="ba-l">corners</span><input type="range" id="ba-r" min="0" max="24" step="1" value="14"><output id="ba-r-out" for="ba-r">14px</output></label>
-          <label class="ba-group"><span class="ba-l">font</span><select id="ba-font">
-            <option value='"Google Sans Flex", ui-sans-serif, sans-serif'>Google Sans</option>
-            <option value="ui-sans-serif, system-ui, sans-serif">System</option>
-            <option value="Georgia, 'Times New Roman', serif">Serif</option>
-            <option value='"Geist Mono", ui-monospace, monospace'>Mono</option>
-          </select></label>
-          <div class="ba-group" role="group" aria-labelledby="ba-icons-l">
-            <span class="ba-l" id="ba-icons-l">icons</span>
-            <button type="button" class="ba-chip" data-icons="builtin" aria-pressed="true">built-in</button>
-            <button type="button" class="ba-chip" data-icons="lucide" aria-pressed="false">Lucide</button>
-            <button type="button" class="ba-chip" data-icons="tabler" aria-pressed="false">Tabler</button>
-          </div>
-          <div class="ba-group" role="group" aria-labelledby="ba-mode-l">
-            <span class="ba-l" id="ba-mode-l">mode</span>
-            <button type="button" class="ba-chip" data-mode="light" aria-pressed="false">light</button>
-            <button type="button" class="ba-chip" data-mode="dark" aria-pressed="true">dark</button>
-          </div>
+          <button type="button" class="ba-chip" data-preset="bootstrap" aria-pressed="false">Bootstrap</button>
+          <button type="button" class="ba-chip" data-preset="material" aria-pressed="false">Material</button>
+          <button type="button" class="ba-chip" data-preset="apple" aria-pressed="false">Apple</button>
+          <button type="button" class="ba-chip" data-preset="tailwind" aria-pressed="false">Tailwind</button>
         </div>
       </div>
     </div></div>

@@ -428,63 +428,27 @@ const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, T
   if (!ba) return;
   const after = $("#ba-after church-lookup");
   const layer = $("#ba-after");
+  // Common design systems church apps are built on. Each one sets only the tokens the widget reads.
   const PRESETS = {
-    hmc: { accent: "#8B5CF6", radius: 14, font: '"Google Sans Flex", ui-sans-serif, sans-serif', mode: "dark" },
-    sensible: { accent: "#171717", radius: 4, font: "ui-sans-serif, system-ui, sans-serif", mode: "light" },
-    parish: { accent: "#9A3412", radius: 2, font: "Georgia, 'Times New Roman', serif", mode: "light" },
+    hmc: { name: "Here's My Church", accent: "#8B5CF6", radius: 14, font: '"Google Sans Flex", ui-sans-serif, sans-serif', mode: "dark" },
+    bootstrap: { name: "Bootstrap", accent: "#0D6EFD", radius: 6, font: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', mode: "light", page: "#FFFFFF", border: "#DEE2E6", input: "#CED4DA", muted: "#6C757D", text: "#212529" },
+    material: { name: "Material", accent: "#6750A4", radius: 4, font: 'Roboto, "Helvetica Neue", Arial, sans-serif', mode: "light", page: "#FEF7FF", popover: "#F3EDF7", border: "#CAC4D0", input: "#79747E", muted: "#49454F", text: "#1D1B20" },
+    apple: { name: "Apple", accent: "#007AFF", radius: 10, font: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif', mode: "light", page: "#F2F2F7", border: "#E5E5EA", input: "#D1D1D6", muted: "#6E6E73", text: "#1C1C1E" },
+    tailwind: { name: "Tailwind", accent: "#4F46E5", radius: 6, font: 'Inter, ui-sans-serif, system-ui, sans-serif', mode: "light", page: "#F9FAFB", border: "#E5E7EB", input: "#D1D5DB", muted: "#6B7280", text: "#111827" },
   };
-  const state = { ...PRESETS.hmc, icons: "builtin" };
-  // Icons from two kinds of library: Lucide as inline SVG, Tabler as an icon font loaded on first use.
-  const lucide = (paths) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
-  const ICONS = {
-    lucide: {
-      search: lucide('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'),
-      result: lucide('<path d="M10 9h4"/><path d="M12 7v5"/><path d="M14 22v-4a2 2 0 0 0-4 0v4"/><path d="M18 22V5.6a1 1 0 0 0-.55-.9l-4.56-2.27a2 2 0 0 0-1.78 0L6.55 4.7A1 1 0 0 0 6 5.6V22"/><path d="m18 7 3.45 1.72a1 1 0 0 1 .55.9V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9.38a1 1 0 0 1 .55-.9L6 7"/>'),
-    },
-    tabler: {
-      search: '<i class="ti ti-search"></i>',
-      result: '<i class="ti ti-building-church"></i>',
-      markup: ['<i slot="search-icon" class="ti ti-search"></i>', '<i slot="result-icon" class="ti ti-building-church"></i>'],
-    },
-  };
-  ICONS.lucide.markup = [ICONS.lucide.search.replace("<svg ", '<svg slot="search-icon" '), ICONS.lucide.result.replace("<svg ", '<svg slot="result-icon" ')];
-  function loadTabler() {
-    if (document.getElementById("tabler-css")) return;
-    const l = document.createElement("link");
-    l.id = "tabler-css";
-    l.rel = "stylesheet";
-    l.href = "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css";
-    document.head.append(l);
-  }
-  function applyIcons() {
-    for (const el of [...after.children]) if (el.slot === "search-icon" || el.slot === "result-icon") el.remove();
-    const set = ICONS[state.icons];
-    if (set) {
-      if (state.icons === "tabler") loadTabler();
-      for (const [slot, html] of [["search-icon", set.search], ["result-icon", set.result]]) {
-        const t = document.createElement("template");
-        t.innerHTML = html.trim();
-        const node = t.content.firstElementChild;
-        node.setAttribute("slot", slot);
-        after.append(node);
-      }
-    }
-    // Re-run the search so the open results pick up the new icon.
-    const input = after.shadowRoot?.querySelector("input");
-    if (input?.value) input.dispatchEvent(new Event("input"));
-  }
+  let state = PRESETS.hmc;
   const mix = (c, p, base) => `color-mix(in oklab, ${c} ${p}%, ${base})`;
   function tokens() {
     const { accent: a, radius: r, mode } = state;
-    const dark = mode === "dark";
-    return dark ? {
+    if (mode === "dark") return {
       "--hmc-bg": mix(a, 12, "#110C20"), "--hmc-popover": mix(a, 14, "#140E26"), "--hmc-text": "#FFFFFF", "--hmc-popover-text": "#FFFFFF",
       "--hmc-muted": "#B8B2CC", "--hmc-border": mix(a, 28, "#2A2340"), "--hmc-input-border": mix(a, 45, "#2A2340"),
       "--hmc-accent": mix(a, 55, "white"), "--hmc-active-bg": mix(a, 32, "transparent"), "--hmc-active-text": "#FFFFFF", "--hmc-radius": `${r}px`,
-    } : {
-      "--hmc-bg": "#FFFFFF", "--hmc-popover": "#FFFFFF", "--hmc-text": "#18181B", "--hmc-popover-text": "#18181B",
-      "--hmc-muted": "#52525B", "--hmc-border": mix(a, 20, "#E4E4E7"), "--hmc-input-border": mix(a, 45, "#D4D4D8"),
-      "--hmc-accent": a, "--hmc-active-bg": mix(a, 12, "white"), "--hmc-active-text": "#18181B", "--hmc-radius": `${r}px`,
+    };
+    return {
+      "--hmc-bg": "#FFFFFF", "--hmc-popover": state.popover ?? "#FFFFFF", "--hmc-text": state.text, "--hmc-popover-text": state.text,
+      "--hmc-muted": state.muted, "--hmc-border": state.border, "--hmc-input-border": state.input,
+      "--hmc-accent": a, "--hmc-active-bg": mix(a, 12, "white"), "--hmc-active-text": state.text, "--hmc-radius": `${r}px`,
     };
   }
   function render() {
@@ -493,29 +457,13 @@ const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, T
     after.style.fontFamily = state.font;
     after.style.colorScheme = state.mode;
     layer.dataset.mode = state.mode;
-    layer.style.setProperty("--ba-bg", state.mode === "dark" ? mix(state.accent, 16, "#0B0814") : mix(state.accent, 7, "white"));
-    $("#ba-r").value = String(state.radius);
-    $("#ba-r-out").textContent = `${state.radius}px`;
-    $("#ba-font").value = state.font;
-    $("#ba-color").value = /^#[0-9a-f]{6}$/i.test(state.accent) ? state.accent : "#8B5CF6";
-    for (const b of $$(".ba-sw")) b.setAttribute("aria-pressed", String(b.dataset.accent.toLowerCase() === state.accent.toLowerCase()));
-    for (const b of $$("[data-mode]", ba.parentElement)) b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode));
-    for (const b of $$("[data-preset]")) {
-      const p = PRESETS[b.dataset.preset];
-      b.setAttribute("aria-pressed", String(Object.keys(p).every((k) => String(p[k]).toLowerCase() === String(state[k]).toLowerCase())));
-    }
-    for (const b of $$("[data-icons]")) b.setAttribute("aria-pressed", String(b.dataset.icons === state.icons));
+    layer.style.setProperty("--ba-bg", state.mode === "dark" ? mix(state.accent, 16, "#0B0814") : state.page);
+    $("#ba-tag").textContent = state.name;
+    for (const b of $$("[data-preset]")) b.setAttribute("aria-pressed", String(PRESETS[b.dataset.preset] === state));
     const lines = Object.entries(t).map(([k, v]) => `    ${k}: ${v};`);
-    const kids = ICONS[state.icons]?.markup.map((m) => `  ${m}`).join("\n");
-    $("#ba-css").textContent = `<style>\n  church-lookup {\n${lines.join("\n")}\n    font-family: ${state.font};\n  }\n</style>\n<church-lookup label="Your church">${kids ? `\n${kids}\n` : ""}</church-lookup>`;
+    $("#ba-css").textContent = `<style>\n  church-lookup {\n${lines.join("\n")}\n    font-family: ${state.font};\n  }\n</style>\n<church-lookup label="Your church"></church-lookup>`;
   }
-  $$("[data-preset]").forEach((b) => b.addEventListener("click", () => { Object.assign(state, PRESETS[b.dataset.preset]); render(); }));
-  $$(".ba-sw").forEach((b) => b.addEventListener("click", () => { state.accent = b.dataset.accent; render(); }));
-  $("#ba-color").addEventListener("input", (e) => { state.accent = e.target.value; render(); });
-  $("#ba-r").addEventListener("input", (e) => { state.radius = Number(e.target.value); render(); });
-  $("#ba-font").addEventListener("change", (e) => { state.font = e.target.value; render(); });
-  $$("[data-mode]", ba.parentElement).forEach((b) => b.addEventListener("click", () => { state.mode = b.dataset.mode; render(); }));
-  $$("[data-icons]").forEach((b) => b.addEventListener("click", () => { state.icons = b.dataset.icons; applyIcons(); render(); }));
+  $$("[data-preset]").forEach((b) => b.addEventListener("click", () => { state = PRESETS[b.dataset.preset]; render(); }));
   $("#ba-range").addEventListener("input", (e) => ba.style.setProperty("--pos", `${e.target.value}%`));
   render();
   // Open both widgets on the same search the first time the slider comes into view.
