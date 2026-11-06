@@ -662,3 +662,6 @@ p.num::after { margin-left: 2px; }
   section { scroll-margin-top: 128px; }
 }
 @media (max-width: 640px) { .index { top: 58px; } }
+/* Site dropdowns: a drawn chevron with room, instead of the browser arrow at the far edge. */
+#ba-font, .docs select { appearance:none; -webkit-appearance:none; padding-right:30px; background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%; background-size:5px 5px; background-repeat:no-repeat; }
+@media (forced-colors: active) { #ba-font, .docs select { appearance: auto; -webkit-appearance: auto; background-image: none; padding-right: 8px; } }
