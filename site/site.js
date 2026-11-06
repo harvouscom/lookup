@@ -410,6 +410,73 @@ const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, T
   setTimeout(step, 900);
 })();
 
+// ── Theming: a before/after slider with a small token playground ──
+(function themingPlayground() {
+  const ba = $("#ba");
+  if (!ba) return;
+  const after = $("#ba-after church-lookup");
+  const layer = $("#ba-after");
+  const PRESETS = {
+    hmc: { accent: "#8B5CF6", radius: 14, font: '"Google Sans Flex", ui-sans-serif, sans-serif', mode: "dark" },
+    sensible: { accent: "#171717", radius: 4, font: "ui-sans-serif, system-ui, sans-serif", mode: "light" },
+    parish: { accent: "#9A3412", radius: 2, font: "Georgia, 'Times New Roman', serif", mode: "light" },
+  };
+  const state = { ...PRESETS.hmc };
+  const mix = (c, p, base) => `color-mix(in oklab, ${c} ${p}%, ${base})`;
+  function tokens() {
+    const { accent: a, radius: r, mode } = state;
+    const dark = mode === "dark";
+    return dark ? {
+      "--hmc-bg": mix(a, 12, "#110C20"), "--hmc-popover": mix(a, 14, "#140E26"), "--hmc-text": "#FFFFFF", "--hmc-popover-text": "#FFFFFF",
+      "--hmc-muted": "#B8B2CC", "--hmc-border": mix(a, 28, "#2A2340"), "--hmc-input-border": mix(a, 45, "#2A2340"),
+      "--hmc-accent": mix(a, 55, "white"), "--hmc-active-bg": mix(a, 32, "transparent"), "--hmc-active-text": "#FFFFFF", "--hmc-radius": `${r}px`,
+    } : {
+      "--hmc-bg": "#FFFFFF", "--hmc-popover": "#FFFFFF", "--hmc-text": "#18181B", "--hmc-popover-text": "#18181B",
+      "--hmc-muted": "#52525B", "--hmc-border": mix(a, 20, "#E4E4E7"), "--hmc-input-border": mix(a, 45, "#D4D4D8"),
+      "--hmc-accent": a, "--hmc-active-bg": mix(a, 12, "white"), "--hmc-active-text": "#18181B", "--hmc-radius": `${r}px`,
+    };
+  }
+  function render() {
+    const t = tokens();
+    for (const [k, v] of Object.entries(t)) after.style.setProperty(k, v);
+    after.style.fontFamily = state.font;
+    after.style.colorScheme = state.mode;
+    layer.dataset.mode = state.mode;
+    layer.style.setProperty("--ba-bg", state.mode === "dark" ? mix(state.accent, 16, "#0B0814") : mix(state.accent, 7, "white"));
+    $("#ba-r").value = String(state.radius);
+    $("#ba-r-out").textContent = `${state.radius}px`;
+    $("#ba-font").value = state.font;
+    $("#ba-color").value = /^#[0-9a-f]{6}$/i.test(state.accent) ? state.accent : "#8B5CF6";
+    for (const b of $$(".ba-sw")) b.setAttribute("aria-pressed", String(b.dataset.accent.toLowerCase() === state.accent.toLowerCase()));
+    for (const b of $$("[data-mode]", ba.parentElement)) b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode));
+    for (const b of $$("[data-preset]")) {
+      const p = PRESETS[b.dataset.preset];
+      b.setAttribute("aria-pressed", String(Object.keys(p).every((k) => String(p[k]).toLowerCase() === String(state[k]).toLowerCase())));
+    }
+    const lines = Object.entries(t).map(([k, v]) => `  ${k}: ${v};`);
+    $("#ba-css").textContent = `church-lookup {\n${lines.join("\n")}\n  font-family: ${state.font};\n}`;
+  }
+  $$("[data-preset]").forEach((b) => b.addEventListener("click", () => { Object.assign(state, PRESETS[b.dataset.preset]); render(); }));
+  $$(".ba-sw").forEach((b) => b.addEventListener("click", () => { state.accent = b.dataset.accent; render(); }));
+  $("#ba-color").addEventListener("input", (e) => { state.accent = e.target.value; render(); });
+  $("#ba-r").addEventListener("input", (e) => { state.radius = Number(e.target.value); render(); });
+  $("#ba-font").addEventListener("change", (e) => { state.font = e.target.value; render(); });
+  $$("[data-mode]", ba.parentElement).forEach((b) => b.addEventListener("click", () => { state.mode = b.dataset.mode; render(); }));
+  $("#ba-range").addEventListener("input", (e) => ba.style.setProperty("--pos", `${e.target.value}%`));
+  render();
+  // Open both widgets on the same search the first time the slider comes into view.
+  new IntersectionObserver(([e], io) => {
+    if (!e.isIntersecting) return;
+    io.disconnect();
+    for (const cl of $$("church-lookup", ba)) {
+      const input = cl.shadowRoot?.querySelector("input");
+      if (!input) continue;
+      input.value = "grace";
+      input.dispatchEvent(new Event("input"));
+    }
+  }, { threshold: 0.4 }).observe(ba);
+})();
+
 // ── Copy buttons ──
 $$(".copy").forEach((btn) => btn.addEventListener("click", async () => {
   const box = btn.closest(".code");
