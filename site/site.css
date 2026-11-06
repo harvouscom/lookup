@@ -641,3 +641,6 @@ p.num::after { margin-left: 2px; }
 @media (max-width: 640px) { .ba { height: 400px; } .ba-layer { padding: 52px 14px 16px; } }
 .ba-layer { isolation: isolate; z-index: 0; }
 .ba-after { z-index: 1; }
+/* The headline keeps growing and stays on one line on desktop; the copy and search keep their own widths. */
+.hero { max-width: 64rem; }
+@media (min-width: 900px) { .hero h1 { white-space: nowrap; } }
