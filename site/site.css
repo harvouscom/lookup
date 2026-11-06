@@ -335,11 +335,16 @@ td.best { color: var(--brand); font-weight: 500; }
 
 /* Token swatches under the stack. */
 .looks { position: absolute; left: 2px; bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.looks button { width: 18px; height: 18px; padding: 0; cursor: pointer; border: 2px solid var(--page); border-radius: 999px; box-shadow: 0 0 0 1px var(--line-2); }
-.looks button[data-look=plum] { background: #7C3AED; border-radius: 6px; }
-.looks button[data-look=teal] { background: #0F766E; }
-.looks button[data-look=amber] { background: #B45309; border-radius: 2px; }
-.looks button[aria-pressed=true] { box-shadow: 0 0 0 2px var(--text); }
+/* Token swatches as tiny planets: a lit top-left, a shaded limb, and each world's own surface. */
+.looks button { position: relative; width: 22px; height: 22px; padding: 0; cursor: pointer; border: 0; border-radius: 999px; box-shadow: inset -3px -4px 6px rgba(0,0,0,.55), inset 2px 2px 4px rgba(255,255,255,.25), 0 0 0 1px rgba(255,255,255,.06); transition: transform .25s cubic-bezier(.3,1.5,.5,1), box-shadow .25s; }
+.looks button[data-look=plum] { background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.55), transparent 32%), repeating-linear-gradient(-18deg, #8B5CF6 0 3px, #6D28D9 3px 5px, #A78BFA 5px 6px), #7C3AED; }
+.looks button[data-look=teal] { background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.6), transparent 30%), radial-gradient(ellipse 40% 26% at 64% 60%, #84CC16 60%, transparent 64%), radial-gradient(ellipse 26% 18% at 30% 70%, #65A30D 60%, transparent 64%), radial-gradient(circle at 50% 50%, #14B8A6, #0F766E 70%); }
+.looks button[data-look=amber] { background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.55), transparent 32%), radial-gradient(ellipse 20% 12% at 64% 62%, #7C2D12 60%, transparent 66%), linear-gradient(180deg, #FCD34D 0 22%, #D97706 22% 36%, #FBBF24 36% 52%, #B45309 52% 64%, #F59E0B 64% 80%, #92400E 80%); }
+.looks button:hover { transform: scale(1.12) rotate(-8deg); }
+.looks button[aria-pressed=true] { transform: scale(1.12); box-shadow: inset -3px -4px 6px rgba(0,0,0,.55), inset 2px 2px 4px rgba(255,255,255,.25), 0 0 0 2px var(--page), 0 0 0 3px rgba(255,255,255,.7), 0 0 14px 2px var(--glow, rgba(167,139,250,.55)); }
+.looks button[data-look=teal] { --glow: rgba(45,212,191,.5); }
+.looks button[data-look=amber] { --glow: rgba(251,191,36,.5); }
+@media (prefers-reduced-motion: reduce) { .looks button { transition: none; } .looks button:hover { transform: none; } }
 
 @media (prefers-reduced-motion: no-preference) {
   .ly-row.on { animation: lyOn .45s both; animation-delay: calc(var(--i) * 90ms); }

@@ -57,6 +57,16 @@ kbd { padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line-2); bac
 :root[data-theme=dark] .dx-top .theme .sun { display: none; }
 :root[data-theme=dark] .dx-top .theme .moon { display: block; }
 .dx-menu { display: none; }
+/* Menu icon: the outer lines slide into the middle, then turn into an X. Closing runs it backwards,
+   because translate and rotate are separate properties with their own delays. */
+.burger path { transform-box: fill-box; transform-origin: center; }
+.burger .b1, .burger .b3 { transition: rotate .18s ease, translate .16s ease .16s; }
+.burger .b2 { transition: scale .14s ease .14s, opacity .1s linear .16s; }
+.dx-menu[aria-expanded=true] .b1 { translate: 0 3.5px; rotate: 45deg; }
+.dx-menu[aria-expanded=true] .b3 { translate: 0 -3.5px; rotate: -45deg; }
+.dx-menu[aria-expanded=true] .b1, .dx-menu[aria-expanded=true] .b3 { transition: translate .16s ease, rotate .26s cubic-bezier(.3, 1.6, .5, 1) .16s; }
+.dx-menu[aria-expanded=true] .b2 { scale: 0 1; opacity: 0; transition: scale .14s ease, opacity .1s linear .06s; }
+@media (prefers-reduced-motion: reduce) { .burger path { transition: none !important; } }
 
 /* Three columns */
 .dx { display: grid; grid-template-columns: 260px minmax(0, 1fr) 232px; max-width: 1440px; margin: 0 auto; }
