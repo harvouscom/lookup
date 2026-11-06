@@ -1,6 +1,6 @@
 // <church-lookup>: an ARIA 1.2 combobox that searches Here's My Church and autofills a form. It's a
 // form-associated element: with a `name`, the chosen church's ID submits like any input.
-/// <reference path="./jsx.d.ts" />
+/// <reference path="./jsx.d.ts" preserve="true" />
 import { createLookup, type ChurchRecord, type FieldStatus, type Lookup, type Meta, type SearchResult } from "./client.ts";
 import { applyFill, consentDiff, contributable, createLookupController, fieldValue, findTargets, planFill, type ControllerState, type FillChange } from "./core.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";

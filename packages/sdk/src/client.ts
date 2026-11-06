@@ -38,8 +38,16 @@ export interface SearchResult {
 export interface SearchResponse {
   query: string;
   results: SearchResult[];
+  /** More churches ranked past `limit`. Ask again with a higher limit to get them. */
+  hasMore?: boolean;
+  /** The place understood from the query or `near`, such as Dallas, TX. */
+  place: { name: string; region: string; country: string } | null;
+  /** The spelling searched instead of what was typed, or null. */
   corrected: string | null;
+  /** A fallback answer: part of the search didn't run. */
   degraded: boolean;
+  /** Whether semantic search ran. */
+  semantic?: "used" | "skipped" | "off" | "failed";
   attribution: string;
 }
 
@@ -70,11 +78,16 @@ export interface Meta {
 
 export class LookupError extends Error {
   status: number;
+  /** Seconds to wait before trying again, on a 429 or 503. */
   retryAfter?: number;
-  constructor(status: number, message: string, retryAfter?: number) {
+  /** A stable reason: invalid, not_found, rate_limited, overloaded, unavailable, … */
+  code?: string;
+  constructor(status: number, message: string, retryAfter?: number, code?: string) {
     super(message);
+    this.name = "LookupError";
     this.status = status;
     this.retryAfter = retryAfter;
+    this.code = code;
   }
 }
 
@@ -92,7 +105,7 @@ export function createLookup(opts: LookupOptions = {}) {
   async function get<T>(path: string, signal?: AbortSignal, init?: RequestInit): Promise<T> {
     const res = await f(base + path, { signal, ...init });
     const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined);
+    if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined, body.code);
     return body;
   }
 

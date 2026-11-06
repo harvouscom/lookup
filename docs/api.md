@@ -35,7 +35,7 @@ Try it against the live API:
 | `settled=1` | The person paused, so semantic search may run. |
 | `geo=off` | Don't use the request's approximate location. |
 
-The response has `results`, plus `hasMore` when more churches ranked past `limit`. To show more, ask again with a higher `limit`: the first results stay in the same order. It also has `place` (the place understood from the query, or `null`), `corrected` (the spelling searched instead, or `null`), `degraded` and `semantic`.
+The response has `results`, plus `hasMore` when more churches ranked past `limit`. To show more, ask again with a higher `limit` and add the results you haven't shown yet. A higher limit can search wider, so don't assume the first ones come back in the same order. It also has `place` (the place understood from the query, or `null`), `corrected` (the spelling searched instead, or `null`), `degraded` and `semantic`.
 
 ## GET /v1/churches/:id
 

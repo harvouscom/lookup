@@ -11,35 +11,34 @@
   ],
   "exports": {
     ".": {
-      "types": "./src/client.ts",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "./core": {
-      "types": "./src/core.ts",
+      "types": "./dist/core.d.ts",
       "default": "./dist/core.js"
     },
     "./element": {
-      "types": "./src/element.ts",
+      "types": "./dist/element.d.ts",
       "default": "./dist/element.js"
     },
     "./service-times": {
-      "types": "./src/service-times.ts",
+      "types": "./dist/service-times.d.ts",
       "default": "./dist/service-times.js"
     },
     "./react": {
-      "types": "./src/react.d.ts"
+      "types": "./dist/react.d.ts"
     },
     "./vue": {
-      "types": "./src/vue.d.ts"
+      "types": "./dist/vue.d.ts"
     },
     "./strings/*": {
-      "types": "./src/strings-*.ts",
+      "types": "./dist/strings-*.d.ts",
       "default": "./dist/strings-*.js"
     }
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",

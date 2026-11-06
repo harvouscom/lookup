@@ -21,9 +21,19 @@ describe("client", () => {
     expect(f.calls[0]).toBe("http://localhost:8787/v1/churches/TX%2F1%202");
   });
   it("throws LookupError with retry-after", async () => {
-    const f = fake({ error: "overloaded" }, 503, { "retry-after": "2" });
+    const f = fake({ error: "overloaded", code: "overloaded" }, 503, { "retry-after": "2" });
     const err = await createLookup({ fetch: f.fetch }).search("grace").catch((e) => e);
     expect(err).toBeInstanceOf(LookupError);
-    expect(err).toMatchObject({ status: 503, message: "overloaded", retryAfter: 2 });
+    expect(err).toMatchObject({ name: "LookupError", status: 503, message: "overloaded", retryAfter: 2, code: "overloaded" });
+  });
+  it("survives an error body that isn't JSON", async () => {
+    const fetch = (async () => new Response("<html>Bad gateway</html>", { status: 502, statusText: "Bad Gateway" })) as unknown as typeof globalThis.fetch;
+    const err = await createLookup({ fetch }).search("grace").catch((e) => e);
+    expect(err).toMatchObject({ status: 502, message: "Bad Gateway", code: undefined });
+  });
+  it("sends lat and lng", async () => {
+    const f = fake({ results: [] });
+    await createLookup({ fetch: f.fetch }).search("grace", { lat: 32.78, lng: -96.8 });
+    expect(new URL(f.calls[0]!).searchParams.get("lat")).toBe("32.78");
   });
 });
