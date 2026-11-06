@@ -665,3 +665,14 @@ p.num::after { margin-left: 2px; }
 /* Site dropdowns: a drawn chevron with room, instead of the browser arrow at the far edge. */
 #ba-font, .docs select { appearance:none; -webkit-appearance:none; padding-right:30px; background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%; background-size:5px 5px; background-repeat:no-repeat; }
 @media (forced-colors: active) { #ba-font, .docs select { appearance: auto; -webkit-appearance: auto; background-image: none; padding-right: 8px; } }
+/* Made in the open, refined: two primary projects, Harvous as a secondary strip. */
+.oss-card { gap: 10px; }
+.oss-card > p { flex: 1; }
+.oss-also { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 14px; margin-top: 12px; padding: 12px 14px 12px 12px; border: 1px solid var(--line); border-radius: 14px; }
+.oss-also .oss-ic { width: 32px; height: 32px; border-radius: 9px; }
+.oss-also p { margin: 0; font-size: .875rem; color: var(--text-2); }
+.oss-also b { font-weight: 600; color: var(--text); }
+.oss-also-l { display: block; font-family: var(--mono); font-size: .625rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.oss-also .oss-actions { margin: 0; padding: 0; flex-wrap: nowrap; }
+@media (max-width: 720px) { .oss-also { grid-template-columns: 32px minmax(0, 1fr); } .oss-also .oss-actions { grid-column: 1 / -1; flex-wrap: wrap; } }
+.oss-card > p .oss-link { font-size: inherit; white-space: nowrap; }
