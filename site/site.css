@@ -705,3 +705,6 @@ p.num::after { margin-left: 2px; }
 /* No dragging: plain cursor, and touch scrolls the page. At the top the nav has no hairline. */
 .horizon canvas, .horizon canvas:active { cursor: default; touch-action: auto; }
 .nav.solid:not(.scrolled) { border-bottom-color: transparent; box-shadow: none; }
+/* Nav contents line up with the docs container (1120px, 24px gutters). */
+.nav { padding-left: max(24px, calc((100% - 1120px) / 2 + 24px)); padding-right: max(24px, calc((100% - 1120px) / 2 + 24px)); }
+@media (max-width: 640px) { .nav { padding-left: 14px; padding-right: 14px; } }
