@@ -488,3 +488,8 @@ th { background: var(--frame); }
 @media (max-width: 760px) { .horizon { height: 340px; } .stack-wrap { margin-top: -200px; } }
 .stack-wrap { max-width: calc(1040px + 2 * clamp(24px, 6vw, 72px)); padding: 0 clamp(24px, 6vw, 72px); }
 @media (max-width: 760px) { .stack-wrap { padding: 0 16px; } }
+/* More globe: a taller band of it shows above the stack, starting just under the try links. */
+.horizon { margin-top: -28px; }
+.stack-wrap { margin-top: calc(-1 * clamp(380px, 40vw, 576px) + 176px); }
+@media (max-width: 760px) { .stack-wrap { margin-top: -150px; } }
+.tag::after { left: calc(50% + var(--stem, 0px)); }

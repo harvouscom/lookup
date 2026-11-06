@@ -56,7 +56,7 @@ export function createGlobe(canvas, data, opts = {}) {
   // The globe is much wider than the canvas is tall, so only its top shows, like a planet rising.
   function geometry() {
     const W = canvas.width, H = canvas.height;
-    const R = Math.min(W * 0.8, 1500 * dpr);
+    const R = Math.min(W * 0.66, 1300 * dpr);
     return { W, H, R, cx: W / 2, cy: R + 36 * dpr };
   }
 

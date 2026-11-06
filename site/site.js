@@ -14,13 +14,13 @@ let globe = null;
 fetch("/data/globe.json")
   .then((r) => r.json())
   // A pick is aimed south of the church, so its pin rises into the visible top of the globe.
-  .then((data) => { globe = createGlobe($("#globe"), data, { lat: 10, lng: -45, onFrame: placeTags,
-    // Degrees to tilt a picked church up from the view's center so its pin lands ~100px under
-    // the crest: the band of globe still visible above the form stack.
+  .then((data) => { globe = createGlobe($("#globe"), data, { lat: -16, lng: -60, onFrame: placeTags,
+    // Degrees to tilt a picked church up from the view's center so its pin lands in the band of
+    // globe still visible above the form stack.
     get pinOffset() {
-      const W = $("#globe").clientWidth, R = Math.min(W * 0.8, 1500);
-      return Math.asin(Math.min(1, Math.max(-1, 1 - ((small() ? 88 : 100) - 36) / R))) * 180 / Math.PI;
-    } }); })
+      const W = $("#globe").clientWidth, R = Math.min(W * 0.66, 1300);
+      return Math.asin(Math.min(1, Math.max(-1, 1 - ((small() ? 136 : 124) - 36) / R))) * 180 / Math.PI;
+    } }); startDemo(); })
   .catch(() => { $(".horizon").hidden = true; });
 
 fetch("/v1/meta")
@@ -48,13 +48,17 @@ function showTags(list) {
   if (globe) placeTags(globe.screen);
 }
 function placeTags(screen) {
-  const h = tagLayer.clientHeight;
-  for (const t of tags) {
+  const h = tagLayer.clientHeight, W = tagLayer.clientWidth;
+  const widths = tags.map((t) => t.el.offsetWidth);
+  tags.forEach((t, i) => {
     const p = screen(t.lat, t.lng);
     const on = p.visible && p.y > 24 && p.y < h - 8;
+    // Keep the label inside the globe's width; its stem still points at the pin.
+    const x = Math.min(Math.max(p.x, widths[i] / 2 + 8), W - widths[i] / 2 - 8);
     t.el.style.opacity = on ? "1" : "0";
-    t.el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, calc(-100% - ${t.big ? 18 : 12}px))`;
-  }
+    t.el.style.transform = `translate(${x}px, ${p.y}px) translate(-50%, calc(-100% - ${t.big ? 18 : 12}px))`;
+    t.el.style.setProperty("--stem", `${p.x - x}px`);
+  });
 }
 
 hero.addEventListener("church-results", (e) => {
@@ -64,20 +68,21 @@ hero.addEventListener("church-results", (e) => {
   hud.textContent = `"${query}" → ${results.length} ${results.length === 1 ? "church" : "churches"}`;
   logEvent("church-results", `${results.length} for "${query}"`, true);
 });
-hero.addEventListener("church-select", (e) => {
-  const r = e.detail.result;
+hero.addEventListener("church-select", (e) => beginPick(e.detail.result));
+hero.addEventListener("church-fill", (e) => showFill(e.detail.changes));
+
+function beginPick(r, quiet = false) {
   globe?.setPins([]);
   globe?.select({ lat: r.latitude, lng: r.longitude });
-  logEvent("church-select", r.name);
+  if (!quiet) logEvent("church-select", r.name);
   $$("input", card).forEach((i) => { i.value = ""; i.placeholder = "…"; i.classList.toggle("on", false); });
   $$(".ly-row", card).forEach((row) => { row.classList.remove("on", "off"); $("b", row).textContent = "·"; });
   status.classList.toggle("done", false);
   status.textContent = `Looking up ${r.name}…`;
   showTags([{ lat: r.latitude, lng: r.longitude, text: r.name, sub: r.locationLabel, big: true }]);
   hud.textContent = "";
-});
-hero.addEventListener("church-fill", (e) => {
-  const { changes } = e.detail;
+}
+function showFill(changes, quiet = false) {
   const filled = new Set(changes.map((c) => c.field));
   const total = $$("input", card).length;
   requestAnimationFrame(() => {
@@ -95,10 +100,63 @@ hero.addEventListener("church-fill", (e) => {
     status.textContent = `Autofilled ${changes.length} of ${total} fields from Here's My Church`;
     const big = $(".tag.big small", tagLayer);
     if (big) big.textContent = `${changes.length} fields filled`;
-    logEvent("church-fill", `${changes.length} fields`);
-    logEvent("input/change", `fired on ${changes.length} fields`);
+    if (!quiet) logEvent("church-fill", `${changes.length} fields`);
+    if (!quiet) logEvent("input/change", `fired on ${changes.length} fields`);
   });
-});
+}
+
+// ── Idle demo: while nobody is searching, real churches light up on the globe and flow through
+// the tagged fields into the app. Any use of the search box ends it for good. ──
+const DEMO_QUERIES = ["grace community", "first baptist", "st mary", "trinity", "calvary chapel", "kosciol", "saint paul", "eglise"];
+let demoOn = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+let demoTimer = 0, demoSeen = false, demoPool = [], demoAt = 0;
+function stopDemo() { demoOn = false; clearTimeout(demoTimer); }
+hero.addEventListener("focusin", stopDemo);
+hero.addEventListener("church-results", stopDemo);
+new IntersectionObserver(([e]) => { demoSeen = e.isIntersecting; }).observe(card);
+function fieldText(rec, f) {
+  const v = rec.fields?.[f];
+  if (v == null) return null;
+  if (Array.isArray(v)) return v.length ? v.join(", ") : null;
+  if (typeof v === "object") return v.raw ?? null;
+  return String(v);
+}
+async function startDemo() {
+  if (!demoOn) return;
+  const lists = await Promise.all(DEMO_QUERIES.map((q) =>
+    fetch(`/v1/search?q=${encodeURIComponent(q)}&geo=off&limit=6`).then((r) => r.json()).then((j) => j.results ?? []).catch(() => [])));
+  const seen = new Set();
+  demoPool = lists.flat().filter((r) => r.latitude != null && !seen.has(r.id) && seen.add(r.id));
+  for (let i = demoPool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [demoPool[i], demoPool[j]] = [demoPool[j], demoPool[i]];
+  }
+  if (demoOn && demoPool.length) demoTimer = setTimeout(demoTick, 1200);
+}
+async function demoTick() {
+  if (!demoOn) return;
+  if (!demoSeen || document.hidden) { demoTimer = setTimeout(demoTick, 1000); return; }
+  const r = demoPool[demoAt++ % demoPool.length];
+  beginPick(r, true);
+  let rec = null;
+  try {
+    [rec] = await Promise.all([
+      fetch(`/v1/churches/${encodeURIComponent(r.id)}`).then((x) => x.json()),
+      new Promise((ok) => setTimeout(ok, 1300)),
+    ]);
+  } catch { /* skip this one */ }
+  if (!demoOn) return;
+  if (rec?.fields) {
+    const changes = [];
+    for (const i of $$("input[data-hmc-field]", card)) {
+      const v = fieldText(rec, i.dataset.hmcField);
+      i.value = v ?? "";
+      if (v != null) changes.push({ field: i.dataset.hmcField, element: i, value: v });
+    }
+    showFill(changes, true);
+  }
+  demoTimer = setTimeout(demoTick, 5200);
+}
 
 // ── The form stack: tagged fields behind, your app on top ──
 // Each data-hmc-field row on the back layer lines up with its field in the app window.
