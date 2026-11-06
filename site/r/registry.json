@@ -14,7 +14,8 @@
       ],
       "registryDependencies": [
         "command",
-        "popover"
+        "popover",
+        "button"
       ],
       "files": [
         {
@@ -51,7 +52,7 @@
       "name": "church-consent",
       "type": "registry:component",
       "title": "Church Consent",
-      "description": "Offer to share corrections back to Here's My Church after a fill. Every change starts unchecked.",
+      "description": "Offer to share corrections back to Here's My Church after a fill. Changed fields start checked; nothing is sent until Share.",
       "registryDependencies": [
         "checkbox",
         "badge",
