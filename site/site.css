@@ -249,134 +249,127 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .meta { margin-top: 22px; }
 .horizon { height: clamp(420px, 50vw, 700px); margin-top: -8px; }
 
-/* ── Scaffolding: a dev-style wireframe of the host app's form, overlapping the card's edge ── */
-.scaffold-wrap { position: relative; z-index: 6; max-width: 800px; margin: clamp(-240px, -18vw, -150px) auto 0; padding: 0 16px; }
-.scaffold { position: relative; padding: 26px 28px 22px; border-radius: 18px; border: 1px dashed var(--line-2);
-  background: radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--muted) 22%, transparent) 1px, transparent 0) 0 0 / 14px 14px, var(--panel);
-  box-shadow: 0 30px 80px -30px rgba(30,16,64,.45); }
-.cm { position: absolute; width: 10px; height: 10px; border-color: var(--brand); border-style: solid; opacity: .7; }
-.cm.tl { top: -1px; left: -1px; border-width: 1.5px 0 0 1.5px; border-top-left-radius: 6px; }
-.cm.tr { top: -1px; right: -1px; border-width: 1.5px 1.5px 0 0; border-top-right-radius: 6px; }
-.cm.bl { bottom: -1px; left: -1px; border-width: 0 0 1.5px 1.5px; border-bottom-left-radius: 6px; }
-.cm.br { bottom: -1px; right: -1px; border-width: 0 1.5px 1.5px 0; border-bottom-right-radius: 6px; }
-.scaffold code { font-family: var(--mono); font-size: .75rem; color: var(--muted); background: none; padding: 0; }
-.sc-head { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 4px 14px; margin-bottom: 16px; }
-.sc-head h2 { margin: 0; font-size: 1.125rem; }
-.sc-status { margin: 0; font-family: var(--mono); font-size: .75rem; color: var(--muted); text-align: right; }
-.sc-status.done { color: var(--brand); }
-.sc-rows { display: grid; gap: 6px; padding-left: 14px; border-left: 1px dashed var(--line-2); margin-left: 4px; }
-.sc-row { display: grid; grid-template-columns: 84px minmax(0, 1fr) 13.5rem; align-items: center; gap: 14px; }
-.sc-row label { font-family: var(--mono); font-size: .75rem; color: var(--text-2); }
-.sc-row input { all: unset; box-sizing: border-box; display: block; width: 100%; min-height: 36px; padding: 0 10px; border-radius: 8px; border: 1px dashed var(--line-2); font-size: .9375rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: color-mix(in oklab, var(--panel) 70%, transparent); }
-.sc-row input::placeholder { color: color-mix(in oklab, var(--muted) 70%, transparent); }
-.sc-row input.on { border-style: solid; border-color: color-mix(in oklab, var(--brand) 45%, transparent); background: var(--tint); }
-.sc-row code { white-space: nowrap; }
-@media (prefers-reduced-motion: no-preference) {
-  .sc-row input.on { animation: scfill .5s both; animation-delay: calc(var(--i) * 80ms); }
-  @keyframes scfill { from { background: transparent; border-color: var(--line-2); border-style: dashed; } }
-}
-@media (max-width: 640px) { .sc-row { grid-template-columns: 70px minmax(0, 1fr); } .sc-row code { display: none; } .sc-head { grid-template-columns: 1fr; } .sc-status { text-align: left; } .scaffold { padding: 20px 16px; } }
 .docs { padding-top: 96px; }
 
-/* ── The scaffold turns into your app: chrome unfolds, annotations fold away, tokens apply ── */
-.scaffold { isolation: isolate; background: var(--panel); --ease: cubic-bezier(.2,.8,.2,1);
-  --app-accent: #7C3AED; --app-radius: 10px;
-  transition: border-color .5s, box-shadow .5s; }
-.scaffold::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--muted) 22%, transparent) 1px, transparent 0) 0 0 / 14px 14px; transition: opacity .5s; }
-.scaffold[data-look=teal] { --app-accent: #0F766E; --app-radius: 999px; }
-.scaffold[data-look=amber] { --app-accent: #B45309; --app-radius: 3px; }
-.cm { transition: opacity .4s, transform .5s var(--ease); }
+/* ── The form stack: your tagged fields on a layer behind, your app's UI on top ── */
+.stack-wrap { position: relative; z-index: 6; max-width: 1040px; margin: clamp(-260px, -19vw, -160px) auto 0; padding: 0 16px; }
+.stack { position: relative; padding: 64px 0 60px; --ease: cubic-bezier(.2,.8,.2,1); --app-accent: #7C3AED; --app-radius: 8px; }
+.stack[data-look=teal] { --app-accent: #0F766E; --app-radius: 999px; }
+.stack[data-look=amber] { --app-accent: #B45309; --app-radius: 2px; }
+:root[data-theme=dark] .stack { --app-accent: #A78BFA; }
+:root[data-theme=dark] .stack[data-look=teal] { --app-accent: #2DD4BF; }
+:root[data-theme=dark] .stack[data-look=amber] { --app-accent: #F59E0B; }
+.ly-num { display: inline-grid; place-items: center; min-width: 22px; height: 18px; padding: 0 5px; border-radius: 5px; font-family: var(--mono); font-size: .625rem; color: var(--brand); background: var(--tint); }
 
-/* Folding regions: a 0fr/1fr grid row, so height animates without measuring. */
-.fold { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .55s var(--ease), opacity .35s, margin .55s var(--ease); }
-.fold > div { min-height: 0; overflow: hidden; }
-.fold.open { grid-template-rows: 1fr; opacity: 1; }
+/* Layer 01: the fields, as a developer sees them. Its right edge peeks out past the app window. */
+.ly-back { position: absolute; z-index: 1; top: 0; right: 0; bottom: 0; width: 56%; border-radius: 16px;
+  border: 1px dashed color-mix(in oklab, var(--brand) 32%, var(--line-2));
+  background: radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--muted) 26%, transparent) 1px, transparent 0) 0 0 / 14px 14px, color-mix(in oklab, var(--panel) 94%, var(--brand));
+  box-shadow: 0 30px 70px -40px rgba(30,16,64,.45); }
+.ly-head { display: flex; align-items: center; gap: 10px; height: 64px; padding: 0 18px; font-family: var(--mono); font-size: .75rem; color: var(--muted); white-space: nowrap; }
+.ly-head code { color: var(--text-2); background: none; padding: 0; font-size: inherit; }
+.ly-cap { margin-left: auto; }
+.ly-col { position: absolute; top: 0; bottom: 0; left: 57.14%; right: 18px; }
+.ly-snip { position: absolute; top: 84px; left: 16px; right: 0; margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--code); color: #C9C4D9; font-family: var(--mono); font-size: .6875rem; line-height: 1.6; white-space: pre; overflow: hidden; }
+.ly-snip span { color: #C4B5FD; }
+/* Keep the globe's readouts clear of the stack that overlaps the card's bottom. */
+.hud { bottom: calc(clamp(160px, 19vw, 260px) + 14px); }
+.ly-colhead, .stack .lbl { font-family: var(--mono); font-size: .625rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.ly-colhead { position: absolute; right: 22px; }
+.ly-row { position: absolute; left: 0; right: 0; margin: 0; display: flex; align-items: center; gap: 8px; translate: 0 -50%; font-family: var(--mono); font-size: .75rem; color: var(--text-2); }
+.ly-row i { flex: 1; min-width: 12px; border-top: 1px dashed var(--line-2); transform-origin: right; }
+.ly-row code { color: inherit; background: none; padding: 0; font-size: inherit; }
+.ly-row b { width: 14px; text-align: center; font-weight: 500; color: var(--muted); }
+.ly-row.on { color: var(--brand); }
+.ly-row.on i { border-top: 1px solid color-mix(in oklab, var(--brand) 55%, transparent); }
+.ly-row.on b { color: var(--brand); }
+.ly-row.off { color: var(--muted); }
+.ly-log { position: absolute; left: 57.14%; right: 18px; bottom: 14px; padding-left: 16px; display: grid; gap: 5px; }
+.sc-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-family: var(--mono); font-size: .6875rem; color: var(--text-2); }
+.sc-log li { display: flex; gap: 8px; min-width: 0; white-space: nowrap; }
+.sc-log li b { flex: none; font-weight: 500; color: var(--brand); }
+.sc-log li span { overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+.sc-log li.idle { color: var(--muted); }
+.ly-front-cap { position: absolute; top: 22px; left: 2px; margin: 0; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: .75rem; color: rgba(237,233,254,.72); }
+.ly-front-cap .ly-num { color: #EDE9FE; background: rgba(167,139,250,.22); }
 
-/* App chrome */
-.sc-chrome { margin: -26px -28px 0; }
-.sc-bar { display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--frame); border-radius: 17px 17px 0 0; }
-.sc-bar .dots { display: flex; gap: 6px; }
-.sc-bar .dots i { width: 10px; height: 10px; border-radius: 999px; background: var(--line-2); }
-.sc-bar .url { flex: 1; min-width: 0; max-width: 340px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 12px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-family: var(--mono); font-size: .6875rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sc-bar .looks { display: flex; align-items: center; gap: 6px; }
-.sc-bar .lbl, .sc-log-wrap .lbl { font-family: var(--mono); font-size: .625rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.looks button { width: 18px; height: 18px; padding: 0; border-radius: 999px; cursor: pointer; border: 2px solid var(--panel); box-shadow: 0 0 0 1px var(--line-2); }
+/* Layer 02: the app window. */
+.win { position: relative; z-index: 2; width: 76%; overflow: hidden; border-radius: 14px; background: var(--panel); border: 1px solid var(--line-2);
+  box-shadow: 0 1px 2px rgba(17,12,34,.06), 0 24px 48px -18px rgba(17,12,34,.32), 0 70px 120px -50px rgba(76,29,149,.55); }
+.win-bar { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 16px; height: 42px; padding: 0 14px; border-bottom: 1px solid var(--line); background: linear-gradient(var(--panel), color-mix(in oklab, var(--frame) 70%, var(--panel))); color: var(--muted); }
+.lights { display: flex; gap: 8px; }
+.lights i { width: 12px; height: 12px; border-radius: 999px; background: #FF5F57; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.2); }
+.lights i:nth-child(2) { background: #FEBC2E; }
+.lights i:nth-child(3) { background: #28C840; }
+.arrows { display: flex; gap: 8px; }
+.arrows svg:last-child { opacity: .4; }
+.addr { justify-self: center; width: min(100%, 360px); height: 26px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 7px; background: color-mix(in oklab, var(--text) 5%, transparent); font-size: .75rem; color: var(--text-2); white-space: nowrap; overflow: hidden; }
+.win-body { display: grid; grid-template-columns: 188px minmax(0, 1fr); }
+.win-side { display: flex; flex-direction: column; gap: 18px; padding: 14px 10px 12px; border-right: 1px solid var(--line); background: color-mix(in oklab, var(--frame) 55%, var(--panel)); font-size: .8125rem; color: var(--text-2); }
+.ws { display: flex; align-items: center; gap: 9px; padding: 2px 6px; }
+.ws b { flex: 1; font-weight: 600; color: var(--text); }
+.ws .logo { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: .75rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, color-mix(in oklab, var(--app-accent) 70%, #fff), var(--app-accent)); transition: background .4s; }
+.win-side nav { display: grid; gap: 2px; }
+.win-side nav span { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 7px; }
+.win-side nav span svg { color: var(--muted); }
+.win-side nav span.on { color: var(--app-accent); font-weight: 500; background: color-mix(in oklab, var(--app-accent) 10%, transparent); transition: color .4s, background .4s; }
+.win-side nav span.on svg { color: inherit; }
+.me { margin-top: auto; display: flex; align-items: center; gap: 9px; padding: 10px 6px 0; border-top: 1px solid var(--line); color: var(--text); }
+.me small { display: block; font-size: .6875rem; color: var(--muted); }
+.av { width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; font-size: .625rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #F59E0B, #EC4899); }
+.win-main { min-width: 0; padding: 20px 28px 0; }
+.crumbs { margin: 0 0 10px; font-size: .75rem; color: var(--muted); }
+.crumbs span { margin: 0 6px; opacity: .6; }
+.win-main h2 { margin: 0; font-size: 1.25rem; }
+.win-status { margin: 4px 0 0; font-size: .8125rem; color: var(--muted); transition: color .4s; }
+.win-status.done { color: var(--app-accent); }
+.fields { display: grid; gap: 10px; margin-top: 20px; }
+.f { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: 14px; }
+.f label { font-size: .8125rem; font-weight: 500; color: var(--text-2); }
+.f input { all: unset; box-sizing: border-box; display: block; width: 100%; height: 38px; padding: 0 12px; border-radius: min(var(--app-radius), 19px); border: 1px solid var(--line-2); background: var(--panel); font-size: .875rem; color: var(--text); box-shadow: 0 1px 2px rgba(17,16,20,.04); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: border-color .4s, background-color .4s, border-radius .45s var(--ease); }
+.f input::placeholder { color: color-mix(in oklab, var(--muted) 75%, transparent); }
+.f input:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 1px; }
+.f input.on { border-color: color-mix(in oklab, var(--app-accent) 45%, var(--line-2)); background: color-mix(in oklab, var(--app-accent) 6%, var(--panel)); }
+.win-foot { display: flex; align-items: center; gap: 8px; margin: 22px -28px 0; padding: 14px 28px; border-top: 1px solid var(--line); background: color-mix(in oklab, var(--frame) 40%, var(--panel)); }
+.sc-credit { display: inline-flex; align-items: center; gap: 8px; margin-right: auto; font-size: .8125rem; color: var(--muted); }
+.sc-credit img { border-radius: 5px; }
+.sc-btn { min-height: 36px; padding: 0 16px; border-radius: min(var(--app-radius), 18px); font: inherit; font-size: .875rem; font-weight: 500; cursor: pointer; transition: border-radius .45s var(--ease), background .4s, border-color .4s; }
+.sc-btn.ghost { color: var(--text); background: var(--panel); border: 1px solid var(--line-2); }
+.sc-btn.primary { color: #fff; background: var(--app-accent); border: 1px solid var(--app-accent); }
+:root[data-theme=dark] .sc-btn.primary { color: #0B0814; }
+.sc-btn:focus-visible, .looks button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Token swatches under the stack. */
+.looks { position: absolute; left: 2px; bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.looks button { width: 18px; height: 18px; padding: 0; cursor: pointer; border: 2px solid var(--page); border-radius: 999px; box-shadow: 0 0 0 1px var(--line-2); }
 .looks button[data-look=plum] { background: #7C3AED; border-radius: 6px; }
 .looks button[data-look=teal] { background: #0F766E; }
 .looks button[data-look=amber] { background: #B45309; border-radius: 2px; }
 .looks button[aria-pressed=true] { box-shadow: 0 0 0 2px var(--text); }
-.scaffold.app .sc-chrome { margin-bottom: 22px; }
-
-/* Head */
-.sc-head { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; }
-.sc-status { text-align: left; margin-top: 2px; transition: color .4s; }
-.sc-open { display: block; max-width: 6ch; overflow: hidden; transition: max-width .5s var(--ease), opacity .3s; }
-.sc-mode { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel); }
-.sc-mode button { all: unset; cursor: pointer; padding: 5px 10px; border-radius: 7px; font-family: var(--mono); font-size: .6875rem; color: var(--muted); transition: background .25s, color .25s; }
-.sc-mode button[aria-pressed=true] { background: var(--tint); color: var(--brand); }
-.sc-mode button:focus-visible, .looks button:focus-visible, .sc-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-
-/* Rows */
-.sc-row { grid-template-columns: 96px minmax(0, 1fr) 13.5rem; transition: grid-template-columns .55s var(--ease), margin .55s var(--ease); }
-.sc-row label { transition: color .4s; }
-.sc-row code { overflow: hidden; transition: opacity .3s; }
-.sc-rows { transition: padding .55s var(--ease), margin .55s var(--ease), border-color .4s, gap .55s var(--ease); }
-.sc-row input { transition: border-color .4s, background-color .4s, border-radius .45s var(--ease), min-height .55s var(--ease), box-shadow .4s; }
-
-/* Footer: the event log (wireframe) and the app's own actions */
-.sc-wire > div { display: grid; gap: 10px; padding-top: 14px; }
-.sc-log-wrap { display: grid; gap: 6px; padding: 10px 12px; border-radius: 10px; border: 1px dashed var(--line-2); background: color-mix(in oklab, var(--panel) 80%, transparent); }
-.sc-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-family: var(--mono); font-size: .6875rem; color: var(--text-2); }
-.sc-log li { display: flex; gap: 10px; min-width: 0; white-space: nowrap; }
-.sc-log li b { flex: none; width: 15ch; font-weight: 500; color: var(--brand); }
-.sc-log li span { overflow: hidden; text-overflow: ellipsis; }
-.sc-log li.idle { color: var(--muted); }
-.sc-actions { display: flex; align-items: center; gap: 8px; padding-top: 20px; margin-top: 4px; }
-.sc-credit { display: inline-flex; align-items: center; gap: 8px; margin-right: auto; font-size: .8125rem; color: var(--muted); }
-.sc-credit img { border-radius: 5px; }
-.sc-btn { min-height: 38px; padding: 0 16px; border-radius: var(--app-radius); font: inherit; font-size: .875rem; font-weight: 500; cursor: pointer; transition: border-radius .45s var(--ease), background .4s, border-color .4s; }
-.sc-btn.ghost { color: var(--text); background: var(--panel); border: 1px solid var(--line-2); }
-.sc-btn.primary { color: #fff; background: var(--app-accent); border: 1px solid var(--app-accent); }
-
-/* ── App state ── */
-.scaffold.app { border-style: solid; border-color: var(--line); box-shadow: 0 40px 90px -30px rgba(30,16,64,.5); }
-.scaffold.app::before { opacity: 0; }
-.scaffold.app .cm { opacity: 0; transform: scale(.4); }
-.scaffold.app .sc-open { max-width: 0; opacity: 0; }
-.scaffold.app .sc-head { column-gap: 0; }
-.scaffold.app .sc-title { padding-right: 14px; }
-.scaffold.app .sc-status { font-family: var(--font); font-size: .8125rem; }
-.scaffold.app .sc-rows { padding-left: 0; margin-left: 0; border-left-color: transparent; gap: 12px; }
-.scaffold.app .sc-row { grid-template-columns: 96px minmax(0, 1fr) 0rem; margin-right: -14px; }
-.scaffold.app .sc-row code { opacity: 0; }
-.scaffold.app .sc-row label { font-family: var(--font); font-size: .875rem; font-weight: 500; color: var(--text); text-transform: capitalize; }
-.scaffold.app .sc-row input { border-style: solid; border-color: var(--line-2); border-radius: var(--app-radius); background: var(--panel); min-height: 42px; padding: 0 14px; box-shadow: 0 1px 2px rgba(17,16,20,.05); }
-.scaffold.app .sc-row input.on { border-color: color-mix(in oklab, var(--app-accent) 45%, var(--line-2)); background: color-mix(in oklab, var(--app-accent) 7%, var(--panel)); padding-right: 64px; }
-.scaffold.app .sc-row { position: relative; }
-.scaffold.app .sc-row:has(input.on)::after { content: "✓ auto"; position: absolute; right: 26px; top: 50%; translate: 0 -50%; font-family: var(--mono); font-size: .625rem; color: var(--app-accent); pointer-events: none; }
-:root[data-theme=dark] .scaffold { --app-accent: #A78BFA; }
-:root[data-theme=dark] .scaffold[data-look=teal] { --app-accent: #2DD4BF; }
-:root[data-theme=dark] .scaffold[data-look=amber] { --app-accent: #F59E0B; }
-:root[data-theme=dark] .sc-btn.primary { color: #0B0814; }
 
 @media (prefers-reduced-motion: no-preference) {
+  .ly-row.on { animation: lyOn .45s both; animation-delay: calc(var(--i) * 90ms); }
+  .ly-row.on i { animation: lyLine .55s var(--ease) both; animation-delay: calc(250ms + var(--i) * 90ms); }
+  .f input.on { animation: fIn .5s both; animation-delay: calc(500ms + var(--i) * 90ms); }
   .sc-log li.new { animation: logIn .35s var(--ease) both; }
+  @keyframes lyOn { from { opacity: .3; } }
+  @keyframes lyLine { from { transform: scaleX(0); } }
+  @keyframes fIn { from { color: transparent; border-color: var(--line-2); background-color: var(--panel); } }
   @keyframes logIn { from { opacity: 0; transform: translateY(4px); } }
 }
-@media (prefers-reduced-motion: reduce) {
-  .scaffold, .scaffold *, .scaffold::before { transition: none !important; }
-}
-@media (max-width: 640px) {
-  .sc-chrome { margin: -20px -16px 0; }
-  .sc-bar .dots, .sc-bar .lbl { display: none; }
-  .sc-bar .url { justify-content: flex-start; }
-  .sc-mode { justify-self: start; }
-  .sc-head { grid-template-columns: minmax(0, 1fr); }
-  .sc-open { display: none; }
-  .sc-row, .scaffold.app .sc-row { grid-template-columns: 70px minmax(0, 1fr); margin-right: 0; }
-  .scaffold.app .sc-row:has(input.on)::after { right: 12px; }
-  .sc-log li b { width: auto; }
+
+@media (max-width: 760px) {
+  .stack { padding-top: 50px; }
+  .ly-back { left: 12px; right: 12px; width: auto; bottom: auto; height: 140px; }
+  .ly-head { height: 50px; padding: 0 14px; }
+  .ly-cap, .ly-col, .ly-log, .ly-front-cap { display: none; }
+  .win { width: 100%; }
+  .win-bar { grid-template-columns: auto minmax(0, 1fr); }
+  .arrows, .win-bar .tools { display: none; }
+  .win-body { grid-template-columns: minmax(0, 1fr); }
+  .win-side { display: none; }
+  .win-main { padding: 16px 16px 0; }
+  .f { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .win-foot { margin: 18px -16px 0; padding: 12px 16px; justify-content: flex-end; }
   .sc-credit { display: none; }
-  .sc-actions { justify-content: flex-end; }
 }

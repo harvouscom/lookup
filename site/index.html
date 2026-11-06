@@ -56,47 +56,64 @@
   </div>
 </header>
 
-<section class="scaffold-wrap" aria-labelledby="scaffold-h">
-  <form class="scaffold" id="result-form" onsubmit="event.preventDefault()">
-    <span class="cm tl" aria-hidden="true"></span><span class="cm tr" aria-hidden="true"></span><span class="cm bl" aria-hidden="true"></span><span class="cm br" aria-hidden="true"></span>
-    <div class="sc-chrome fold" inert><div><div class="sc-bar">
-      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span class="url" aria-hidden="true"><svg viewBox="0 0 16 16" width="11" height="11"><path d="M4.5 7V5.5a3.5 3.5 0 0 1 7 0V7M3.5 7h9v6.5h-9z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>app.yourchurch.org/churches/new</span>
-      <span class="looks" role="group" aria-label="Your design tokens"><span class="lbl" aria-hidden="true">tokens</span>
-        <button type="button" data-look="plum" aria-pressed="true" aria-label="Plum, rounded"></button>
-        <button type="button" data-look="teal" aria-pressed="false" aria-label="Teal, pill"></button>
-        <button type="button" data-look="amber" aria-pressed="false" aria-label="Amber, square"></button>
-      </span>
-    </div></div></div>
-    <div class="sc-head">
-      <code class="sc-open" aria-hidden="true">&lt;form&gt;</code>
-      <div class="sc-title">
-        <h2 id="scaffold-h">Your app's form</h2>
-        <p class="sc-status" id="result-foot" aria-live="polite">pick a church above to fill this in</p>
+<section class="stack-wrap" aria-labelledby="app-h">
+  <form class="stack" id="result-form" onsubmit="event.preventDefault()">
+    <div class="ly-back" aria-hidden="true">
+      <div class="ly-head"><span class="ly-num">01</span><code>&lt;form id="result-form"&gt;</code><span class="ly-cap">your fields, tagged</span></div>
+      <div class="ly-col">
+        <pre class="ly-snip"><span>&lt;church-lookup</span>
+  form="result-form"<span>&gt;</span></pre>
+        <span class="ly-colhead">data-hmc-field</span>
+          <p class="ly-row" data-for="name" style="--i:0"><i></i><code>name</code><b>·</b></p>
+          <p class="ly-row" data-for="street" style="--i:1"><i></i><code>street</code><b>·</b></p>
+          <p class="ly-row" data-for="city" style="--i:2"><i></i><code>city</code><b>·</b></p>
+          <p class="ly-row" data-for="regionName" style="--i:3"><i></i><code>regionName</code><b>·</b></p>
+          <p class="ly-row" data-for="website" style="--i:4"><i></i><code>website</code><b>·</b></p>
+          <p class="ly-row" data-for="phone" style="--i:5"><i></i><code>phone</code><b>·</b></p>
+          <p class="ly-row" data-for="serviceTimes" style="--i:6"><i></i><code>serviceTimes</code><b>·</b></p>
       </div>
-      <div class="sc-mode" role="group" aria-label="Show the form as">
-        <button type="button" data-mode="wire" aria-pressed="true">wireframe</button>
-        <button type="button" data-mode="app" aria-pressed="false">in your app</button>
+      <div class="ly-log"><span class="lbl">sdk events</span><ol class="sc-log" id="sc-log"><li class="idle">waiting for church-select…</li></ol></div>
+    </div>
+    <p class="ly-front-cap" aria-hidden="true"><span class="ly-num">02</span>your app, your styles</p>
+    <div class="win">
+      <div class="win-bar" aria-hidden="true">
+        <span class="lights"><i></i><i></i><i></i></span>
+        <span class="arrows"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4 6 8l4 4"/></svg><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l4 4-4 4"/></svg></span>
+        <span class="addr"><svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7V5.5a3.5 3.5 0 0 1 7 0V7M3.5 7h9v6.5h-9z"/></svg>app.yourchurch.org/churches/new</span>
+        <span class="tools"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v3h-3"/></svg></span>
+      </div>
+      <div class="win-body">
+        <aside class="win-side" aria-hidden="true">
+          <div class="ws"><span class="logo">Y</span><b>Your App</b><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 6 8 3.5 10.5 6M5.5 10 8 12.5 10.5 10"/></svg></div>
+          <nav><span><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.5 8 3l5.5 4.5V13a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5z"/></svg>Home</span><span class="on"><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v3M6.5 3h3M3.5 14V8L8 5l4.5 3v6M6.5 14v-3a1.5 1.5 0 0 1 3 0v3M2 14h12"/></svg>Churches</span><span><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3.5h10v10H3zM3 6.5h10M5.5 2v3M10.5 2v3"/></svg>Events</span><span><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7.5a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5zM2 13.5c0-2.2 1.8-4 4-4s4 1.8 4 4M11 3.2a2.2 2.2 0 0 1 0 4.2M12 9.7c1.2.5 2 1.9 2 3.8"/></svg>People</span><span><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13.5S2.5 10.3 2.5 6.4A2.9 2.9 0 0 1 8 5a2.9 2.9 0 0 1 5.5 1.4C13.5 10.3 8 13.5 8 13.5z"/></svg>Giving</span></nav>
+          <div class="me"><span class="av">JD</span><span>Jordan Diaz<small>Admin</small></span></div>
+        </aside>
+        <div class="win-main">
+          <p class="crumbs" aria-hidden="true">Churches<span>/</span>New</p>
+          <h2 id="app-h">Add a church</h2>
+          <p class="win-status" id="result-foot" aria-live="polite">Pick a church above and Lookup fills this in.</p>
+          <div class="fields">
+              <div class="f" style="--i:0"><label for="s-name">Church name</label><input id="s-name" readonly data-hmc-field="name" placeholder="—"></div>
+              <div class="f" style="--i:1"><label for="s-street">Street</label><input id="s-street" readonly data-hmc-field="street" placeholder="—"></div>
+              <div class="f" style="--i:2"><label for="s-city">City</label><input id="s-city" readonly data-hmc-field="city" placeholder="—"></div>
+              <div class="f" style="--i:3"><label for="s-region">Region</label><input id="s-region" readonly data-hmc-field="regionName" placeholder="—"></div>
+              <div class="f" style="--i:4"><label for="s-site">Website</label><input id="s-site" readonly data-hmc-field="website" placeholder="—"></div>
+              <div class="f" style="--i:5"><label for="s-phone">Phone</label><input id="s-phone" readonly data-hmc-field="phone" placeholder="—"></div>
+              <div class="f" style="--i:6"><label for="s-times">Service times</label><input id="s-times" readonly data-hmc-field="serviceTimes" placeholder="—"></div>
+          </div>
+          <div class="win-foot">
+            <span class="sc-credit"><img src="/brand/mark.svg" alt="" width="18" height="18">Autofilled by Lookup</span>
+            <button type="button" class="sc-btn ghost">Cancel</button>
+            <button type="button" class="sc-btn primary" id="sc-save">Save church</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="sc-rows">
-      <div class="sc-row" style="--i:0"><label for="s-name">church</label><input id="s-name" readonly data-hmc-field="name" placeholder="—"><code aria-hidden="true">data-hmc-field="name"</code></div>
-      <div class="sc-row" style="--i:1"><label for="s-street">street</label><input id="s-street" readonly data-hmc-field="street" placeholder="—"><code aria-hidden="true">data-hmc-field="street"</code></div>
-      <div class="sc-row" style="--i:2"><label for="s-city">city</label><input id="s-city" readonly data-hmc-field="city" placeholder="—"><code aria-hidden="true">data-hmc-field="city"</code></div>
-      <div class="sc-row" style="--i:3"><label for="s-region">region</label><input id="s-region" readonly data-hmc-field="regionName" placeholder="—"><code aria-hidden="true">data-hmc-field="regionName"</code></div>
-      <div class="sc-row" style="--i:4"><label for="s-site">website</label><input id="s-site" readonly data-hmc-field="website" placeholder="—"><code aria-hidden="true">data-hmc-field="website"</code></div>
-      <div class="sc-row" style="--i:5"><label for="s-phone">phone</label><input id="s-phone" readonly data-hmc-field="phone" placeholder="—"><code aria-hidden="true">data-hmc-field="phone"</code></div>
-      <div class="sc-row" style="--i:6"><label for="s-times">services</label><input id="s-times" readonly data-hmc-field="serviceTimes" placeholder="—"><code aria-hidden="true">data-hmc-field="serviceTimes"</code></div>
+    <div class="looks" role="group" aria-label="Try your design tokens"><span class="lbl" aria-hidden="true">your tokens</span>
+      <button type="button" data-look="plum" aria-pressed="true" aria-label="Plum, rounded"></button>
+      <button type="button" data-look="teal" aria-pressed="false" aria-label="Teal, pill"></button>
+      <button type="button" data-look="amber" aria-pressed="false" aria-label="Amber, square"></button>
     </div>
-    <div class="sc-wire fold open"><div>
-      <code class="sc-close" aria-hidden="true">&lt;/form&gt;</code>
-      <div class="sc-log-wrap"><span class="lbl">sdk events</span><ol class="sc-log" id="sc-log" aria-label="SDK events"><li class="idle">waiting for church-select…</li></ol></div>
-    </div></div>
-    <div class="sc-app fold" inert><div><div class="sc-actions">
-      <span class="sc-credit"><img src="/brand/mark.svg" alt="" width="18" height="18">Autofilled by Lookup</span>
-      <button type="button" class="sc-btn ghost">Cancel</button>
-      <button type="button" class="sc-btn primary" id="sc-save">Save church</button>
-    </div></div></div>
   </form>
 </section>
 

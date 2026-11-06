@@ -62,49 +62,58 @@ hero.addEventListener("church-select", (e) => {
   const r = e.detail.result;
   globe?.setPins([]);
   globe?.select({ lat: r.latitude, lng: r.longitude });
-  setMode("wire");
   logEvent("church-select", r.name);
   $$("input", card).forEach((i) => { i.value = ""; i.placeholder = "…"; i.classList.toggle("on", false); });
-  $("#result-foot").classList.toggle("done", false);
-  $("#result-foot").textContent = `looking up ${r.name}…`;
+  $$(".ly-row", card).forEach((row) => { row.classList.remove("on", "off"); $("b", row).textContent = "·"; });
+  status.classList.toggle("done", false);
+  status.textContent = `Looking up ${r.name}…`;
   showTags([{ lat: r.latitude, lng: r.longitude, text: r.name, sub: r.locationLabel, big: true }]);
   hud.textContent = `flying to ${r.city || r.nearestPlace || r.regionName}…`;
 });
 hero.addEventListener("church-fill", (e) => {
   const { changes } = e.detail;
   const filled = new Set(changes.map((c) => c.field));
+  const total = $$("input", card).length;
   requestAnimationFrame(() => {
     $$("input", card).forEach((i) => {
       const on = filled.has(i.dataset.hmcField);
-      if (!on) { i.value = ""; i.placeholder = "not listed yet"; }
+      if (!on) { i.value = ""; i.placeholder = "Not listed yet"; }
       i.classList.toggle("on", on);
     });
-    $("#result-foot").classList.add("done");
-    $("#result-foot").textContent = `filled ${changes.length} of ${$$("input", card).length} fields from here's my church`;
+    $$(".ly-row", card).forEach((row) => {
+      const on = filled.has(row.dataset.for);
+      row.classList.add(on ? "on" : "off");
+      $("b", row).textContent = on ? "✓" : "–";
+    });
+    status.classList.add("done");
+    status.textContent = `Autofilled ${changes.length} of ${total} fields from Here's My Church`;
     const big = $(".tag.big small", tagLayer);
     if (big) big.textContent = `${changes.length} fields filled`;
     hud.textContent = `filled ${changes.length} fields`;
-    logEvent("church-fill", `${changes.length} fields → form#result-form`);
-    logEvent("input/change", `fired on ${changes.length} fields, so framework forms update`);
-    modeTimer = setTimeout(() => setMode("app"), 1600);
+    logEvent("church-fill", `${changes.length} fields`);
+    logEvent("input/change", `fired on ${changes.length} fields`);
   });
 });
 
-// ── The scaffold: a wireframe that becomes your app once it's filled ──
-let modeTimer;
-function setMode(mode) {
-  clearTimeout(modeTimer);
-  const app = mode === "app";
-  card.classList.toggle("app", app);
-  $$(".sc-mode button", card).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
-  for (const [sel, show] of [[".sc-chrome", app], [".sc-app", app], [".sc-wire", !app]]) {
-    const el = $(sel, card);
-    el.classList.toggle("open", show);
-    el.inert = !show;
+// ── The form stack: tagged fields behind, your app on top ──
+// Each data-hmc-field row on the back layer lines up with its field in the app window.
+const status = $("#result-foot");
+const back = $(".ly-back", card);
+function alignLayers() {
+  if (getComputedStyle($(".ly-col", card)).display === "none") return;
+  const top = back.getBoundingClientRect().top;
+  let first = Infinity;
+  for (const row of $$(".ly-row", card)) {
+    const r = $(`[data-hmc-field="${row.dataset.for}"]`, card).getBoundingClientRect();
+    const y = r.top + r.height / 2 - top;
+    row.style.top = `${y}px`;
+    first = Math.min(first, y);
   }
-  $("#scaffold-h").textContent = app ? "Add your church" : "Your app's form";
+  $(".ly-colhead", card).style.top = `${first - 34}px`;
 }
-$$(".sc-mode button", card).forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+new ResizeObserver(alignLayers).observe(card);
+document.fonts?.ready.then(alignLayers);
+
 $$(".looks button", card).forEach((b) => b.addEventListener("click", () => {
   card.dataset.look = b.dataset.look;
   $$(".looks button", card).forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
