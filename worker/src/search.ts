@@ -45,6 +45,8 @@ export interface SearchRow {
 
 export interface SearchResult {
   results: ReturnType<typeof present>[];
+  /** More ranked results exist past `limit`. Ask again with a higher limit to get them. */
+  hasMore: boolean;
   place: { name: string; region: string; country: string } | null;
   corrected: string | null;
   degraded: boolean;
@@ -199,7 +201,7 @@ export async function search(db: Db, input: SearchInput): Promise<SearchResult> 
   const required = requiredTokens(tokens);
   const text = allTokens(required, true);
   if (!text && !scope.center && !scope.region && !scope.country && !filter) {
-    return { results: [], place: null, corrected: null, degraded: false, semantic: "skipped", timing: { statements: run.statements, d1Ms: run.d1Ms, aiMs: 0 } };
+    return { results: [], hasMore: false, place: null, corrected: null, degraded: false, semantic: "skipped", timing: { statements: run.statements, d1Ms: run.d1Ms, aiMs: 0 } };
   }
 
   const found = new Map<number, SearchRow & Candidate>();
@@ -288,6 +290,7 @@ export async function search(db: Db, input: SearchInput): Promise<SearchResult> 
   }
   return {
     results: ranked.slice(0, input.limit).map((r) => present(center ? r : { ...r, distanceKm: null })),
+    hasMore: ranked.length > input.limit,
     place: placeRow ? { name: placeRow.name, region: placeRow.region, country: placeRow.country } : null,
     corrected,
     degraded,
