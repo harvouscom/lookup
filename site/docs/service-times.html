@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service times · Lookup docs</title>
+<meta name="description" content="Edit a service-times field as rows of day, time and label, while it still submits one plain string.">
+<link rel="canonical" href="https://lookup.heresmychurch.com/docs/service-times">
+<link rel="alternate" type="text/markdown" href="/docs/service-times.md" title="This page as Markdown">
+<meta property="og:title" content="Service times · Lookup docs">
+<meta property="og:description" content="Edit a service-times field as rows of day, time and label, while it still submits one plain string.">
+<meta property="og:url" content="https://lookup.heresmychurch.com/docs/service-times">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght,ROND@6..144,400..700,0..100&family=Geist+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/docs.css">
+<script>
+  try { var t = localStorage.getItem("lookup-docs-theme"); if (t === "dark" || (!t && matchMedia("(prefers-color-scheme: dark)").matches)) document.documentElement.dataset.theme = "dark"; } catch (e) {}
+</script>
+</head>
+<body class="dx-body" data-page="service-times">
+<a class="skip" href="#content">Skip to content</a>
+<header class="dx-top">
+  <button class="dx-icon dx-menu" id="dx-menu" type="button" aria-label="Docs menu" aria-expanded="false" aria-controls="dx-side"><svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg></button>
+  <a class="dx-brand" href="/" aria-label="Lookup home"><img src="/brand/mark.svg" alt="" width="22" height="22"><span>Lookup</span></a>
+  <a class="dx-pill" href="/docs">Docs</a>
+  <button class="dx-search" id="dx-search-open" type="button"><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m13.5 13.5-3.3-3.3"/></svg><span>Search docs</span><kbd>⌘K</kbd></button>
+  <button class="dx-ask" id="dx-ask-open" type="button"><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5 9.3 6.7 13.5 8 9.3 9.3 8 13.5 6.7 9.3 2.5 8l4.2-1.3z"/></svg><span>Ask AI</span></button>
+  <div class="dx-top-end">
+    <button class="theme dx-icon" id="theme" type="button" aria-pressed="false" aria-label="Dark mode"><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
+    <a class="dx-icon" href="https://github.com/harvouscom/lookup" aria-label="Lookup on GitHub"><svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
+  </div>
+</header>
+<div class="dx">
+  <nav class="dx-side" id="dx-side" aria-label="Docs"><div class="sg"><p class="sg-t">Get started</p><ul><li><a href="/docs">Overview</a></li><li><a href="/docs/quickstart">Quickstart</a></li><li><a href="/docs/examples">Examples</a></li></ul></div><div class="sg"><p class="sg-t">Widget</p><ul><li><a href="/docs/widget">Widget</a></li><li><a href="/docs/service-times" aria-current="page">Service times</a></li><li><a href="/docs/theming">Theming</a></li></ul></div><div class="sg"><p class="sg-t">API</p><ul><li><a href="/docs/api">API</a></li></ul></div><div class="sg"><p class="sg-t">How it works</p><ul><li><a href="/docs/how-search-works">How search works</a></li><li><a href="/docs/data">Data and review</a></li></ul></div><div class="sg sg-ai"><p class="sg-t">For AI tools</p><ul>
+<li><a href="/SKILL.md">SKILL.md</a></li><li><a href="/llms.txt">llms.txt</a></li><li><a href="/llms-full.txt">llms-full.txt</a></li></ul></div></nav>
+  <main class="dx-main" id="content">
+    <p class="dx-crumbs"><a href="/docs">Docs</a><span aria-hidden="true">/</span>Widget</p>
+    <div class="dx-head">
+      <h1>Service times</h1>
+      <div class="dx-actions">
+        <button class="dx-act" type="button" data-copy-page="/docs/service-times.md"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg><span>Copy page</span></button>
+        <button class="dx-act dx-act-more" type="button" aria-label="More page actions" aria-expanded="false" aria-controls="dx-act-menu"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button>
+        <div class="dx-menu-pop" id="dx-act-menu" hidden>
+          <a href="/docs/service-times.md">View as Markdown<small>Plain text for people and agents</small></a>
+          <a href="https://claude.ai/new?q=Read%20https%3A%2F%2Flookup.heresmychurch.com%2Fdocs%2Fservice-times.md%20so%20I%20can%20ask%20questions%20about%20Lookup's%20Service%20times%20docs." target="_blank" rel="noopener">Open in Claude<small>Ask questions about this page</small></a>
+          <a href="https://chatgpt.com/?q=Read%20https%3A%2F%2Flookup.heresmychurch.com%2Fdocs%2Fservice-times.md%20so%20I%20can%20ask%20questions%20about%20Lookup's%20Service%20times%20docs." target="_blank" rel="noopener">Open in ChatGPT<small>Ask questions about this page</small></a>
+        </div>
+      </div>
+    </div>
+    <p class="dx-desc">Edit a service-times field as rows of day, time and label, while it still submits one plain string.</p>
+    <article class="dx-prose">
+<p>Wrap a service-times field in <code>&lt;church-service-times&gt;</code> to edit it as rows of day, time and label, the same way Here&#39;s My Church does. The field keeps one plain string, such as <code>Sun 9:00 AM (Main Service); Wed 7:00 PM</code>, so it submits like any input.</p>
+<div class="frame"><div class="frame-in demo">
+      <church-service-times label="Service times"><textarea aria-label="Service times">Sun 9:00 AM; Sun 11:00 AM (Contemporary); Wed 7:00 PM</textarea></church-service-times>
+    </div></div>
+
+<div class="cb"><div class="cb-bar"><span class="cb-l">html</span><button class="copy cb-copy" type="button">Copy</button></div><pre class="shiki" tabindex="0"><code><span class="line"><span style="--shiki-light:#6D28D9;--shiki-dark:#C4B5FD">&#x3C;church-service-times></span></span>
+<span class="line"><span style="--shiki-light:#6D28D9;--shiki-dark:#C4B5FD">  &#x3C;textarea</span><span style="--shiki-light:#4B5563;--shiki-dark:#D4D0E2"> name</span><span style="--shiki-light:#5B5868;--shiki-dark:#A9A6B8">=</span><span style="--shiki-light:#0F766E;--shiki-dark:#7DD3C0">"times"</span><span style="--shiki-light:#4B5563;--shiki-dark:#D4D0E2"> data-hmc-field</span><span style="--shiki-light:#5B5868;--shiki-dark:#A9A6B8">=</span><span style="--shiki-light:#0F766E;--shiki-dark:#7DD3C0">"serviceTimes"</span><span style="--shiki-light:#6D28D9;--shiki-dark:#C4B5FD">>&#x3C;/textarea></span></span>
+<span class="line"><span style="--shiki-light:#6D28D9;--shiki-dark:#C4B5FD">&#x3C;/church-service-times></span></span>
+<span class="line"><span style="--shiki-light:#6D28D9;--shiki-dark:#C4B5FD">&#x3C;script</span><span style="--shiki-light:#4B5563;--shiki-dark:#D4D0E2"> type</span><span style="--shiki-light:#5B5868;--shiki-dark:#A9A6B8">=</span><span style="--shiki-light:#0F766E;--shiki-dark:#7DD3C0">"module"</span><span style="--shiki-light:#4B5563;--shiki-dark:#D4D0E2"> src</span><span style="--shiki-light:#5B5868;--shiki-dark:#A9A6B8">=</span><span style="--shiki-light:#0F766E;--shiki-dark:#7DD3C0">"https://lookup.heresmychurch.com/service-times.js"</span><span style="--shiki-light:#6D28D9;--shiki-dark:#C4B5FD">>&#x3C;/script></span></span></code></pre></div><p>When <code>&lt;church-lookup&gt;</code> fills a <code>serviceTimes</code> field inside <code>&lt;church-service-times&gt;</code>, the rows update with it.</p>
+
+    </article>
+    <nav class="dx-pager" aria-label="Previous and next page">
+      <a href="/docs/widget"><small>Previous</small>The widget</a>
+      <a class="next" href="/docs/theming"><small>Next</small>Theming</a>
+    </nav>
+    <footer class="dx-foot"><span>Lookup is part of <a href="https://heresmychurch.com">Here&#8217;s My Church</a>.</span><a href="https://github.com/harvouscom/lookup/edit/main/docs/service-times.md">Edit this page on GitHub</a></footer>
+  </main>
+  <aside class="dx-rail" aria-label="On this page">
+    
+    <div class="dx-rail-ai">
+      <p>Using an AI assistant?</p>
+      <button type="button" class="dx-rail-btn" data-copy-page="/docs/service-times.md"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg>Copy page as Markdown</button>
+      <button type="button" class="dx-rail-btn" data-ask><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5 9.3 6.7 13.5 8 9.3 9.3 8 13.5 6.7 9.3 2.5 8l4.2-1.3z"/></svg>Ask AI about this page</button>
+    </div>
+  </aside>
+</div>
+<div class="dx-scrim" id="dx-scrim" hidden></div>
+<dialog class="dx-dialog dx-search-d" id="dx-search" aria-label="Search docs">
+  <div class="dx-search-in"><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m13.5 13.5-3.3-3.3"/></svg><input id="dx-q" type="search" placeholder="Search the docs" autocomplete="off" spellcheck="false" aria-controls="dx-hits" aria-label="Search the docs"><kbd>esc</kbd></div>
+  <ul class="dx-hits" id="dx-hits" role="listbox" aria-label="Results"></ul>
+  <p class="dx-search-ask"><button type="button" data-ask><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5 9.3 6.7 13.5 8 9.3 9.3 8 13.5 6.7 9.3 2.5 8l4.2-1.3z"/></svg>Ask AI instead</button></p>
+</dialog>
+<dialog class="dx-dialog dx-ask-d" id="dx-ask" aria-labelledby="dx-ask-h">
+  <div class="dx-ask-head"><h2 id="dx-ask-h"><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5 9.3 6.7 13.5 8 9.3 9.3 8 13.5 6.7 9.3 2.5 8l4.2-1.3z"/></svg>Ask AI</h2><button type="button" class="dx-icon" data-close aria-label="Close">×</button></div>
+  <div class="dx-ask-log" id="dx-ask-log" aria-live="polite">
+    <p class="dx-ask-intro">Answers come from these docs, written by an AI model on Cloudflare Workers AI. Check anything important against the linked page.</p>
+    <div class="dx-ask-sugg" id="dx-ask-sugg">
+      <button type="button">How do I save the church ID with my form?</button>
+      <button type="button">How do I theme the widget to match my app?</button>
+      <button type="button">Which fields can people share back?</button>
+      <button type="button">How do I use Lookup from React?</button>
+    </div>
+  </div>
+  <form class="dx-ask-form" id="dx-ask-form"><label class="sr" for="dx-ask-q">Your question</label><textarea id="dx-ask-q" rows="1" maxlength="500" placeholder="Ask a question about Lookup"></textarea><button type="submit" class="dx-ask-send">Ask</button></form>
+</dialog>
+<script type="module" src="/element.js"></script>
+<script type="module" src="/service-times.js"></script>
+<script type="module" src="/docs.js"></script>
+</body>
+</html>

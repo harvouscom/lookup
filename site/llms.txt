@@ -1,0 +1,24 @@
+# Lookup
+
+> Lookup is a church search box and autofill SDK for any church app, from Here's My Church: one script tag, an open API, no key. People pick their church and the address, website and service times fill in.
+
+## Docs
+
+- [Overview](https://lookup.heresmychurch.com/docs/index.md): Lookup is a church search box that fills in your form from Here's My Church. One script tag, an open API, no key.
+- [Quickstart](https://lookup.heresmychurch.com/docs/quickstart.md): Add a church search box that fills in your form. Hand this to your AI agent, or follow three steps yourself.
+- [See it in real apps](https://lookup.heresmychurch.com/docs/examples.md): Three made-up apps built with Lookup, each opening full screen. A church management app, a nonprofit sign-up and a church website builder.
+- [The widget](https://lookup.heresmychurch.com/docs/widget.md): <church-lookup> is an accessible combobox: it searches as people type and fills your form when they choose.
+- [Service times](https://lookup.heresmychurch.com/docs/service-times.md): Edit a service-times field as rows of day, time and label, while it still submits one plain string.
+- [Theming](https://lookup.heresmychurch.com/docs/theming.md): Match your design system with a few CSS variables. On pages with shadcn/ui-style tokens, it matches with no setup.
+- [API](https://lookup.heresmychurch.com/docs/api.md): Search churches and read autofill records over plain HTTP. Open CORS, no key, no cookies.
+- [How search works](https://lookup.heresmychurch.com/docs/how-search-works.md): Words first, then places, spelling and, only when words fail, meaning. And where AI is and isn't used.
+- [Data and review](https://lookup.heresmychurch.com/docs/data.md): Where the data comes from, how often it syncs, and how fixes people share go back to Here's My Church.
+
+## For agents
+
+- [SKILL.md](https://lookup.heresmychurch.com/SKILL.md): How to add Lookup to an app, step by step.
+- [Full docs](https://lookup.heresmychurch.com/llms-full.txt): Every page in one file.
+
+## Source
+
+- [GitHub](https://github.com/harvouscom/lookup)

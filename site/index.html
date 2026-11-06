@@ -27,13 +27,13 @@
 </script>
 </head>
 <body>
-<a class="skip" href="#docs">Skip to the docs</a>
+<a class="skip" href="#main">Skip to the content</a>
 
 <nav class="nav solid" id="nav" aria-label="Site">
   <div class="brand-wrap"><a class="brand" href="/" aria-label="Lookup home"><img src="/brand/mark.svg" alt="" width="24" height="24"><span>Lookup</span></a><a class="brand-by" href="https://heresmychurch.com">by Here&#8217;s My Church</a></div>
   <ul class="nav-links">
-    <li><a href="#quickstart">docs</a></li>
-    <li><a href="#api">api</a></li>
+    <li><a href="/docs">docs</a></li>
+    <li><a href="/docs/api">api</a></li>
     <li><a href="https://github.com/harvouscom/lookup">github</a></li>
   </ul>
   <div class="nav-end">
@@ -41,7 +41,7 @@
       <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
       <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
     </button>
-    <a class="btn" href="#quickstart">Get started</a>
+    <a class="btn" href="/docs/quickstart">Get started</a>
   </div>
 </nav>
 
@@ -124,25 +124,10 @@
   </form>
 </section>
 
-<main class="docs" id="docs">
-  <nav class="index" aria-label="On this page">
-    <p class="index-h" aria-hidden="true">on this page</p>
-    <a href="#overview"><i>01</i> overview</a>
-    <a href="#quickstart"><i>02</i> quickstart</a>
-    <a href="#widget"><i>03</i> widget</a>
-    <a href="#service-times"><i>04</i> service times</a>
-    <a href="#theming"><i>05</i> theming</a>
-    <a href="#api"><i>06</i> api</a>
-    <a href="#how-search-works"><i>07</i> how search works</a>
-    <a href="#data"><i>08</i> data</a>
-    <a href="#open-source"><i>09</i> open source</a>
-    <a href="#thanks"><i>10</i> thanks</a>
-  </nav>
-
+<main class="docs home" id="main">
   <section id="overview" aria-labelledby="overview-h">
-    <p class="num" aria-hidden="true"><span>01</span></p>
     <h2 id="overview-h">Stop retyping church details</h2>
-    <p class="lead">Church tools keep asking people for the same details. Lookup fills them in from <a href="https://heresmychurch.com">Here's My Church</a>, an open directory of 587,842 churches in 19 countries. Because every pick comes from the same open directory, each app that uses Lookup helps keep church data accurate. When someone corrects a detail in your app, they can choose to share the fix back.</p>
+    <p class="lead">Church tools keep asking people for the same details. Lookup fills them in from <a href="https://heresmychurch.com">Here's My Church</a>, an open directory of 587,842 churches in 19 countries. Because every pick comes from the same open directory, each app that uses Lookup helps keep church data accurate.</p>
     <ul class="features">
       <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 12.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM14.5 14.5l-3.6-3.6"/></svg></span><b>Search as you type</b><span>Prefixes, typos and places like "church in dallas" all work, nearby churches first.</span></li>
       <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h6M11 11.5l1.5 1.5 2.5-3"/></svg></span><b>Fill your form</b><span>Pick a church and empty fields fill in. Anything already typed is left alone.</span></li>
@@ -150,52 +135,28 @@
     </ul>
   </section>
 
-  <section id="quickstart" aria-labelledby="quickstart-h">
-    <p class="num" aria-hidden="true"><span>02</span></p>
-    <h2 id="quickstart-h">Quickstart</h2>
-    <p>Add the script, put <code>&lt;church-lookup&gt;</code> in your form, and mark the fields it should fill with <code>data-hmc-field</code>. There's no key to request.</p>
-    <div class="frame"><div class="frame-in code" data-tabs>
-      <div class="code-bar">
-        <div role="tablist" aria-label="Install method" class="tabs">
-          <button role="tab" aria-selected="true" aria-controls="qs-html" id="qs-html-t">script tag</button>
-          <button role="tab" aria-selected="false" aria-controls="qs-client" id="qs-client-t" tabindex="-1">client only</button>
-          <button role="tab" aria-selected="false" aria-controls="qs-npm" id="qs-npm-t" tabindex="-1">npm</button>
-        </div>
-        <button class="copy" type="button">copy</button>
-      </div>
-      <pre tabindex="0" role="tabpanel" id="qs-html" aria-labelledby="qs-html-t"><code><span class="t">&lt;form&gt;</span>
-  <span class="t">&lt;church-lookup</span> <span class="a">label</span>=<span class="s">"Your church"</span><span class="t">&gt;&lt;/church-lookup&gt;</span>
-  <span class="t">&lt;input</span> <span class="a">name</span>=<span class="s">"street"</span>  <span class="a">data-hmc-field</span>=<span class="s">"street"</span><span class="t">&gt;</span>
-  <span class="t">&lt;input</span> <span class="a">name</span>=<span class="s">"city"</span>    <span class="a">data-hmc-field</span>=<span class="s">"city"</span><span class="t">&gt;</span>
-  <span class="t">&lt;input</span> <span class="a">name</span>=<span class="s">"website"</span> <span class="a">data-hmc-field</span>=<span class="s">"website"</span><span class="t">&gt;</span>
-<span class="t">&lt;/form&gt;</span>
-<span class="t">&lt;script</span> <span class="a">type</span>=<span class="s">"module"</span> <span class="a">src</span>=<span class="s">"https://lookup.heresmychurch.com/element.js"</span><span class="t">&gt;&lt;/script&gt;</span></code></pre>
-      <pre tabindex="0" role="tabpanel" id="qs-client" aria-labelledby="qs-client-t" hidden><code><span class="t">import</span> { createLookup } <span class="t">from</span> <span class="s">"https://lookup.heresmychurch.com/lookup.js"</span>;
-
-<span class="t">const</span> lookup = createLookup({ client: <span class="s">"my-app"</span> });
-<span class="t">const</span> { results } = <span class="t">await</span> lookup.search(<span class="s">"grace comm"</span>);
-<span class="t">const</span> church = <span class="t">await</span> lookup.getChurch(results[0].id);</code></pre>
-      <pre tabindex="0" role="tabpanel" id="qs-npm" aria-labelledby="qs-npm-t" hidden><code><span class="c"># Coming soon. The package isn't published yet.</span>
-npm install @heresmychurch/lookup</code></pre>
-    </div></div>
-    <p>Try it in a real form. Values are set the way typing sets them, so React and other frameworks see them.</p>
-    <div class="frame"><form class="frame-in demo" id="demo-form" onsubmit="event.preventDefault()">
-      <church-lookup label="Church" form="demo-form" placeholder="Search for a church"></church-lookup>
-      <div class="grid">
-        <div><label for="d-street">Street</label><input id="d-street" data-hmc-field="street" autocomplete="off"></div>
-        <div><label for="d-city">City</label><input id="d-city" data-hmc-field="city" autocomplete="off"></div>
-        <div><label for="d-site">Website</label><input id="d-site" data-hmc-field="website" autocomplete="off"></div>
-        <div><label for="d-phone">Phone</label><input id="d-phone" data-hmc-field="phone" autocomplete="off"></div>
-        <div class="wide"><span class="lbl" id="d-times-l">Service times</span><church-service-times label="Service times"><textarea data-hmc-field="serviceTimes" aria-labelledby="d-times-l"></textarea></church-service-times></div>
-      </div>
-    </form></div>
-    <p>See it in real forms: <a href="/demo/chms">a React church management app</a>, <a href="/demo/retreat">a retreat sign-up</a> and <a href="/demo/builder">a church website builder</a>. Each one shows the share panel when you correct a detail.</p>
+  <section id="examples" aria-labelledby="ex-h">
+    <h2 id="ex-h">See it in real apps</h2>
+    <p>Three made-up apps using the real widget and live data. Each opens full screen, in demo mode, so nothing you share is sent.</p>
+    <ul class="exs">
+      <li><button type="button" class="ex-card" data-ex="kinship" aria-label="Open the Kinship example">
+        <span class="ex-thumb ex-kinship" aria-hidden="true"><span class="ext-bar"><i></i><i></i><i></i></span><span class="ext-body"><span class="ext-side"><i></i><i class="on"></i><i></i><i></i></span><span class="ext-main"><b></b><em></em><span class="ext-fields"><i></i><i></i><i></i><i></i></span><span class="ext-btn"></span></span></span></span>
+        <span class="ex-txt"><small>Church management</small><b>Kinship</b><span>Add a partner church to a React app with controlled inputs. Watch its state fill in.</span><span class="ex-go">Open example<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></span>
+      </button></li>
+      <li><button type="button" class="ex-card" data-ex="harvest" aria-label="Open the Harvest Table example">
+        <span class="ex-thumb ex-harvest" aria-hidden="true"><span class="ext-bar"><i></i><i></i><i></i></span><span class="ext-body"><span class="ext-steps"><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="ext-main"><b></b><em></em><span class="ext-fields"><i></i><i></i></span><span class="ext-btn"></span></span></span></span>
+        <span class="ex-txt"><small>Food pantry network</small><b>Harvest Table</b><span>A nonprofit signs up churches as distribution sites, with service times feeding pantry hours.</span><span class="ex-go">Open example<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></span>
+      </button></li>
+      <li><button type="button" class="ex-card" data-ex="steeple" aria-label="Open the Steeple example">
+        <span class="ex-thumb ex-steeple" aria-hidden="true"><span class="ext-bar"><i></i><i></i><i></i></span><span class="ext-body"><span class="ext-split"><span class="ext-main"><b></b><span class="ext-fields"><i></i><i></i><i></i></span></span><span class="ext-site"><span class="ext-hero"></span><i></i><i></i></span></span></span></span>
+        <span class="ex-txt"><small>Church website builder</small><b>Steeple</b><span>Pick your church and a live website preview builds itself from its details.</span><span class="ex-go">Open example<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></span>
+      </button></li>
+    </ul>
   </section>
 
   <section id="widget" aria-labelledby="widget-h">
-    <p class="num" aria-hidden="true"><span>03</span></p>
-    <h2 id="widget-h">The widget</h2>
-    <p><code>&lt;church-lookup&gt;</code> is an accessible combobox. It searches as people type, asks for smarter results when they pause, and fills your form when they choose.</p>
+    <h2 id="widget-h">Every option, live</h2>
+    <p><code>&lt;church-lookup&gt;</code> is an accessible combobox and a real form field. Change an option and the preview, the HTML and the events update.</p>
     <div class="frame"><div class="frame-in flush wo">
       <div class="wo-stage">
         <span class="ba-tag">preview</span>
@@ -232,94 +193,12 @@ npm install @heresmychurch/lookup</code></pre>
     </div></div>
     <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html</span><button class="copy" type="button">copy</button></div>
 <pre tabindex="0"><code id="wo-code"></code></pre></div></div>
-    <h3>Attributes</h3>
-    <dl class="defs">
-      <div><dt><code>name</code></dt><dd>Submit the chosen church&#8217;s ID with your form under this name, like any input.</dd></div>
-      <div><dt><code>required</code></dt><dd>The form won&#8217;t submit until a church is chosen from the list.</dd></div>
-      <div><dt><code>value</code></dt><dd>A church ID to show, such as one saved earlier on an edit screen.</dd></div>
-      <div><dt><code>fill-on-load</code></dt><dd>Also fill the form from <code>value</code> when the page loads.</dd></div>
-      <div><dt><code>label</code>, <code>placeholder</code></dt><dd>The visible label and the hint inside the box.</dd></div>
-      <div><dt><code>lang</code></dt><dd>English, Spanish, French, German, Portuguese or Polish. Defaults to the page&#8217;s language. Set the <code>strings</code> property to change any text.</dd></div>
-      <div><dt><code>region</code>, <code>country</code></dt><dd>Limit results, such as <code>region="TX"</code> or <code>country="DE"</code>.</dd></div>
-      <div><dt><code>near</code></dt><dd>Rank results near a place, such as <code>near="Dallas"</code>.</dd></div>
-      <div><dt><code>geo="off"</code></dt><dd>Don't use the visitor's approximate location.</dd></div>
-      <div><dt><code>form</code></dt><dd>The id of the form to fill. Defaults to the enclosing form.</dd></div>
-      <div><dt><code>overwrite</code></dt><dd>Replace fields that already have values.</dd></div>
-      <div><dt><code>limit</code></dt><dd>How many results to show, up to 20. Defaults to 8.</dd></div>
-      <div><dt><code>icons="none"</code></dt><dd>Hide the icon beside each result.</dd></div>
-      <div><dt><code>contribute="off"</code></dt><dd>Don&#8217;t offer to share corrections back to Here&#8217;s My Church.</dd></div>
-    </dl>
-    <h3>In your form</h3>
-    <p>It&#8217;s a real form field. Give it a <code>name</code> and the chosen church&#8217;s ID submits with your form, so you can store the ID and look the church up again later. React and Vue get types for the tag and its events.</p>
-    <div class="frame"><div class="frame-in code" data-tabs>
-      <div class="code-bar">
-        <div role="tablist" aria-label="Form example" class="tabs">
-          <button role="tab" aria-selected="true" aria-controls="ff-html" id="ff-html-t">html form</button>
-          <button role="tab" aria-selected="false" aria-controls="ff-react" id="ff-react-t" tabindex="-1">react</button>
-        </div>
-        <button class="copy" type="button">copy</button>
-      </div>
-      <pre tabindex="0" role="tabpanel" id="ff-html" aria-labelledby="ff-html-t"><code><span class="t">&lt;form</span> <span class="a">action</span>=<span class="s">&quot;/signup&quot;</span> <span class="a">method</span>=<span class="s">&quot;post&quot;</span><span class="t">&gt;</span>
-  <span class="t">&lt;church-lookup</span> <span class="a">name</span>=<span class="s">&quot;church_id&quot;</span> <span class="a">required</span><span class="t">&gt;&lt;/church-lookup&gt;</span>
-  <span class="t">&lt;input</span> <span class="a">name</span>=<span class="s">&quot;city&quot;</span> <span class="a">data-hmc-field</span>=<span class="s">&quot;city&quot;</span><span class="t">&gt;</span>
-  <span class="t">&lt;button&gt;</span>Join<span class="t">&lt;/button&gt;</span>
-<span class="t">&lt;/form&gt;</span>
-<span class="c">&lt;!-- Posts church_id=CA-ON-56994145&amp;city=Thorold --&gt;</span></code></pre>
-      <pre tabindex="0" role="tabpanel" id="ff-react" aria-labelledby="ff-react-t" hidden><code><span class="t">import</span> <span class="s">&quot;@heresmychurch/lookup/element&quot;</span>;
-<span class="t">import type</span> {} <span class="t">from</span> <span class="s">&quot;@heresmychurch/lookup/react&quot;</span>;
-
-<span class="t">function</span> ChurchField({ onChange }) {
-  <span class="t">const</span> ref = useRef(null);
-  useEffect(() =&gt; {
-    <span class="t">const</span> el = ref.current;
-    const pick = (e) =&gt; onChange(e.detail.result.id);
-    const clear = () =&gt; onChange("");
-    el.addEventListener(<span class="s">&quot;church-select&quot;</span>, pick);
-    el.addEventListener(<span class="s">&quot;church-clear&quot;</span>, clear);
-    return () =&gt; { el.removeEventListener("church-select", pick); el.removeEventListener("church-clear", clear); };
-  }, [onChange]);
-  <span class="t">return</span> <span class="t">&lt;church-lookup</span> <span class="a">ref</span>={ref} <span class="a">name</span>=<span class="s">&quot;church_id&quot;</span> <span class="a">lang</span>=<span class="s">&quot;es&quot;</span> <span class="t">/&gt;</span>;
-}</code></pre>
-    </div></div>
-    <h3>Icons</h3>
-    <p>Use the icons your design system already has. Put one with <code>slot="search-icon"</code> in the box, and one with <code>slot="result-icon"</code> to repeat beside every result. It works with SVG sets like Lucide or Heroicons, icon fonts like Tabler or Font Awesome, and icon components like Iconify, because the icons stay in your page and pick up its CSS.</p>
-    <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html</span><button class="copy" type="button">copy</button></div>
-<pre tabindex="0"><code><span class="t">&lt;church-lookup</span> <span class="a">label</span>=<span class="s">"Your church"</span><span class="t">&gt;</span>
-  <span class="t">&lt;i</span> <span class="a">slot</span>=<span class="s">"search-icon"</span> <span class="a">class</span>=<span class="s">"ti ti-search"</span><span class="t">&gt;&lt;/i&gt;</span>
-  <span class="t">&lt;i</span> <span class="a">slot</span>=<span class="s">"result-icon"</span> <span class="a">class</span>=<span class="s">"ti ti-building-church"</span><span class="t">&gt;&lt;/i&gt;</span>
-<span class="t">&lt;/church-lookup&gt;</span></code></pre></div></div>
-    <h3>Fields</h3>
-    <p>Use any of these in <code>data-hmc-field</code>: <code>name</code>, <code>street</code>, <code>city</code>, <code>region</code>, <code>regionName</code>, <code>postalCode</code>, <code>country</code>, <code>countryName</code>, <code>latitude</code>, <code>longitude</code>, <code>phone</code>, <code>email</code>, <code>website</code>, <code>denomination</code>, <code>serviceTimes</code>, <code>languages</code>, <code>ministries</code>, <code>pastorName</code> and <code>id</code>.</p>
-    <h3>Events</h3>
-    <dl class="defs">
-      <div><dt><code>church-results</code></dt><dd>Results appeared. <code>detail</code> has <code>query</code>, <code>results</code> and <code>settled</code>.</dd></div>
-      <div><dt><code>church-select</code></dt><dd>A church was chosen. Cancel it to stop the fill.</dd></div>
-      <div><dt><code>church-fill</code></dt><dd>Fields are about to fill. Cancel it to fill them yourself from <code>detail.record</code>.</dd></div>
-      <div><dt><code>church-clear</code></dt><dd>The choice was cleared, with the clear button or by editing the name.</dd></div>
-      <div><dt><code>church-contribute</code></dt><dd>Someone chose Share. <code>detail</code> has <code>churchId</code> and <code>changes</code>. Cancel it to send them yourself, or not at all.</dd></div>
-      <div><dt><code>church-confirm</code></dt><dd>Someone chose Still correct. Cancel it to skip the confirmation.</dd></div>
-    </dl>
-    <p class="note">An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. Results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.</p>
-  </section>
-
-  <section id="service-times" aria-labelledby="st-h">
-    <p class="num" aria-hidden="true"><span>04</span></p>
-    <h2 id="st-h">Service times</h2>
-    <p>Wrap a service-times field in <code>&lt;church-service-times&gt;</code> to edit it as rows of day, time and label, the same way Here's My Church does. The field keeps one plain string, such as <code>Sun 9:00 AM (Main Service); Wed 7:00 PM</code>, so it submits like any input.</p>
-    <div class="frame"><div class="frame-in demo">
-      <church-service-times label="Service times"><textarea aria-label="Service times">Sun 9:00 AM; Sun 11:00 AM (Contemporary); Wed 7:00 PM</textarea></church-service-times>
-    </div></div>
-    <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html</span><button class="copy" type="button">copy</button></div>
-<pre tabindex="0"><code><span class="t">&lt;church-service-times&gt;</span>
-  <span class="t">&lt;textarea</span> <span class="a">name</span>=<span class="s">"times"</span> <span class="a">data-hmc-field</span>=<span class="s">"serviceTimes"</span><span class="t">&gt;&lt;/textarea&gt;</span>
-<span class="t">&lt;/church-service-times&gt;</span>
-<span class="t">&lt;script</span> <span class="a">type</span>=<span class="s">"module"</span> <span class="a">src</span>=<span class="s">"https://lookup.heresmychurch.com/service-times.js"</span><span class="t">&gt;&lt;/script&gt;</span></code></pre></div></div>
+    <p class="more"><a href="/docs/widget">All attributes and events<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
   </section>
 
   <section id="theming" aria-labelledby="theme-h">
-    <p class="num" aria-hidden="true"><span>05</span></p>
-    <h2 id="theme-h">Theming</h2>
-    <p>Theming is built on <a href="https://sensibleui.com">Sensible UI</a>&#8217;s design tokens by <a href="https://cameronpak.com">Cam Pak</a>, the same names shadcn/ui uses. On a page that already has them, the widget matches with no setup. Anywhere else, set a few CSS variables. Pick a design system church apps are often built on, then drag across to compare it with the default.</p>
+    <h2 id="theme-h">Fits your design system</h2>
+    <p>The widget reads its own <code>--hmc-*</code> CSS variables, and falls back to the shadcn/ui token names that <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://cameronpak.com">Cam Pak</a> also uses, so on those pages it matches with no setup. Pick a design system church apps are often built on, then drag across to compare.</p>
     <div class="frame"><div class="frame-in flush ba-wrap">
       <div class="ba" id="ba" style="--pos: 50%">
         <div class="ba-layer ba-before" inert>
@@ -346,143 +225,53 @@ npm install @heresmychurch/lookup</code></pre>
     </div></div>
     <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html · your tokens</span><button class="copy" type="button">copy</button></div>
 <pre tabindex="0"><code id="ba-css"></code></pre></div></div>
-    <p class="note">Want to see it fill a real form? <a href="/examples/autofill">Open the full theming example</a>.</p>
-  </section>
-
-  <section id="api" aria-labelledby="api-h">
-    <p class="num" aria-hidden="true"><span>06</span></p>
-    <h2 id="api-h">API</h2>
-    <p>Base URL <code>https://lookup.heresmychurch.com/v1</code>. Open CORS, no key, no cookies.</p>
-    <h3><span class="verb">GET</span> /v1/search</h3>
-    <div class="frame"><div class="frame-in play">
-      <form id="play-form">
-        <label class="sr" for="play-q">Query</label>
-        <input id="play-q" type="text" value="grace comm" autocomplete="off" spellcheck="false">
-        <button class="btn btn-dark" type="submit">send</button>
-        <div class="opts">
-          <label><input type="checkbox" id="play-settled"> settled=1</label>
-          <label><input type="checkbox" id="play-geo" checked> geo=off</label>
-        </div>
-        <div class="url" id="play-url" aria-live="polite"></div>
-      </form>
-      <div class="status" id="play-status" aria-live="polite">send a request to the live api</div>
-      <pre id="play-out" tabindex="0" aria-label="Response"><code>{}</code></pre>
-    </div></div>
-    <dl class="defs">
-      <div><dt><code>q</code></dt><dd>What the person typed. Place words like "in Dallas" or ", TX" are understood.</dd></div>
-      <div><dt><code>near</code>, <code>lat</code>, <code>lng</code></dt><dd>Rank near a place or point.</dd></div>
-      <div><dt><code>country</code>, <code>region</code></dt><dd>Only return churches there.</dd></div>
-      <div><dt><code>limit</code></dt><dd>1 to 20. Defaults to 8.</dd></div>
-      <div><dt><code>settled=1</code></dt><dd>The person paused, so semantic search may run.</dd></div>
-      <div><dt><code>geo=off</code></dt><dd>Don't use the request's approximate location.</dd></div>
-    </dl>
-    <h3><span class="verb">GET</span> /v1/churches/:id</h3>
-    <p>The autofill record. Every key in <code>fields</code> is always present, with <code>null</code> or <code>[]</code> when empty, plus <code>missing</code>, <code>completeness</code> and <code>hints</code>.</p>
-    <h3><span class="verb">GET</span> /v1/meta</h3>
-    <p>Field names, what can be contributed and how it's reviewed, completeness weights, counts and attribution.</p>
-    <h3><span class="verb post">POST</span> /v1/churches/:id/contributions</h3>
-    <p>Send corrections as <code>{ client, changes: [{ field, value }] }</code>. Each field comes back with its own status:</p>
-    <dl class="defs">
-      <div><dt><code>live</code></dt><dd>Applied now. These fields go live on one vote.</dd></div>
-      <div><dt><code>in_review</code></dt><dd>Waits for a Here&#8217;s My Church moderator.</dd></div>
-      <div><dt><code>not_applied</code></dt><dd>Accepted, but the listed value didn&#8217;t change, such as when it was already the same.</dd></div>
-      <div><dt><code>rejected</code></dt><dd>Not accepted, with a <code>message</code> saying why.</dd></div>
-      <div><dt><code>try_again</code></dt><dd>A temporary problem, such as maintenance or a rate limit. Nothing was refused.</dd></div>
-      <div><dt><code>coming_soon</code></dt><dd>A field Lookup will accept soon. Name is coming soon.</dd></div>
-    </dl>
-    <p>Test with <code>client: "lookup-demo"</code>: changes are checked the same way but never sent, and responses say <code>sandbox: true</code>.</p>
-    <h3><span class="verb post">POST</span> /v1/churches/:id/confirm</h3>
-    <p>&#8220;Still correct.&#8221; Send <code>{ client }</code> to mark a listing as checked today.</p>
-    <p class="note">120 searches and 30 semantic searches a minute per visitor, and 5 contributions a minute. Over the limit returns <code>429</code>, a busy database returns <code>503</code>, and both send <code>Retry-After</code>.</p>
-  </section>
-
-  <section id="how-search-works" aria-labelledby="how-h">
-    <p class="num" aria-hidden="true"><span>07</span></p>
-    <h2 id="how-h">How search works</h2>
-    <ol class="flow">
-      <li><b>Words, as you type.</b> A full-text index finds names that start with what's typed: nearby first, then wider, then the whole country.</li>
-      <li><b>Places.</b> "church in dallas", "grace, chicago" and "first baptist TX" become a place filter. A lowercase "in" is never read as Indiana.</li>
-      <li><b>Spelling.</b> When almost nothing matches, the closest spelling is tried, so "gracee" finds Grace.</li>
-      <li><b>Meaning, only when words fail.</b> If no result matches every word, a settled query also asks semantic search (bge-m3 in Cloudflare Vectorize). Those results always rank below real name matches.</li>
-    </ol>
-    <p>78 held-out test queries we didn't tune on, against Here's My Church's search today:</p>
-    <div class="frame"><div class="frame-in table" tabindex="0" role="region" aria-label="Search results compared"><table>
-      <thead><tr><th>system</th><th class="num">top result right</th><th class="num">in top 5</th><th class="num">no results</th><th class="num">typical time</th></tr></thead>
-      <tbody>
-        <tr><td>Today's search</td><td class="num">28%</td><td class="num">31%</td><td class="num">41%</td><td class="num">20 s</td></tr>
-        <tr><td>Lookup, words only</td><td class="num">78%</td><td class="num">85%</td><td class="num">1%</td><td class="num">150 ms</td></tr>
-        <tr><td>Lookup, with semantic</td><td class="num best">78%</td><td class="num best">87%</td><td class="num best">0%</td><td class="num">170 ms</td></tr>
-      </tbody>
-    </table></div></div>
-    <p class="note">Semantic search helped two queries in 78 and hurt none. It doesn't fix translations such as "trinity church munich", and common names with no location stay hard. <a href="https://github.com/harvouscom/lookup/tree/main/eval/results">Full write-up</a>.</p>
-    <h3>Where AI is used, and where it isn&#8217;t</h3>
-    <dl class="defs">
-      <div><dt>Semantic search</dt><dd>One AI model, bge-m3 on Cloudflare Workers AI and Vectorize, runs only when no name matches every word. On the held-out test it moved &#8220;in top 5&#8221; from 85% to 87% and &#8220;no results&#8221; from 1% to 0%. That&#8217;s the only place we credit AI.</dd></div>
-      <div><dt>Ranking</dt><dd>A formula, not AI, orders results: 60% how well the name matches, 25% how near the church is, and 15% how complete its listing is. That&#8217;s why complete listings rank higher.</dd></div>
-      <div><dt>Church details</dt><dd>AI never writes or changes them. Every fill comes from Here&#8217;s My Church, and every shared fix goes through its review rules.</dd></div>
-      <div><dt>Searches</dt><dd>Lookup doesn&#8217;t log them.</dd></div>
-    </dl>
-  </section>
-
-  <section id="data" aria-labelledby="data-h">
-    <p class="num" aria-hidden="true"><span>08</span></p>
-    <h2 id="data-h">Data and review</h2>
-    <p>Lookup reads Here's My Church's reviewed listings and re-syncs changed regions every 5 minutes. Searches aren't logged, and approximate location is only used in memory to rank nearby churches.</p>
-    <p class="note">Why fewer churches than Here's My Church shows? Its map counts every listing, about 655,000. Lookup leaves out about 68,000 that have no real name yet, such as "Unnamed church", since nobody can find those by typing. Once a listing gets a name on Here's My Church, the next sync adds it.</p>
-    <h3>Sharing fixes back</h3>
-    <p>When someone changes a detail Lookup filled, the widget offers to share it. Every change starts unchecked, says whether it goes live or waits for a moderator, and nothing is sent until they choose Share. Your form&#8217;s own submit is never blocked.</p>
-    <dl class="defs">
-      <div><dt>Service times, denomination, languages, ministries</dt><dd>Everywhere. Live on one vote.</dd></div>
-      <div><dt>Phone</dt><dd>US and Canada. Live on one vote.</dd></div>
-      <div><dt>Website</dt><dd>Everywhere. Waits for a moderator.</dd></div>
-      <div><dt>Name</dt><dd>Coming soon. It will wait for a moderator.</dd></div>
-      <div><dt>Address</dt><dd>US. Waits for a moderator.</dd></div>
-      <div><dt>Email, pastor name</dt><dd>Not accepted, so personal details in a host's form can't go live.</dd></div>
-    </dl>
-  </section>
-
-  <section id="open-source" aria-labelledby="oss-h">
-    <p class="num" aria-hidden="true"><span>09</span></p>
-    <h2 id="oss-h">Made in the open</h2>
-    <p>Lookup is one of Harvous's open source projects. Everything is public on GitHub: read it, learn from it, run your own copy.</p>
-    <div class="oss">
-      <article class="oss-card">
-        <div class="oss-top"><img class="oss-ic" src="/brand/mark.svg" alt="" width="40" height="40"><div><h3>Lookup</h3><code>github.com/harvouscom/lookup</code></div></div>
-        <p>A church search box, autofill SDK and open API for any church app, built on Here's My Church.</p>
-        <div class="oss-actions"><a class="gh oss-gh" href="https://github.com/harvouscom/lookup"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span>View on GitHub</span><b data-stars-for="harvouscom/lookup" hidden><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 .8l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5L.8 6l5-.6z"/></svg><span></span></b></a></div>
-      </article>
-      <article class="oss-card">
-        <div class="oss-top"><span class="oss-ic"><svg viewBox="0 0 20 20" aria-hidden="true"><defs><clipPath id="hmc-o"><rect width="20" height="20" rx="5"/></clipPath></defs><g clip-path="url(#hmc-o)"><rect width="20" height="20" fill="#3B1D6E"/><path d="M-1 16C3 14 6 9 7.4 5.2 8.4 2.4 6.3 1.7 5.8 4.6 5.3 8 5.5 13 5.7 21M5.9 15.2C7.1 11.4 9.9 9.4 11.9 10.2 13.8 11 13.3 14.6 13.8 16.8 14.2 18.6 17 18.2 21 15.4" fill="none" stroke="#D2B4FB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg></span><div><h3>Here's My Church</h3><code>github.com/harvouscom/heresmychurch</code></div></div>
-        <p>A crowd-sourced map of Christian churches. Anyone can add or correct a church, and browsing is free. <a class="oss-link" href="https://heresmychurch.com">Explore the map<span aria-hidden="true"> ↗</span></a></p>
-        <div class="oss-actions"><a class="gh oss-gh" href="https://github.com/harvouscom/heresmychurch"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span>View on GitHub</span><b data-stars-for="harvouscom/heresmychurch" hidden><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 .8l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5L.8 6l5-.6z"/></svg><span></span></b></a></div>
-      </article>
-    </div>
-    <a class="oss-row" href="https://harvous.com">
-      <img src="/brand/harvous.png" alt="" width="28" height="28">
-      <span class="oss-row-t"><b>Harvous</b><span>The Bible study notes app, also built on Here&#8217;s My Church</span></span>
-      <span class="oss-row-go">Visit Harvous<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></span>
-    </a>
-  </section>
-
-  <section id="thanks" aria-labelledby="thanks-h">
-    <p class="num" aria-hidden="true"><span>10</span></p>
-    <h2 id="thanks-h">Thanks</h2>
-    <p>Lookup was built for the AI for Church hackathon, on the work of a lot of people.</p>
-    <ul class="thanks">
-      <li><span class="th-ic th-hmc"><svg viewBox="0 0 20 20" aria-hidden="true"><defs><clipPath id="hmc-t2"><rect width="20" height="20" rx="5"/></clipPath></defs><g clip-path="url(#hmc-t2)"><rect width="20" height="20" fill="#3B1D6E"/><path d="M-1 16C3 14 6 9 7.4 5.2 8.4 2.4 6.3 1.7 5.8 4.6 5.3 8 5.5 13 5.7 21M5.9 15.2C7.1 11.4 9.9 9.4 11.9 10.2 13.8 11 13.3 14.6 13.8 16.8 14.2 18.6 17 18.2 21 15.4" fill="none" stroke="#D2B4FB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg></span><div><b>Here's My Church contributors</b><span>Every church someone added, corrected or reviewed.</span></div><a href="https://heresmychurch.com">heresmychurch.com<span aria-hidden="true"> ↗</span></a></li>
-      <li><span class="th-ic th-osm"><svg viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 3.5 5.5 2l5 1.5 4-1.5v10.5l-4 1.5-5-1.5-4 1.5z"/><path d="M5.5 2v10.5M10.5 3.5V14"/></svg></span><div><b>OpenStreetMap contributors</b><span>The map data underneath, shared under the Open Database License (ODbL).</span></div><a href="https://www.openstreetmap.org/copyright">License<span aria-hidden="true"> ↗</span></a></li>
-      <li><img class="th-ic" src="https://cdn.u.pika.page/wDBwOvLYvxN_6afdsMZG2EpX3yiBp0JH27IiKQNgqrw/s:300:300/fn:grok-bot-cam-from-richard-transparent/plain/s3://pika-production/htco39frd2p8a0fz11vdsqi09jn4" alt="" width="40" height="40" loading="lazy"><div><b>Cam Pak and Sensible UI</b><span>Our widget speaks Sensible UI&#8217;s design tokens, so it fits right in.</span></div><a href="https://sensibleui.com">sensibleui.com<span aria-hidden="true"> ↗</span></a></li>
-    </ul>
+    <p class="more"><a href="/docs/theming">Theming docs<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
   </section>
 </main>
 
+<section class="cta" aria-labelledby="cta-h">
+  <div class="cta-in">
+    <h2 id="cta-h">Add church lookup to your app</h2>
+    <p>One script tag and no key. Read the docs, or hand the job to your AI agent.</p>
+    <div class="cta-btns">
+      <a class="cta-btn primary" href="/docs">Explore the docs<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      <a class="cta-btn" href="https://github.com/harvouscom/lookup"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>View on GitHub</a>
+    </div>
+    <div class="cta-agent"><span aria-hidden="true">Agent</span><code>Add church lookup to my app: lookup.heresmychurch.com/SKILL.md</code><button type="button" class="cta-copy" data-copy-text="Add church lookup to my app: lookup.heresmychurch.com/SKILL.md">copy</button></div>
+  </div>
+</section>
+
 <footer class="foot">
   <div class="foot-in">
-    <a class="foot-hmc" href="https://heresmychurch.com"><svg viewBox="0 0 20 20" aria-hidden="true"><defs><clipPath id="hmc-f"><rect width="20" height="20" rx="5"/></clipPath></defs><g clip-path="url(#hmc-f)"><rect width="20" height="20" fill="#3B1D6E"/><path d="M-1 16C3 14 6 9 7.4 5.2 8.4 2.4 6.3 1.7 5.8 4.6 5.3 8 5.5 13 5.7 21M5.9 15.2C7.1 11.4 9.9 9.4 11.9 10.2 13.8 11 13.3 14.6 13.8 16.8 14.2 18.6 17 18.2 21 15.4" fill="none" stroke="#D2B4FB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg><span><small>Built on</small><b>Here's My Church</b></span></a>
-    <a class="gh" href="https://github.com/harvouscom/lookup"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span><i>Star on&nbsp;</i>GitHub</span><b id="gh-stars" data-stars-for="harvouscom/lookup" hidden><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M8 .8l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5L.8 6l5-.6z"/></svg><span></span></b></a>
+    <a class="foot-hmc" href="https://heresmychurch.com"><svg viewBox="0 0 20 20" aria-hidden="true"><defs><clipPath id="hmc-f"><rect width="20" height="20" rx="5"/></clipPath></defs><g clip-path="url(#hmc-f)"><rect width="20" height="20" fill="#3B1D6E"/><path d="M-1 16C3 14 6 9 7.4 5.2 8.4 2.4 6.3 1.7 5.8 4.6 5.3 8 5.5 13 5.7 21M5.9 15.2C7.1 11.4 9.9 9.4 11.9 10.2 13.8 11 13.3 14.6 13.8 16.8 14.2 18.6 17 18.2 21 15.4" fill="none" stroke="#D2B4FB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg><span><small>Lookup is part of</small><b>Here's My Church</b></span></a>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="/docs">Docs</a>
+      <a href="https://github.com/harvouscom/lookup">GitHub</a>
+      <a href="https://harvous.com">Made by Harvous</a>
+    </nav>
   </div>
+  <p class="foot-thanks">Thanks to <a href="https://heresmychurch.com">Here&#8217;s My Church</a> contributors, <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors and <a href="https://cameronpak.com">Cam Pak</a>.</p>
 </footer>
 
+<dialog class="exm" id="exm" aria-labelledby="exm-name">
+  <div class="exm-top">
+    <div class="exm-id"><span class="exm-logo" id="exm-logo" aria-hidden="true"></span><span><b id="exm-name">Example</b><small id="exm-kind"></small></span></div>
+    <div class="exm-pager">
+      <button type="button" class="exm-ic" id="exm-prev" aria-label="Previous example"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg></button>
+      <span id="exm-count" aria-live="polite">1 of 3</span>
+      <button type="button" class="exm-ic" id="exm-next" aria-label="Next example"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></button>
+    </div>
+    <div class="exm-end">
+      <a class="exm-link" id="exm-open" href="/demo/kinship" target="_blank" rel="noopener">Open in a tab</a>
+      <a class="exm-link" href="/docs/examples">How it&#8217;s built</a>
+      <button type="button" class="exm-ic exm-close" id="exm-close" aria-label="Close example"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg></button>
+    </div>
+  </div>
+  <div class="exm-win">
+    <div class="exm-bar" aria-hidden="true"><span class="lights"><i></i><i></i><i></i></span><span class="exm-addr"><svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7V5.5a3.5 3.5 0 0 1 7 0V7M3.5 7h9v6.5h-9z"/></svg><span id="exm-addr"></span></span><span></span></div>
+    <iframe id="exm-frame" title="Example app" loading="lazy"></iframe>
+  </div>
+</dialog>
 <script type="module" src="/element.js"></script>
 <script type="module" src="/service-times.js"></script>
 <script type="module" src="/site.js"></script>

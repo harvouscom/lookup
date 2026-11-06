@@ -16,10 +16,11 @@
   "triggers": { "crons": ["*/5 * * * *"] },
   "limits": { "cpu_ms": 120000 },
   // Kill switches: set either to "false" and redeploy to turn the feature off.
-  "vars": { "SEMANTIC_ENABLED": "true", "SYNC_ENABLED": "true", "CONTRIBUTIONS_ENABLED": "true", "NAME_CONTRIBUTIONS": "false", "CONTRIBUTIONS_DAILY_CAP": "2000" },
+  "vars": { "SEMANTIC_ENABLED": "true", "SYNC_ENABLED": "true", "CONTRIBUTIONS_ENABLED": "true", "NAME_CONTRIBUTIONS": "false", "CONTRIBUTIONS_DAILY_CAP": "2000", "ASK_ENABLED": "true" },
   "ratelimits": [
     { "name": "RL_SEARCH", "namespace_id": "4101", "simple": { "limit": 120, "period": 60 } },
     { "name": "RL_SEMANTIC", "namespace_id": "4102", "simple": { "limit": 30, "period": 60 } },
-    { "name": "RL_CONTRIB", "namespace_id": "4103", "simple": { "limit": 5, "period": 60 } }
+    { "name": "RL_CONTRIB", "namespace_id": "4103", "simple": { "limit": 5, "period": 60 } },
+    { "name": "RL_ASK", "namespace_id": "4104", "simple": { "limit": 10, "period": 60 } }
   ]
 }

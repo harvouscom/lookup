@@ -1,5 +1,6 @@
 // hmc-lookup Worker. Search, the autofill record, metadata, and the cron sync.
 // Queries are never logged: invocation logs are off, and request location stays in memory.
+import { ask } from "./ask.ts";
 import { confirm, contribute, contributableFields } from "./contribute.ts";
 import { COMPLETENESS_WEIGHTS, RECORD_FIELDS, toRecord, type ChurchRow } from "./record.ts";
 import { COUNTRIES, REGIONS } from "./regions.generated.ts";
@@ -15,6 +16,8 @@ export interface Env {
   RL_SEARCH?: RateLimit;
   RL_SEMANTIC?: RateLimit;
   RL_CONTRIB?: RateLimit;
+  RL_ASK?: RateLimit;
+  ASSETS?: Fetcher;
   CF_VERSION_METADATA?: WorkerVersionMetadata;
   LOOKUP_INTERNAL_KEY?: string;
   /** Enables the /internal admin routes. Unset means they 404. */
@@ -25,6 +28,7 @@ export interface Env {
   CONTRIBUTIONS_ENABLED?: string;
   NAME_CONTRIBUTIONS?: string;
   CONTRIBUTIONS_DAILY_CAP?: string;
+  ASK_ENABLED?: string;
 }
 
 export const ATTRIBUTION = "Church data from OpenStreetMap contributors (ODbL) and Here's My Church contributors.";
@@ -223,6 +227,10 @@ export default {
       catch (e) { return fail(500, String((e as Error).message ?? e).slice(0, 300)); }
     }
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
+    if (url.pathname.replace(/\/+$/, "") === "/v1/ask") {
+      if (request.method !== "POST") return fail(405, "method not allowed", { allow: "POST, OPTIONS" });
+      return ask(request, env);
+    }
     const writeMatch = url.pathname.replace(/\/+$/, "").match(/^\/v1\/churches\/([^/]+)\/(contributions|confirm)$/);
     if (writeMatch) {
       if (request.method !== "POST") return fail(405, "method not allowed", { allow: "POST, OPTIONS" });

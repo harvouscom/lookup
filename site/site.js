@@ -3,6 +3,7 @@
 import { createGlobe } from "/globe.js";
 import { createSky } from "/sky.js";
 import { createAurora } from "/aurora.js";
+import "/common.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -25,7 +26,7 @@ fetch("/data/globe.json")
     } });
     startSky();
     startDemo(); })
-  .catch(() => { $(".horizon").hidden = true; });
+  .catch((err) => { console.error(err); $(".horizon").hidden = true; });
 
 fetch("/v1/meta")
   .then((r) => r.json())
@@ -390,17 +391,6 @@ for (const repo of new Set($$("[data-stars-for]").map((el) => el.dataset.starsFo
 // ── Nav: dark over the header, solid once the docs scroll in ──
 const nav = $("#nav");
 
-// ── Docs theme: light by default, dark on request, remembered ──
-const themeBtn = $("#theme");
-const setTheme = (dark) => {
-  if (dark) document.documentElement.dataset.theme = "dark";
-  else delete document.documentElement.dataset.theme;
-  themeBtn.setAttribute("aria-pressed", String(dark));
-  try { localStorage.setItem("lookup-docs-theme", dark ? "dark" : "light"); } catch {}
-};
-themeBtn.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
-themeBtn.addEventListener("click", () => setTheme(document.documentElement.dataset.theme !== "dark"));
-
 // ── The search's placeholder types out example searches, one after another ──
 const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, TX", "gracee", "st mary"];
 (function rotatePlaceholder() {
@@ -422,233 +412,73 @@ const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, T
   setTimeout(step, 900);
 })();
 
-// ── Theming: a before/after slider with a small token playground ──
-(function themingPlayground() {
-  const ba = $("#ba");
-  if (!ba) return;
-  const after = $("#ba-after church-lookup");
-  const layer = $("#ba-after");
-  // Common design systems church apps are built on. Each one sets only the tokens the widget reads.
-  const PRESETS = {
-    hmc: { name: "Here's My Church", accent: "#8B5CF6", radius: 14, font: '"Google Sans Flex", ui-sans-serif, sans-serif', mode: "dark" },
-    bootstrap: { name: "Bootstrap", accent: "#0D6EFD", radius: 6, font: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', mode: "light", page: "#FFFFFF", border: "#DEE2E6", input: "#CED4DA", muted: "#6C757D", text: "#212529" },
-    material: { name: "Material", accent: "#6750A4", radius: 4, font: 'Roboto, "Helvetica Neue", Arial, sans-serif', mode: "light", page: "#FEF7FF", popover: "#F3EDF7", border: "#CAC4D0", input: "#79747E", muted: "#49454F", text: "#1D1B20" },
-    apple: { name: "Apple", accent: "#007AFF", radius: 10, font: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif', mode: "light", page: "#F2F2F7", border: "#E5E5EA", input: "#D1D1D6", muted: "#6E6E73", text: "#1C1C1E" },
-    tailwind: { name: "Tailwind", accent: "#4F46E5", radius: 6, font: 'Inter, ui-sans-serif, system-ui, sans-serif', mode: "light", page: "#F9FAFB", border: "#E5E7EB", input: "#D1D5DB", muted: "#6B7280", text: "#111827" },
-  };
-  let state = PRESETS.hmc;
-  const mix = (c, p, base) => `color-mix(in oklab, ${c} ${p}%, ${base})`;
-  function tokens() {
-    const { accent: a, radius: r, mode } = state;
-    if (mode === "dark") return {
-      "--hmc-bg": mix(a, 12, "#110C20"), "--hmc-popover": mix(a, 14, "#140E26"), "--hmc-text": "#FFFFFF", "--hmc-popover-text": "#FFFFFF",
-      "--hmc-muted": "#B8B2CC", "--hmc-border": mix(a, 28, "#2A2340"), "--hmc-input-border": mix(a, 45, "#2A2340"),
-      "--hmc-accent": mix(a, 55, "white"), "--hmc-active-bg": mix(a, 32, "transparent"), "--hmc-active-text": "#FFFFFF", "--hmc-radius": `${r}px`,
-    };
-    return {
-      "--hmc-bg": "#FFFFFF", "--hmc-popover": state.popover ?? "#FFFFFF", "--hmc-text": state.text, "--hmc-popover-text": state.text,
-      "--hmc-muted": state.muted, "--hmc-border": state.border, "--hmc-input-border": state.input,
-      "--hmc-accent": a, "--hmc-active-bg": mix(a, 12, "white"), "--hmc-active-text": state.text, "--hmc-radius": `${r}px`,
-    };
-  }
-  function render() {
-    const t = tokens();
-    for (const [k, v] of Object.entries(t)) after.style.setProperty(k, v);
-    after.style.fontFamily = state.font;
-    after.style.colorScheme = state.mode;
-    layer.dataset.mode = state.mode;
-    layer.style.setProperty("--ba-bg", state.mode === "dark" ? mix(state.accent, 16, "#0B0814") : state.page);
-    $("#ba-tag").textContent = state.name;
-    for (const b of $$("[data-preset]")) b.setAttribute("aria-pressed", String(PRESETS[b.dataset.preset] === state));
-    const lines = Object.entries(t).map(([k, v]) => `    ${k}: ${v};`);
-    $("#ba-css").textContent = `<style>\n  church-lookup {\n${lines.join("\n")}\n    font-family: ${state.font};\n  }\n</style>\n<church-lookup label="Your church"></church-lookup>`;
-  }
-  $$("[data-preset]").forEach((b) => b.addEventListener("click", () => { state = PRESETS[b.dataset.preset]; render(); }));
-  $("#ba-range").addEventListener("input", (e) => ba.style.setProperty("--pos", `${e.target.value}%`));
-  render();
-  // Open both widgets on the same search the first time the slider comes into view.
-  new IntersectionObserver(([e], io) => {
-    if (!e.isIntersecting) return;
-    io.disconnect();
-    for (const cl of $$("church-lookup", ba)) {
-      const input = cl.shadowRoot?.querySelector("input");
-      if (!input) continue;
-      input.value = "grace";
-      input.dispatchEvent(new Event("input"));
-    }
-  }, { threshold: 0.4 }).observe(ba);
-})();
-
-// ── Copy buttons ──
-$$(".copy").forEach((btn) => btn.addEventListener("click", async () => {
-  const box = btn.closest(".code");
-  const pre = $$("pre", box).find((p) => !p.hidden);
-  try {
-    await navigator.clipboard.writeText(pre.textContent);
-    btn.textContent = "copied";
-  } catch {
-    btn.textContent = "select to copy";
-  }
-  setTimeout(() => (btn.textContent = "copy"), 1800);
-}));
-
-// ── Tabs, with arrow-key movement ──
-$$("[data-tabs]").forEach((box) => {
-  const tabs = $$("[role=tab]", box);
-  const pick = (t) => {
-    tabs.forEach((x) => {
-      const on = x === t;
-      x.setAttribute("aria-selected", String(on));
-      x.tabIndex = on ? 0 : -1;
-      document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
-    });
-  };
-  tabs.forEach((t, i) => {
-    t.addEventListener("click", () => pick(t));
-    t.addEventListener("keydown", (e) => {
-      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-      if (!d) return;
-      const next = tabs[(i + d + tabs.length) % tabs.length];
-      pick(next);
-      next.focus();
-    });
-  });
-});
-
-// ── Scrollspy for the section index ──
-const links = $$(".index a");
-const sections = $$(".docs section[id]");
-const spy = new IntersectionObserver((entries) => {
-  for (const e of entries) {
-    if (!e.isIntersecting) continue;
-    links.forEach((a) => {
-      if (a.getAttribute("href") === `#${e.target.id}`) {
-        a.setAttribute("aria-current", "true");
-        // In the horizontal bar, keep the current section's link in view.
-        const bar = a.parentElement;
-        if (bar.scrollWidth > bar.clientWidth) bar.scrollTo({ left: a.offsetLeft - 16, behavior: "smooth" });
-      } else a.removeAttribute("aria-current");
-    });
-  }
-}, { rootMargin: "-20% 0px -70% 0px" });
-sections.forEach((s) => spy.observe(s));
-
-// ── API playground ──
-const form = $("#play-form");
-const q = $("#play-q"), settled = $("#play-settled"), geoOff = $("#play-geo");
-const urlFor = () => {
-  const p = new URLSearchParams({ q: q.value, limit: "5" });
-  if (settled.checked) p.set("settled", "1");
-  if (geoOff.checked) p.set("geo", "off");
-  return `/v1/search?${p}`;
-};
-const showUrl = () => { $("#play-url").innerHTML = `<b>GET</b> https://lookup.heresmychurch.com${urlFor().replace(/&/g, "&amp;").replace(/</g, "&lt;")}`; };
-[q, settled, geoOff].forEach((el) => el.addEventListener("input", showUrl));
-showUrl();
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const status = $("#play-status"), out = $("#play-out code");
-  status.textContent = "sending…";
-  const t0 = performance.now();
-  try {
-    const res = await fetch(urlFor());
-    const body = await res.json();
-    const ms = Math.round(performance.now() - t0);
-    const timing = res.headers.get("server-timing") ?? "";
-    const d1 = timing.match(/d1;dur=(\d+)/)?.[1], ai = timing.match(/ai;dur=(\d+)/)?.[1];
-    const cache = res.headers.get("x-lookup-cache");
-    status.textContent = `${res.status} · ${ms} ms round trip` + (cache === "hit" ? " · from the edge cache" : d1 ? ` · database ${d1} ms` : "") + (ai && ai !== "0" ? ` · AI ${ai} ms` : "") + ` · ${body.results?.length ?? 0} results`;
-    out.textContent = JSON.stringify(body, null, 2);
-  } catch (err) {
-    status.textContent = `Request failed: ${err.message}`;
-  }
-});
-
 // A dark glass nav while scrolling inside the header, so links never sit on top of content.
 const markScrolled = () => nav.classList.toggle("scrolled", scrollY > 8);
 addEventListener("scroll", markScrolled, { passive: true });
 markScrolled();
 
-// Widget options: every change rebuilds a fresh <church-lookup>, since the element reads attributes when it connects.
-(function widgetOptions() {
-  const host = $("#wo-host");
-  if (!host) return;
-  const HINTS = {
-    required: "The form won\u2019t submit until a church is chosen. Clear the box to see why.",
-    value: "Starts with Grace Community Church chosen, as on an edit screen. Its ID submits with the form.",
-    icons: "Results without the icon beside each one.",
-    geo: "Results aren\u2019t ranked by the visitor\u2019s approximate location.",
-  };
-  const state = { label: "", placeholder: "", lang: "", near: "", limit: 8, required: false, value: false, icons: false, geo: false };
-  const log = $("#wo-log");
-  const hint0 = $("#wo-hint").innerHTML;
-  let el = null;
-  function attrs() {
-    const a = [["name", "church_id"]];
-    if (state.label) a.push(["label", state.label]);
-    if (state.placeholder) a.push(["placeholder", state.placeholder]);
-    if (state.lang) a.push(["lang", state.lang]);
-    if (state.near) a.push(["near", state.near]);
-    if (state.limit !== 8) a.push(["limit", String(state.limit)]);
-    if (state.value) a.push(["value", "CA-ON-56994145"]);
-    if (state.icons) a.push(["icons", "none"]);
-    if (state.geo) a.push(["geo", "off"]);
-    if (state.required) a.push(["required", ""]);
-    return a;
+// ── Examples: each app opens full screen in a window frame. Deep links: /#example/<name> ──
+(function examples() {
+  const dlg = $("#exm");
+  if (!dlg) return;
+  const LIST = [
+    { key: "kinship", name: "Kinship", kind: "Church management · React", addr: "app.kinship.church/churches/new", color: "#6D28D9",
+      logo: '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="6" cy="8" r="3.6"/><circle cx="10" cy="8" r="3.6"/></svg>' },
+    { key: "harvest", name: "Harvest Table", kind: "Food pantry network · plain HTML form", addr: "partners.harvesttable.org/join", color: "#C2410C",
+      logo: '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 14V6M8 6c0-2.5 2-4 4.5-4C12.5 4.5 10.5 6 8 6zM8 9C8 6.5 6 5 3.5 5 3.5 7.5 5.5 9 8 9z"/></svg>' },
+    { key: "steeple", name: "Steeple", kind: "Church website builder · live preview", addr: "build.steeple.site/setup", color: "#2F5D46",
+      logo: '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5v3M6.5 3h3M4 14V8l4-3 4 3v6M2.5 14h11M7 14v-2.5h2V14"/></svg>' },
+  ];
+  const frame = $("#exm-frame");
+  // Load without adding history entries, so Back closes the modal instead of stepping through the frame.
+  const load = (url) => { try { frame.contentWindow.location.replace(url); } catch { frame.src = url; } };
+  let at = 0, opener = null, pushed = false;
+  function show(i) {
+    at = (i + LIST.length) % LIST.length;
+    const ex = LIST[at];
+    $("#exm-name").textContent = ex.name;
+    $("#exm-kind").textContent = ex.kind;
+    $("#exm-addr").textContent = ex.addr;
+    $("#exm-count").textContent = `${at + 1} of ${LIST.length}`;
+    $("#exm-open").href = `/demo/${ex.key}`;
+    const logo = $("#exm-logo");
+    logo.innerHTML = ex.logo;
+    logo.style.background = ex.color;
+    frame.title = `${ex.name} example app`;
+    load(`/demo/${ex.key}?embed=1`);
+    const hash = `#example/${ex.key}`;
+    if (location.hash !== hash) history.replaceState(null, "", hash);
   }
-  function note(kind, text) {
-    log.querySelector(".wo-empty")?.remove();
-    const li = document.createElement("li");
-    li.innerHTML = `<code></code><span></span>`;
-    li.firstChild.textContent = kind;
-    li.lastChild.textContent = text;
-    log.prepend(li);
-    while (log.children.length > 4) log.lastChild.remove();
-  }
-  function build() {
-    const query = el && !el.value ? el.shadowRoot?.querySelector("input")?.value ?? "" : "";
-    const next = document.createElement("church-lookup");
-    for (const [k, v] of attrs()) next.setAttribute(k, v);
-    next.setAttribute("contribute", "off");
-    next.addEventListener("church-results", (e) => note("church-results", `${e.detail.results.length} for \u201c${e.detail.query}\u201d${e.detail.settled ? " \u00b7 settled" : ""}`));
-    next.addEventListener("church-select", (e) => note("church-select", `${e.detail.result.name} \u00b7 value ${e.detail.result.id}`));
-    next.addEventListener("church-clear", () => note("church-clear", "value is now empty"));
-    next.addEventListener("church-fill", (e) => e.preventDefault());
-    host.replaceChildren(next);
-    el = next;
-    if (query) {
-      const input = el.shadowRoot?.querySelector("input");
-      if (input) { input.value = query; input.dispatchEvent(new Event("input")); }
+  function open(key, from) {
+    const i = LIST.findIndex((e) => e.key === key);
+    if (i < 0) return;
+    opener = from ?? document.activeElement;
+    if (!dlg.open) {
+      if (!location.hash.startsWith("#example/")) { history.pushState(null, "", `#example/${key}`); pushed = true; }
+      dlg.showModal();
+      document.documentElement.style.overflow = "hidden";
     }
-    code();
+    show(i);
   }
-  function code() {
-    const esc = (v) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-    const parts = attrs().map(([k, v]) => (v === "" ? `  <span class="a">${k}</span>` : `  <span class="a">${k}</span>=<span class="s">"${esc(v)}"</span>`));
-    $("#wo-code").innerHTML = `<span class="t">&lt;church-lookup</span>\n${parts.join("\n")}<span class="t">&gt;&lt;/church-lookup&gt;</span>`;
-  }
-  let typing;
-  $$("#wo-opts input[data-opt]").forEach((i) => i.addEventListener("input", () => {
-    state[i.dataset.opt] = i.type === "range" ? Number(i.value) : i.value.trim();
-    if (i.type === "range") $("#wo-limit").textContent = i.value;
-    clearTimeout(typing);
-    typing = setTimeout(build, i.type === "range" ? 120 : 300);
-  }));
-  const pick = (attr, key) => $$(`#wo-opts [data-${attr}]`).forEach((b) => b.addEventListener("click", () => {
-    state[key] = b.dataset[attr];
-    for (const o of $$(`#wo-opts [data-${attr}]`)) o.setAttribute("aria-pressed", String(o === b));
-    build();
-  }));
-  pick("lang", "lang");
-  pick("near", "near");
-  $$("#wo-opts [data-flag]").forEach((b) => b.addEventListener("click", () => {
-    const k = b.dataset.flag;
-    state[k] = !state[k];
-    b.setAttribute("aria-pressed", String(state[k]));
-    const on = state[k] ? k : ["value", "required", "icons", "geo"].find((f) => state[f]);
-    if (on) $("#wo-hint").textContent = HINTS[on];
-    else $("#wo-hint").innerHTML = hint0;
-    build();
-  }));
-  build();
+  function close() { if (dlg.open) dlg.close(); }
+  dlg.addEventListener("close", () => {
+    document.documentElement.style.overflow = "";
+    if (location.hash.startsWith("#example/")) {
+      if (pushed) history.back();
+      else history.replaceState(null, "", "#examples");
+    }
+    pushed = false;
+    opener?.focus?.();
+  });
+  $$(".ex-card").forEach((b) => b.addEventListener("click", () => open(b.dataset.ex, b)));
+  $("#exm-prev").addEventListener("click", () => show(at - 1));
+  $("#exm-next").addEventListener("click", () => show(at + 1));
+  $("#exm-close").addEventListener("click", close);
+  addEventListener("popstate", () => {
+    const m = location.hash.match(/^#example\/([a-z]+)$/);
+    if (dlg.open && !m) { pushed = false; close(); }
+    else if (!dlg.open && m) open(m[1], $(`.ex-card[data-ex="${m[1]}"]`));
+  });
+  const deep = location.hash.match(/^#example\/([a-z]+)$/);
+  if (deep) open(deep[1], $(`.ex-card[data-ex="${deep[1]}"]`));
 })();

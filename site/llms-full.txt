@@ -1,0 +1,444 @@
+# Lookup docs
+
+> Lookup is a church search box and autofill SDK for any church app, from Here's My Church: one script tag, an open API, no key. People pick their church and the address, website and service times fill in.
+
+# Overview
+
+> Lookup is a church search box that fills in your form from Here's My Church. One script tag, an open API, no key.
+
+Source: https://lookup.heresmychurch.com/docs
+
+Church tools keep asking people for the same details. Lookup fills them in from [Here's My Church](https://heresmychurch.com), an open directory of 587,842 churches in 19 countries. Someone types a few letters, picks their church, and the address, website, phone and service times fill in.
+
+## What you get
+
+- [Quickstart](/docs/quickstart): Add the search box to a form in a few minutes, or hand the job to your agent.
+- [See it in real apps](/docs/examples): A church management app, a nonprofit sign-up and a church website builder.
+- [The widget](/docs/widget): Every attribute, event and form option, with a live preview.
+- [API](/docs/api): Search and church records over plain HTTP, with open CORS and no key.
+
+## How it works
+
+1. **Search as you type.** Prefixes, typos and places like "church in dallas" all work, nearby churches first.
+2. **Fill your form.** Pick a church and the empty fields you tagged with `data-hmc-field` fill in. Anything already typed is left alone.
+3. **Share fixes back.** When someone corrects a detail Lookup filled, they can share it back to Here's My Church, one checked box at a time.
+
+Because every pick comes from the same open directory, each app that uses Lookup helps keep church data accurate.
+
+## Credits
+
+- **[Here's My Church](https://heresmychurch.com)**, the open, crowd-sourced church directory every result comes from.
+- **[OpenStreetMap](https://www.openstreetmap.org/copyright) contributors**, whose map data many listings started from (ODbL).
+- **[Cam Pak](https://cameronpak.com)** and **[Sensible UI](https://sensibleui.com)**. The widget reads the same design token names Sensible UI uses, so it fits right in on those pages.
+
+Lookup was built for the AI for Church hackathon and is open source on [GitHub](https://github.com/harvouscom/lookup).
+
+
+---
+
+# Quickstart
+
+> Add a church search box that fills in your form. Hand this to your AI agent, or follow three steps yourself.
+
+Source: https://lookup.heresmychurch.com/docs/quickstart
+
+**Add Lookup to your app**
+
+```text
+# Add church lookup with Lookup by Here's My Church
+
+Add a church search field to the form in this project where people enter a church (sign-up, profile, partner or settings form). When someone picks their church, its details should fill the other fields.
+
+## Steps
+1. Load the widget once on the page:
+   <script type="module" src="https://lookup.heresmychurch.com/element.js"></script>
+   (Service times editor, optional: https://lookup.heresmychurch.com/service-times.js)
+2. Put <church-lookup name="church_id" label="Church"></church-lookup> inside the form, above the fields it fills.
+   - `name` submits the chosen church's ID with the form. Store it so you can look the church up again.
+   - Add `required` if a church must be chosen.
+   - On an edit screen, set `value` to the saved ID.
+3. Tag the existing inputs with data-hmc-field. Use only these names:
+   name, street, city, region, regionName, postalCode, country, countryName, latitude, longitude,
+   phone, email, website, denomination, serviceTimes, languages, ministries, pastorName, id
+   Don't create new inputs unless I ask. Don't rename existing ones.
+4. React or Vue: the element is a custom element. Listen for `church-select` and `church-clear` events
+   with addEventListener in an effect; values are set the way typing sets them, so controlled inputs stay in sync.
+   Types: import type {} from "@heresmychurch/lookup/react" (or /vue).
+5. While testing, add client="lookup-demo" so corrections people share are checked but never sent.
+   Remove it (or set your app's name) before shipping.
+6. Match my styles: set --hmc-accent, --hmc-radius, --hmc-border and friends on church-lookup,
+   or rely on shadcn-style tokens (--background, --foreground, --accent, --radius) if the app already has them.
+
+## Check
+- Type "grace comm", pick a result, confirm the tagged fields fill and the form submits church_id.
+- Keyboard: arrow keys move, Enter picks, Escape closes.
+
+Docs: https://lookup.heresmychurch.com/llms-full.txt
+```
+
+Or set it up yourself. There's no key to request.
+
+## 1. Add the script
+
+```html
+<script type="module" src="https://lookup.heresmychurch.com/element.js"></script>
+```
+
+## 2. Put the search box in your form
+
+Tag the fields it should fill with `data-hmc-field`. Give it a `name` and the chosen church's ID submits with the form.
+
+script tag:
+
+```html
+<form action="/signup" method="post">
+  <church-lookup name="church_id" label="Your church"></church-lookup>
+  <input name="street"  data-hmc-field="street">
+  <input name="city"    data-hmc-field="city">
+  <input name="website" data-hmc-field="website">
+  <button>Join</button>
+</form>
+<script type="module" src="https://lookup.heresmychurch.com/element.js"></script>
+```
+client only:
+
+```javascript
+import { createLookup } from "https://lookup.heresmychurch.com/lookup.js";
+
+const lookup = createLookup({ client: "my-app" });
+const { results } = await lookup.search("grace comm");
+const church = await lookup.getChurch(results[0].id);
+```
+npm:
+
+```bash
+# Coming soon. The package isn't published yet.
+npm install @heresmychurch/lookup
+```
+
+## 3. Try it
+
+Values are set the way typing sets them, so React and other frameworks see them.
+
+> **Testing:** Add `client="lookup-demo"` while you build. Corrections people share are checked the same way, but never sent to Here's My Church.
+
+## Next steps
+
+- [The widget](/docs/widget): Attributes, events, icons and the form field, with a live preview.
+- [Theming](/docs/theming): Match your design system with a few CSS variables.
+- [See it in real apps](/docs/examples): Three believable apps built with Lookup.
+
+
+---
+
+# See it in real apps
+
+> Three made-up apps built with Lookup, each opening full screen. A church management app, a nonprofit sign-up and a church website builder.
+
+Source: https://lookup.heresmychurch.com/docs/examples
+
+Each example is a working app using the real widget and live data, in demo mode so nothing you share is sent. They open full screen on the homepage.
+
+- [Kinship, a church management app](/#example/kinship): React with controlled inputs. Add a partner church and watch React's state fill in.
+- [Harvest Table, a food pantry network](/#example/harvest): A plain HTML sign-up that registers churches as distribution sites, posting `church_id` with the form.
+- [Steeple, a church website builder](/#example/steeple): Pick your church and a live website preview builds itself from its details.
+
+## What each one shows
+
+| Example | Shows |
+|---|---|
+| Kinship | React controlled inputs, `church-select` and `church-clear` events, the share panel |
+| Harvest Table | `name` and `required` in a plain form, service times feeding distribution hours |
+| Steeple | Filling a live preview, `<church-service-times>`, theming to a product's own look |
+
+Every example uses `client="lookup-demo"`, so corrections are checked but never sent to Here's My Church.
+
+
+---
+
+# The widget
+
+> <church-lookup> is an accessible combobox: it searches as people type and fills your form when they choose.
+
+Source: https://lookup.heresmychurch.com/docs/widget
+
+It also asks for smarter results when people pause. Change the options below to see each one live.
+
+## Attributes
+
+| Attribute | What it does |
+|---|---|
+| `name` | Submit the chosen church's ID with your form under this name, like any input. |
+| `required` | The form won't submit until a church is chosen from the list. |
+| `value` | A church ID to show, such as one saved earlier on an edit screen. |
+| `fill-on-load` | Also fill the form from `value` when the page loads. |
+| `label`, `placeholder` | The visible label and the hint inside the box. |
+| `lang` | English, Spanish, French, German, Portuguese or Polish. Defaults to the page's language. Set the `strings` property to change any text. |
+| `region`, `country` | Limit results, such as `region="TX"` or `country="DE"`. |
+| `near` | Rank results near a place, such as `near="Dallas"`. |
+| `geo="off"` | Don't use the visitor's approximate location. |
+| `form` | The id of the form to fill. Defaults to the enclosing form. |
+| `overwrite` | Replace fields that already have values. |
+| `limit` | How many results to show, up to 20. Defaults to 8. |
+| `icons="none"` | Hide the icon beside each result. |
+| `contribute="off"` | Don't offer to share corrections back to Here's My Church. |
+| `client` | Your app's name, sent with requests. Use `lookup-demo` while testing. |
+
+## In your form
+
+It's a real form field. Give it a `name` and the chosen church's ID submits with your form, so you can store the ID and look the church up again later. React and Vue get types for the tag and its events.
+
+html form:
+
+```html
+<form action="/signup" method="post">
+  <church-lookup name="church_id" required></church-lookup>
+  <input name="city" data-hmc-field="city">
+  <button>Join</button>
+</form>
+<!-- Posts church_id=CA-ON-56994145&city=Thorold -->
+```
+react:
+
+```tsx
+import "@heresmychurch/lookup/element";
+import type {} from "@heresmychurch/lookup/react";
+
+function ChurchField({ onChange }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    const pick = (e) => onChange(e.detail.result.id);
+    const clear = () => onChange("");
+    el.addEventListener("church-select", pick);
+    el.addEventListener("church-clear", clear);
+    return () => {
+      el.removeEventListener("church-select", pick);
+      el.removeEventListener("church-clear", clear);
+    };
+  }, [onChange]);
+  return <church-lookup ref={ref} name="church_id" lang="es" />;
+}
+```
+
+## Fields
+
+Use any of these in `data-hmc-field`: `name`, `street`, `city`, `region`, `regionName`, `postalCode`, `country`, `countryName`, `latitude`, `longitude`, `phone`, `email`, `website`, `denomination`, `serviceTimes`, `languages`, `ministries`, `pastorName` and `id`.
+
+## Icons
+
+Use the icons your design system already has. Put one with `slot="search-icon"` in the box, and one with `slot="result-icon"` to repeat beside every result. It works with SVG sets like Lucide or Heroicons, icon fonts like Tabler or Font Awesome, and icon components like Iconify, because the icons stay in your page and pick up its CSS.
+
+```html
+<church-lookup label="Your church">
+  <i slot="search-icon" class="ti ti-search"></i>
+  <i slot="result-icon" class="ti ti-building-church"></i>
+</church-lookup>
+```
+
+## Events
+
+| Event | When it fires |
+|---|---|
+| `church-results` | Results appeared. `detail` has `query`, `results` and `settled`. |
+| `church-select` | A church was chosen. Cancel it to stop the fill. |
+| `church-fill` | Fields are about to fill. Cancel it to fill them yourself from `detail.record`. |
+| `church-clear` | The choice was cleared, with the clear button or by editing the name. |
+| `church-contribute` | Someone chose Share. `detail` has `churchId` and `changes`. Cancel it to send them yourself, or not at all. |
+| `church-confirm` | Someone chose Still correct. Cancel it to skip the confirmation. |
+
+## Accessibility
+
+An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. Results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.
+
+
+---
+
+# Service times
+
+> Edit a service-times field as rows of day, time and label, while it still submits one plain string.
+
+Source: https://lookup.heresmychurch.com/docs/service-times
+
+Wrap a service-times field in `<church-service-times>` to edit it as rows of day, time and label, the same way Here's My Church does. The field keeps one plain string, such as `Sun 9:00 AM (Main Service); Wed 7:00 PM`, so it submits like any input.
+
+```html
+<church-service-times>
+  <textarea name="times" data-hmc-field="serviceTimes"></textarea>
+</church-service-times>
+<script type="module" src="https://lookup.heresmychurch.com/service-times.js"></script>
+```
+
+When `<church-lookup>` fills a `serviceTimes` field inside `<church-service-times>`, the rows update with it.
+
+
+---
+
+# Theming
+
+> Match your design system with a few CSS variables. On pages with shadcn/ui-style tokens, it matches with no setup.
+
+Source: https://lookup.heresmychurch.com/docs/theming
+
+The widget reads its own `--hmc-*` CSS variables. When one isn't set, it falls back to the shadcn/ui token names (`--background`, `--foreground`, `--accent`, `--border`, `--radius` and so on), the same names [Sensible UI](https://sensibleui.com) by [Cam Pak](https://cameronpak.com) uses. So on those pages it matches with no setup. Anywhere else, set a few variables.
+
+Pick a design system church apps are often built on, then drag across to compare it with the default.
+
+## Variables
+
+| Variable | Falls back to | Used for |
+|---|---|---|
+| `--hmc-bg` | `--background` | The input background |
+| `--hmc-text` | `--foreground` | Text |
+| `--hmc-popover`, `--hmc-popover-text` | `--popover`, `--popover-foreground` | The results list |
+| `--hmc-border` | `--border` | The results list border |
+| `--hmc-input-border` | `--input` | The input border |
+| `--hmc-accent` | `--ring` | Focus ring and icons |
+| `--hmc-active-bg`, `--hmc-active-text` | `--accent`, `--accent-foreground` | The highlighted result |
+| `--hmc-muted` | `--muted-foreground` | Secondary text |
+| `--hmc-radius` | `--radius` | Corners |
+
+The widget also takes your page's font. For anything else, style its parts with `::part(label)`, `::part(input)` and `::part(popup)`.
+
+Want to see it fill a real form? [Open the full theming example](/examples/autofill).
+
+
+---
+
+# API
+
+> Search churches and read autofill records over plain HTTP. Open CORS, no key, no cookies.
+
+Source: https://lookup.heresmychurch.com/docs/api
+
+Base URL `https://lookup.heresmychurch.com/v1`. Open CORS, no key, no cookies. Send a `client` name, such as your app's, so Here's My Church knows which tool is asking.
+
+## GET /v1/search
+
+Try it against the live API:
+
+| Parameter | What it does |
+|---|---|
+| `q` | What the person typed. Place words like "in Dallas" or ", TX" are understood. |
+| `near`, `lat`, `lng` | Rank near a place or point. |
+| `country`, `region` | Only return churches there. |
+| `limit` | 1 to 20. Defaults to 8. |
+| `settled=1` | The person paused, so semantic search may run. |
+| `geo=off` | Don't use the request's approximate location. |
+
+## GET /v1/churches/:id
+
+The autofill record. Every key in `fields` is always present, with `null` or `[]` when empty, plus `missing`, `completeness` and `hints`.
+
+```bash
+curl https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145
+```
+
+## GET /v1/meta
+
+Field names, what can be contributed and how it's reviewed, completeness weights, counts and attribution.
+
+## POST /v1/churches/:id/contributions
+
+Send corrections as `{ client, changes: [{ field, value }] }`. Each field comes back with its own status:
+
+| Status | Meaning |
+|---|---|
+| `live` | Applied now. These fields go live on one vote. |
+| `in_review` | Waits for a Here's My Church moderator. |
+| `not_applied` | Accepted, but the listed value didn't change, such as when it was already the same. |
+| `rejected` | Not accepted, with a `message` saying why. |
+| `try_again` | A temporary problem, such as maintenance or a rate limit. Nothing was refused. |
+| `coming_soon` | A field Lookup will accept soon. Name is coming soon. |
+
+```bash
+curl -X POST https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145/contributions \
+  -H "content-type: application/json" \
+  -d '{"client":"lookup-demo","changes":[{"field":"phone","value":"905-555-0100"}]}'
+```
+
+> **Sandbox:** Test with `client: "lookup-demo"`. Changes are checked the same way but never sent, and responses say `sandbox: true`.
+
+## POST /v1/churches/:id/confirm
+
+"Still correct." Send `{ client }` to mark a listing as checked today.
+
+## POST /v1/ask
+
+Ask a question about these docs. Send `{ question }` (up to 500 characters) and the answer streams back as server-sent events. It powers the Ask AI button and is limited to 10 questions a minute.
+
+## Limits
+
+120 searches and 30 semantic searches a minute per visitor, 5 contributions and 10 docs questions a minute. Over the limit returns `429`, a busy database returns `503`, and both send `Retry-After`.
+
+
+---
+
+# How search works
+
+> Words first, then places, spelling and, only when words fail, meaning. And where AI is and isn't used.
+
+Source: https://lookup.heresmychurch.com/docs/how-search-works
+
+1. **Words, as you type.** A full-text index finds names that start with what's typed: nearby first, then wider, then the whole country.
+2. **Places.** "church in dallas", "grace, chicago" and "first baptist TX" become a place filter. A lowercase "in" is never read as Indiana.
+3. **Spelling.** When almost nothing matches, the closest spelling is tried, so "gracee" finds Grace.
+4. **Meaning, only when words fail.** If no result matches every word, a settled query also asks semantic search (bge-m3 in Cloudflare Vectorize). Those results always rank below real name matches.
+
+## How it compares
+
+78 held-out test queries we didn't tune on, against Here's My Church's search today:
+
+| System | Top result right | In top 5 | No results | Typical time |
+|---|---|---|---|---|
+| Today's search | 28% | 31% | 41% | 20 s |
+| Lookup, words only | 78% | 85% | 1% | 150 ms |
+| Lookup, with semantic | **78%** | **87%** | **0%** | 170 ms |
+
+Semantic search helped two queries in 78 and hurt none. It doesn't fix translations such as "trinity church munich", and common names with no location stay hard. [Full write-up](https://github.com/harvouscom/lookup/tree/main/eval/results).
+
+## Ranking
+
+A formula, not AI, orders results: 60% how well the name matches, 25% how near the church is, and 15% how complete its listing is. That's why complete listings rank higher.
+
+## Where AI is used, and where it isn't
+
+| Where | How |
+|---|---|
+| Semantic search | One AI model, bge-m3 on Cloudflare Workers AI and Vectorize, runs only when no name matches every word. On the held-out test it moved "in top 5" from 85% to 87% and "no results" from 1% to 0%. |
+| Ask AI in these docs | An instruct model on Workers AI answers questions using only these docs, and links the pages it used. Questions aren't stored. |
+| Ranking | A formula, not AI. |
+| Church details | AI never writes or changes them. Every fill comes from Here's My Church, and every shared fix goes through its review rules. |
+| Searches | Lookup doesn't log them. |
+
+
+---
+
+# Data and review
+
+> Where the data comes from, how often it syncs, and how fixes people share go back to Here's My Church.
+
+Source: https://lookup.heresmychurch.com/docs/data
+
+Lookup reads Here's My Church's reviewed listings and re-syncs changed regions every 5 minutes. Searches aren't logged, and approximate location is only used in memory to rank nearby churches.
+
+> **Why fewer churches than Here's My Church shows?:** Its map counts every listing, about 655,000. Lookup leaves out about 68,000 that have no real name yet, such as "Unnamed church", since nobody can find those by typing. Once a listing gets a name on Here's My Church, the next sync adds it.
+
+## Sharing fixes back
+
+When someone changes a detail Lookup filled, the widget offers to share it. Every change starts unchecked, says whether it goes live or waits for a moderator, and nothing is sent until they choose Share. Your form's own submit is never blocked.
+
+| Field | Where | Review |
+|---|---|---|
+| Service times, denomination, languages, ministries | Everywhere | Live on one vote |
+| Phone | US and Canada | Live on one vote |
+| Website | Everywhere | Waits for a moderator |
+| Name | Coming soon | Will wait for a moderator |
+| Address | US | Waits for a moderator |
+| Email, pastor name | Not accepted | Personal details in a host's form can't go live |
+
+Turn the offer off with `contribute="off"`, or cancel the `church-contribute` event to send changes yourself.
+
+## Attribution
+
+Church data from OpenStreetMap contributors (ODbL) and Here's My Church contributors. Search responses include this line as `attribution`; please show it near results you display yourself.

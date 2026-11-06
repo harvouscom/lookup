@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harvest Table · Lookup example</title>
+<meta name="description" content="A made-up food pantry network signing up churches as distribution sites, with Lookup in a plain HTML form.">
+<script>if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");</script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=Google+Sans+Flex:opsz,wght@6..144,400..700&family=Geist+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="/demo/demo.css">
+<style>
+  body { background: #FBF6EC; color: #2B2118; }
+  .hdr { display: flex; align-items: center; gap: 12px; padding: 14px 28px; background: #FFFDF8; border-bottom: 1px solid #EDE3D1; }
+  .logo { display: flex; align-items: center; gap: 10px; color: #2B2118; text-decoration: none; font: 700 19px/1 "Fraunces", Georgia, serif; }
+  .logo span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #C2410C; }
+  .hdr nav { margin-left: auto; display: flex; gap: 20px; font-size: 14px; }
+  .hdr nav a { color: #6B5B4A; text-decoration: none; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 36px 24px 96px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start; }
+  .intro { grid-column: 1 / -1; }
+  .intro small { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #C2410C; }
+  .intro h1 { margin: 6px 0 6px; font: 650 34px/1.15 "Fraunces", Georgia, serif; letter-spacing: -.01em; }
+  .intro p { margin: 0; max-width: 40rem; color: #6B5B4A; }
+  .steps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 0 22px; padding: 0; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; gap: 8px; font-size: 13px; font-weight: 600; color: #7A6A57; }
+  .steps li::before { content: ""; height: 4px; border-radius: 3px; background: #EADFC8; }
+  .steps li[data-on]::before { background: #C2410C; }
+  .steps li[aria-current] { color: #2B2118; }
+  .steps li span::before { content: counter(s) ". "; }
+  .card { background: #fff; border: 1px solid #EDE3D1; border-radius: 18px; padding: 26px; box-shadow: 0 1px 2px rgba(43,33,24,.04); }
+  fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+  fieldset[hidden] { display: none; }
+  legend { padding: 0; margin-bottom: 4px; font: 650 22px/1.2 "Fraunces", Georgia, serif; }
+  .hint { margin: 0 0 18px; font-size: 14px; color: #6B5B4A; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin-top: 18px; }
+  .wide { grid-column: 1 / -1; }
+  label, .lbl { display: grid; gap: 6px; font-size: 14px; font-weight: 500; color: #3D3027; }
+  input, select, textarea { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid #DCCFB8; border-radius: 10px; background: #FFFEFB; color: #2B2118; font-size: 15px; }
+  textarea { min-height: 80px; padding: 10px 12px; }
+  input[readonly] { background: #F7F1E6; color: #5A4B3D; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: #EA580C; box-shadow: 0 0 0 3px rgba(234,88,12,.18); }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .checks label { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #DCCFB8; border-radius: 99px; font-weight: 500; cursor: pointer; }
+  .checks input { width: 16px; height: 16px; min-height: 0; accent-color: #C2410C; }
+  .err { margin: 10px 0 0; font-size: 14px; color: #B91C1C; }
+  .err:empty { display: none; }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #F1E8D8; }
+  .btn { min-height: 44px; padding: 0 20px; border-radius: 10px; border: 1px solid #DCCFB8; background: #fff; color: #2B2118; font-weight: 600; cursor: pointer; }
+  .btn.primary { border-color: #C2410C; background: #C2410C; color: #fff; }
+  .btn.primary:hover { background: #9A3412; }
+  .btn:focus-visible { outline: 2px solid #EA580C; outline-offset: 2px; }
+  .btn[hidden] { display: none; }
+  .review { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 18px; }
+  .review dl { margin: 0; display: grid; gap: 10px; }
+  .review dt { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #A0907C; }
+  .review dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+  .pin { position: relative; height: 200px; border-radius: 14px; overflow: hidden; background: #EDE6D6; background-image: linear-gradient(#E3D9C4 1px, transparent 1px), linear-gradient(90deg, #E3D9C4 1px, transparent 1px); background-size: 28px 28px; }
+  .pin::before { content: ""; position: absolute; left: -20%; top: 58%; width: 140%; height: 14px; background: #F8F3E8; transform: rotate(-12deg); }
+  .pin::after { content: ""; position: absolute; left: 38%; top: -10%; width: 12px; height: 120%; background: #F8F3E8; transform: rotate(8deg); }
+  .pin svg { position: absolute; z-index: 1; left: 50%; top: 50%; width: 34px; height: 34px; margin: -30px 0 0 -17px; color: #C2410C; filter: drop-shadow(0 4px 6px rgba(0,0,0,.2)); }
+  .pin small { position: absolute; z-index: 1; left: 8px; bottom: 8px; padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,.85); font: 11px "Geist Mono", monospace; color: #6B5B4A; }
+  .done { text-align: center; padding: 20px 0; }
+  .done h2 { margin: 10px 0 6px; font: 650 26px/1.2 "Fraunces", Georgia, serif; }
+  .done p { margin: 0 auto; max-width: 30rem; color: #6B5B4A; }
+  .aside { display: grid; gap: 14px; }
+  .aside .card { padding: 18px; }
+  .aside h2 { margin: 0 0 8px; font: 650 17px/1.25 "Fraunces", Georgia, serif; }
+  .aside p, .aside li { margin: 0; font-size: 14px; color: #6B5B4A; }
+  .aside ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+  .stat { display: flex; gap: 18px; }
+  .stat b { display: block; font: 700 24px/1 "Fraunces", Georgia, serif; color: #C2410C; }
+  .stat span { font-size: 12px; color: #6B5B4A; }
+  church-lookup { --hmc-accent: #C2410C; --hmc-active-bg: #FFF1E6; --hmc-radius: 10px; --hmc-input-border: #DCCFB8; --hmc-border: #EDE3D1; --hmc-bg: #FFFEFB; --hmc-text: #2B2118; --hmc-muted: #6B5B4A; }
+  church-lookup::part(label) { font-size: 14px; font-weight: 500; color: #3D3027; }
+  @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } .review { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } .hdr nav { display: none; } .wrap { padding: 24px 16px 96px; } .card { padding: 18px; } .steps li span { font-size: 0; } .steps li span::before { font-size: 13px; } .intro h1 { font-size: 28px; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#join">Skip to the form</a>
+<aside class="demo-banner" aria-label="About this example"><b>Lookup example</b><span>Harvest Table is a made-up food pantry network. A plain HTML form, no framework.</span><a href="/#examples">All examples</a></aside>
+<header class="hdr">
+  <a class="logo" href="#" onclick="return false"><span><svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 14V6M8 6c0-2.5 2-4 4.5-4C12.5 4.5 10.5 6 8 6zM8 9C8 6.5 6 5 3.5 5 3.5 7.5 5.5 9 8 9z"/></svg></span>Harvest Table</a>
+  <nav aria-label="Harvest Table"><a href="#" onclick="return false">Find food</a><a href="#" onclick="return false">Volunteer</a><a href="#" onclick="return false" aria-current="page">Partner with us</a></nav>
+</header>
+<main class="wrap">
+  <div class="intro">
+    <small>Partner sign-up</small>
+    <h1>Host a food pantry at your church</h1>
+    <p>We deliver food, shelving and training. You open your doors a few hours a week. Start with your church and we’ll fill in what we can.</p>
+  </div>
+  <div>
+    <ol class="steps" id="steps" aria-label="Progress">
+      <li data-on aria-current="step"><span>Church</span></li><li><span>Pantry</span></li><li><span>Contact</span></li><li><span>Review</span></li>
+    </ol>
+    <form class="card" id="join" action="/demo/harvest" method="post" novalidate>
+      <fieldset data-step="0">
+        <legend>Your church</legend>
+        <p class="hint">Search for your church. Its address and phone fill in from Here’s My Church.</p>
+        <church-lookup name="church_id" required client="lookup-demo" label="Church" placeholder="Search for your church"></church-lookup>
+        <p class="err" id="err-0" role="alert"></p>
+        <div class="grid">
+          <label class="wide">Church name<input name="church_name" data-hmc-field="name" autocomplete="off" required></label>
+          <label class="wide">Street<input name="street" data-hmc-field="street" autocomplete="off"></label>
+          <label>City<input name="city" data-hmc-field="city" autocomplete="off"></label>
+          <label>State or region<input name="region" data-hmc-field="regionName" autocomplete="off"></label>
+          <label>Postal code<input name="postal_code" data-hmc-field="postalCode" autocomplete="off"></label>
+          <label>Church phone<input name="church_phone" data-hmc-field="phone" autocomplete="off"></label>
+          <input type="hidden" name="lat" data-hmc-field="latitude"><input type="hidden" name="lng" data-hmc-field="longitude">
+        </div>
+      </fieldset>
+      <fieldset data-step="1" hidden>
+        <legend>Your pantry</legend>
+        <p class="hint">Many partners open right after a service, when people are already there.</p>
+        <div class="grid">
+          <label class="wide">Worship times, from Here’s My Church<input name="worship_times" data-hmc-field="serviceTimes" readonly placeholder="Choose your church first"></label>
+          <label class="wide">When could the pantry be open?<input name="pantry_hours" id="hours" placeholder="Such as Sun 12:30 PM to 2:00 PM"></label>
+          <div class="wide"><span class="lbl" id="store-l">Storage you have</span>
+            <div class="checks" role="group" aria-labelledby="store-l"><label><input type="checkbox" name="storage" value="dry">Dry goods</label><label><input type="checkbox" name="storage" value="fridge">Refrigerator</label><label><input type="checkbox" name="storage" value="freezer">Freezer</label></div></div>
+          <label>Households a week<select name="households"><option>Up to 25</option><option>25 to 75</option><option>75 to 150</option><option>More than 150</option></select></label>
+        </div>
+      </fieldset>
+      <fieldset data-step="2" hidden>
+        <legend>Pantry contact</legend>
+        <p class="hint">Who should our team call? This stays with Harvest Table and is never shared back.</p>
+        <div class="grid">
+          <label class="wide">Name<input name="contact_name" autocomplete="name" required></label>
+          <label>Email<input name="contact_email" type="email" autocomplete="email" required></label>
+          <label>Phone<input name="contact_phone" type="tel" autocomplete="tel"></label>
+        </div>
+        <p class="err" id="err-2" role="alert"></p>
+      </fieldset>
+      <fieldset data-step="3" hidden>
+        <legend>Review</legend>
+        <p class="hint">Here’s what we’ll send. Change anything with Back.</p>
+        <div class="review"><dl id="summary"></dl><div class="pin" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg><small id="coords">—</small></div></div>
+      </fieldset>
+      <div class="done" id="done" hidden tabindex="-1">
+        <svg viewBox="0 0 48 48" width="48" height="48" style="margin:0 auto" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#FFF1E6"/><path d="m15 24.5 6 6 12-13" fill="none" stroke="#C2410C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h2>Thanks, you’re on the list</h2>
+        <p>In a real app, the form would post now. It would send <code id="posted-id"></code> as <code>church_id</code>, so Harvest Table can look the church up again later.</p>
+      </div>
+      <div class="nav" id="nav"><button type="button" class="btn" id="back" hidden>Back</button><span></span><button type="button" class="btn primary" id="next">Continue</button></div>
+    </form>
+  </div>
+  <aside class="aside">
+    <div class="card"><h2>Why churches host</h2><ul><li>Neighbors already know where you are.</li><li>We bring the food, you bring the welcome.</li><li>Most pantries run on 4 volunteers.</li></ul></div>
+    <div class="card"><div class="stat"><div><b>312</b><span>partner churches</span></div><div><b>41k</b><span>households a month</span></div></div></div>
+  </aside>
+</main>
+<aside class="demo-pill" aria-label="Demo mode"><img src="/brand/mark.svg" alt=""><span>Demo mode: nothing you share is sent</span><button type="button" id="dev-open" aria-expanded="false" aria-controls="dev">Form data</button></aside>
+<aside class="dev" id="dev" hidden aria-label="Form data"><header>What the form would post<button type="button" id="dev-close" aria-label="Close">×</button></header><pre id="state"></pre></aside>
+<script type="module" src="/element.js"></script>
+<script type="module">
+const form = document.getElementById("join");
+const $ = (id) => document.getElementById(id);
+const steps = [...form.querySelectorAll("fieldset")];
+const marks = [...document.querySelectorAll("#steps li")];
+const lookup = form.querySelector("church-lookup");
+let at = 0;
+function go(i) {
+  at = i;
+  steps.forEach((f, n) => (f.hidden = n !== i));
+  marks.forEach((m, n) => { m.toggleAttribute("data-on", n <= i); if (n === i) m.setAttribute("aria-current", "step"); else m.removeAttribute("aria-current"); });
+  $("back").hidden = i === 0;
+  $("next").textContent = i === steps.length - 1 ? "Submit" : "Continue";
+  if (i === 3) review();
+  steps[i].querySelector("legend").scrollIntoView({ block: "nearest" });
+}
+function review() {
+  const d = new FormData(form);
+  const rows = [["Church", d.get("church_name")], ["Address", [d.get("street"), d.get("city"), d.get("region"), d.get("postal_code")].filter(Boolean).join(", ")], ["Pantry hours", d.get("pantry_hours")], ["Storage", d.getAll("storage").join(", ")], ["Households a week", d.get("households")], ["Contact", [d.get("contact_name"), d.get("contact_email")].filter(Boolean).join(" · ")]];
+  $("summary").replaceChildren(...rows.map(([k, v]) => { const div = document.createElement("div"); div.innerHTML = "<dt></dt><dd></dd>"; div.firstChild.textContent = k; div.lastChild.textContent = v || "—"; return div; }));
+  const lat = Number(d.get("lat")), lng = Number(d.get("lng"));
+  $("coords").textContent = lat ? `${lat.toFixed(4)}, ${lng.toFixed(4)}` : "No location";
+}
+function valid(i) {
+  if (i === 0) {
+    if (!lookup.value) { $("err-0").textContent = "Choose your church from the list. If it isn’t there, type its name and add it on Here’s My Church."; lookup.shadowRoot?.querySelector("input")?.focus(); return false; }
+    $("err-0").textContent = "";
+  }
+  if (i === 2) {
+    const bad = [...steps[2].querySelectorAll("input")].find((x) => !x.checkValidity());
+    if (bad) { $("err-2").textContent = bad.type === "email" && bad.value ? "Enter a valid email." : "Add a contact name and email."; bad.focus(); return false; }
+    $("err-2").textContent = "";
+  }
+  return true;
+}
+$("next").addEventListener("click", () => {
+  if (!valid(at)) return;
+  if (at < steps.length - 1) return go(at + 1);
+  // The last step would post the form. Here it shows what would be sent.
+  steps.forEach((f) => (f.hidden = true));
+  $("nav").hidden = true;
+  $("posted-id").textContent = lookup.value;
+  $("done").hidden = false;
+  $("done").focus();
+  marks.forEach((m) => m.setAttribute("data-on", ""));
+});
+$("back").addEventListener("click", () => go(at - 1));
+// Suggest pantry hours right after the last Sunday service.
+lookup.addEventListener("church-fill", (e) => {
+  const times = e.detail.record?.fields?.serviceTimes;
+  const raw = typeof times === "string" ? times : times?.raw;
+  form.elements.worship_times.placeholder = raw ? "" : "Not listed on Here’s My Church yet";
+  const sun = raw?.split(";").map((s) => s.trim()).filter((s) => /^Sun/i.test(s)).pop();
+  if (sun && !$("hours").value) $("hours").placeholder = `Such as after the ${sun.replace(/\s*\(.*\)/, "")} service`;
+});
+const dev = $("dev"), openBtn = $("dev-open");
+const show = () => { $("state").textContent = [...new FormData(form)].map(([k, v]) => `${k}=${v}`).join("\n") || "(empty)"; };
+form.addEventListener("input", show); form.addEventListener("change", show); form.addEventListener("church-fill", () => setTimeout(show, 0));
+lookup.addEventListener("church-select", () => setTimeout(show, 0));
+openBtn.addEventListener("click", () => { dev.hidden = !dev.hidden; openBtn.setAttribute("aria-expanded", String(!dev.hidden)); show(); });
+$("dev-close").addEventListener("click", () => { dev.hidden = true; openBtn.setAttribute("aria-expanded", "false"); openBtn.focus(); });
+</script>
+</body>
+</html>
