@@ -422,30 +422,48 @@ markScrolled();
   const dlg = $("#exm");
   if (!dlg) return;
   const LIST = [
-    { key: "kinship", name: "Kinship", kind: "Church management · React", addr: "app.kinship.church/churches/new" },
+    { key: "kinship", name: "Kinship", kind: "Church management · React", addr: "app.kinship.church/churches/new",
+      // The same app built two ways: the drop-in element, and the shadcn/ui registry component.
+      versions: [
+        { key: "element", label: "Web component", src: "/demo/kinship?embed=1", open: "/demo/kinship" },
+        { key: "shadcn", label: "shadcn/ui", src: "/demo/shadcn/?embed=1", open: "/demo/shadcn/" },
+      ] },
     { key: "harvest", name: "Harvest Table", kind: "Food pantry network · plain HTML form", addr: "partners.harvesttable.org/join" },
     { key: "steeple", name: "Steeple", kind: "Church website builder · live preview", addr: "build.steeple.site/setup" },
   ];
   const frame = $("#exm-frame");
   // Load without adding history entries, so Back closes the modal instead of stepping through the frame.
   const load = (url) => { try { frame.contentWindow.location.replace(url); } catch { frame.src = url; } };
-  let at = 0, opener = null, pushed = false;
-  function show(i) {
+  let at = 0, opener = null, pushed = false, version = "";
+  const ver = $("#exm-ver");
+  function show(i, v = "") {
     at = (i + LIST.length) % LIST.length;
     const ex = LIST[at];
+    const vs = ex.versions ?? [];
+    const pick = vs.find((x) => x.key === v) ?? vs[0];
+    version = pick && pick !== vs[0] ? pick.key : "";
+    ver.hidden = !vs.length;
+    ver.replaceChildren(...vs.map((x) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = x.label;
+      b.setAttribute("aria-pressed", String(x === pick));
+      b.addEventListener("click", () => show(at, x.key));
+      return b;
+    }));
     $("#exm-name").textContent = ex.name;
     $("#exm-kind").textContent = ex.kind;
     $("#exm-addr").textContent = ex.addr;
     $("#exm-count").textContent = `${at + 1} of ${LIST.length}`;
-    $("#exm-open").href = `/demo/${ex.key}`;
+    $("#exm-open").href = pick?.open ?? `/demo/${ex.key}`;
     // The same app icon the card shows.
     $("#exm-logo").innerHTML = $(`.ex-card[data-ex="${ex.key}"] .ex-icon`)?.innerHTML ?? "";
     frame.title = `${ex.name} example app`;
-    load(`/demo/${ex.key}?embed=1`);
-    const hash = `#example/${ex.key}`;
+    load(pick?.src ?? `/demo/${ex.key}?embed=1`);
+    const hash = `#example/${ex.key}${version ? `/${version}` : ""}`;
     if (location.hash !== hash) history.replaceState(null, "", hash);
   }
-  function open(key, from) {
+  function open(key, from, v = "") {
     const i = LIST.findIndex((e) => e.key === key);
     if (i < 0) return;
     opener = from ?? document.activeElement;
@@ -454,7 +472,7 @@ markScrolled();
       dlg.showModal();
       document.documentElement.style.overflow = "hidden";
     }
-    show(i);
+    show(i, v);
   }
   function close() { if (dlg.open) dlg.close(); }
   dlg.addEventListener("close", () => {
@@ -471,10 +489,10 @@ markScrolled();
   $("#exm-next").addEventListener("click", () => show(at + 1));
   $("#exm-close").addEventListener("click", close);
   addEventListener("popstate", () => {
-    const m = location.hash.match(/^#example\/([a-z]+)$/);
+    const m = location.hash.match(/^#example\/([a-z]+)(?:\/([a-z]+))?$/);
     if (dlg.open && !m) { pushed = false; close(); }
-    else if (!dlg.open && m) open(m[1], $(`.ex-card[data-ex="${m[1]}"]`));
+    else if (!dlg.open && m) open(m[1], $(`.ex-card[data-ex="${m[1]}"]`), m[2]);
   });
-  const deep = location.hash.match(/^#example\/([a-z]+)$/);
-  if (deep) open(deep[1], $(`.ex-card[data-ex="${deep[1]}"]`));
+  const deep = location.hash.match(/^#example\/([a-z]+)(?:\/([a-z]+))?$/);
+  if (deep) open(deep[1], $(`.ex-card[data-ex="${deep[1]}"]`), deep[2]);
 })();

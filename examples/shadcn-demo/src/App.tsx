@@ -35,6 +35,8 @@ const FIELDS: [keyof Values, string, boolean?][] = [
   ["serviceTimes", "Service times", true],
 ]
 
+const embedded = new URLSearchParams(location.search).has("embed")
+
 export default function App() {
   const form = useForm<Values>({
     defaultValues: { church_id: "", name: "", street: "", city: "", regionName: "", postalCode: "", phone: "", website: "", serviceTimes: "", notes: "" },
@@ -50,7 +52,7 @@ export default function App() {
           <span className="bg-foreground text-background grid size-7 place-items-center rounded-md text-xs font-bold">K</span>
           <span className="font-semibold">Kinship</span>
           <span className="text-muted-foreground">Partner churches / New</span>
-          <span className="text-muted-foreground ml-auto">
+          <span className="text-muted-foreground ml-auto" hidden={embedded}>
             Lookup example · React, shadcn/ui and React Hook Form ·{" "}
             <a className="text-foreground underline underline-offset-4" href="/#examples">All examples</a>
           </span>

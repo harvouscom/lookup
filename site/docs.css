@@ -271,3 +271,11 @@ pre.shiki:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px;
 .excard-tags i { font-style: normal; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); background: var(--side); font-size: .75rem; color: var(--text-2); }
 .excard-go { grid-column: 1 / -1; font-size: .8125rem; font-weight: 600; color: var(--brand); }
 @media (max-width: 640px) { .excards { grid-template-columns: 1fr; } }
+
+/* Example cards: links at the bottom; Kinship links to both versions */
+.excard { grid-template-rows: auto auto auto 1fr; }
+.excard-go { align-self: end; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+div.excard .excard-go a { color: var(--brand); text-decoration: none; }
+div.excard .excard-go a:hover { text-decoration: underline; }
+div.excard:hover { transform: none; }
+a.excard .excard-go { gap: 0; }
