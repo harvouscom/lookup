@@ -756,6 +756,7 @@ export function newChurchFrom(name: string, targets: Targets): NewChurch | null 
     const val = el.value.trim();
     if (val && (ADD_KEYS.includes(key) || key === "name") && !v[key]) v[key] = val;
   }
-  const church = { ...v, name: name.trim() || v.name || "" } as NewChurch;
+  const { name: mapped, ...rest } = v;
+  const church = { name: name.trim() || mapped || "", ...rest } as NewChurch;
   return church.name.length >= 3 && church.city && church.region ? church : null;
 }

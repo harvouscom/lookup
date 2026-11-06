@@ -57,7 +57,7 @@ a{color:var(--_ring);font-weight:500;text-underline-offset:3px}
 .cs ul{max-height:none;overflow:visible;gap:4px;margin:0 0 10px}.cs li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;min-height:44px;padding:6px 4px;cursor:default;align-items:start}.cs li:hover{background:none}
 .cs input[type=checkbox]{width:20px;height:20px;min-height:0;margin:2px 0 0;padding:0;accent-color:var(--_ring)}.cs label{font-weight:600}.cs .v{grid-column:2;display:flex;flex-wrap:wrap;gap:4px 8px;color:var(--_muted);overflow-wrap:anywhere}.cs s{opacity:.75}.cs ins{text-decoration:none;color:inherit}
 .cs .b{grid-column:2;justify-self:start;padding:1px 8px;border-radius:999px;font-size:.75rem;background:color-mix(in oklab,var(--_ring) 12%,transparent);color:var(--_ring)}.cs .b.m{background:color-mix(in oklab,var(--_muted) 14%,transparent);color:inherit}
-.cs .ex{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;font-size:.8125rem}.cs .ex button{padding:0;border:0;background:none;font:inherit;color:var(--_ring);cursor:pointer;text-decoration:underline;text-underline-offset:3px}.cs .ex[hidden]{display:none}.cs li button{all:unset;cursor:pointer;grid-column:1/-1}.cs li button:focus-visible{outline:2px solid var(--_ring)}.cs li:has(button):hover{background:var(--_active)}
+.cs .ex{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;font-size:.8125rem}.cs .ex button{padding:0;border:0;background:none;font:inherit;color:var(--_ring);cursor:pointer;text-decoration:underline;text-underline-offset:3px}.cs .ex[hidden]{display:none}.cs .kv li{min-height:0;padding:2px 4px}.cs li button{all:unset;cursor:pointer;grid-column:1/-1}.cs li button:focus-visible{outline:2px solid var(--_ring)}.cs li:has(button):hover{background:var(--_active)}
 .cs .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.cs .bt{min-height:40px;padding:0 14px;border-radius:calc(var(--_r) - 2px);font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--_ring);background:var(--_ring);color:#fff}.cs .bt.g{background:transparent;color:inherit;border-color:var(--_input)}.cs .bt:disabled{opacity:.6;cursor:default}.cs .bt:focus-visible,.cs input:focus-visible{outline:2px solid var(--_ring);outline-offset:2px}.cs .note{padding:0;margin:8px 0 0}
 @media (prefers-reduced-motion:reduce){input{transition:none}.field::after{animation-duration:0s,2.4s!important}}
 @media (forced-colors:active){li[aria-selected=true]{background:Highlight;color:HighlightText;forced-color-adjust:none}input,.pop{border:1px solid CanvasText}input:focus-visible{outline:2px solid Highlight}}
@@ -685,6 +685,8 @@ export class ChurchLookup extends Base {
     if (!this.dispatchEvent(new CustomEvent("church-contribute", { detail: { churchId: s.id, changes, onSubmit: true }, cancelable: true, bubbles: true, composed: true }))) return;
     for (const r of rows) s.sent.set(r.field, r.value.trim());
     this.client().contribute(s.id, changes, { keepalive: true }).catch(() => { /* nothing to show: the page is moving on */ });
+    // A form that stays on the page (a single-page app) shouldn't offer the same fixes again.
+    this.renderPanel();
   };
 
   private async sendConfirm(): Promise<void> {
@@ -726,6 +728,7 @@ export class ChurchLookup extends Base {
     p.innerHTML = `<h3 id="${h}"></h3><p></p><ul></ul><div class="row"><button type="button" class="bt"></button><button type="button" class="bt g"></button></div>`;
     p.querySelector("h3")!.textContent = t.addQ(church.name);
     p.querySelector("p")!.textContent = t.addBody;
+    p.querySelector("ul")!.className = "kv";
     const labels = new Map([...this.targets()].map(([f, el]) => [f === "regionName" ? "region" : f === "countryName" ? "country" : f, (el.labels?.[0]?.textContent ?? f).trim()]));
     for (const [k, v] of Object.entries(church)) {
       const li = document.createElement("li");
@@ -764,6 +767,7 @@ export class ChurchLookup extends Base {
     if (out.status === "similar" && out.similar?.length) {
       head.textContent = t.similarQ;
       body.textContent = "";
+      ul.className = "";
       ul.replaceChildren(...out.similar.map((r) => {
         const li = document.createElement("li");
         const b = document.createElement("button");
@@ -779,7 +783,7 @@ export class ChurchLookup extends Base {
       btn.onclick = () => void this.sendAdd(true);
       this.say(t.similarQ);
     } else if (out.status === "live") {
-      ul.replaceChildren();
+      ul.remove();
       head.textContent = t.added(church.name);
       body.textContent = out.sandbox ? t.sandbox : "";
       p.querySelector(".row")!.remove();

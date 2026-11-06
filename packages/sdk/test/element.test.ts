@@ -602,6 +602,7 @@ describe("consent", () => {
     expect(submit.defaultPrevented).toBe(false);
     await flush(10);
     expect(posts).toEqual([{ path: "/v1/churches/R-1/contributions", body: { client: "acme", changes: [{ field: "website", value: "https://new.example" }] }, keepalive: true }]);
+    expect(document.querySelector("church-lookup")!.shadowRoot!.querySelector("[part=consent] ul")).toBeNull();
   });
   it("sends nothing on submit when data-hmc-share is unchecked", async () => {
     const { input } = mountConsent("", undefined, `<input type="checkbox" data-hmc-share>`);
