@@ -480,3 +480,5 @@ th { background: var(--frame); }
 .hud-r { transition: opacity .3s; }
 .hud-r:empty { opacity: 0; }
 .lede { text-wrap: balance; }
+.hero { padding-top: 112px; }
+@media (max-width: 640px) { .hero { padding-top: 72px; } }
