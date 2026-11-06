@@ -54,8 +54,8 @@ function showTags(list) {
 function placeTags(screen) {
   const h = tagLayer.clientHeight, W = tagLayer.clientWidth;
   const sizes = tags.map((t) => [t.el.offsetWidth, t.el.offsetHeight]);
-  // The church card always keeps clear space below the search box.
-  const minY = hero.getBoundingClientRect().bottom - tagLayer.getBoundingClientRect().top + 16;
+  // The church card always keeps clear space below the search box (past its glow ring).
+  const minY = hero.getBoundingClientRect().bottom - tagLayer.getBoundingClientRect().top + 30;
   tags.forEach((t, i) => {
     const p = screen(t.lat, t.lng);
     const on = p.visible && p.y > 24 && p.y < h - 8;

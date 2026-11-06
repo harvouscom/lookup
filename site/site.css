@@ -699,3 +699,6 @@ p.num::after { margin-left: 2px; }
 .oss-top > div { min-width: 0; }
 .oss-card code { overflow-wrap: anywhere; }
 :not(pre) > code { overflow-wrap: anywhere; }
+/* Search sits closer to the copy, leaving more globe below it. */
+.lede { margin-bottom: 28px; }
+@media (max-width: 640px) { .hero { padding-top: 56px; } .lede { margin-bottom: 24px; } }
