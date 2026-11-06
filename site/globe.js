@@ -221,22 +221,7 @@ export function createGlobe(canvas, data, opts = {}) {
     if (!raf && visible) raf = requestAnimationFrame(frame);
   }
 
-  canvas.addEventListener("pointerdown", (e) => {
-    dragging = { x: e.clientX, y: e.clientY, lat0, lng0 };
-    anim = null;
-    canvas.setPointerCapture(e.pointerId);
-  });
-  canvas.addEventListener("pointermove", (e) => {
-    if (!dragging) return;
-    const k = 120 / canvas.getBoundingClientRect().width;
-    lng0 = dragging.lng0 - (e.clientX - dragging.x) * k;
-    lat0 = Math.max(-60, Math.min(70, dragging.lat0 + (e.clientY - dragging.y) * k));
-    draw();
-    opts.onFrame?.(screen);
-  });
-  const end = () => { dragging = null; idleUntil = performance.now() + 2500; wake(); };
-  canvas.addEventListener("pointerup", end);
-  canvas.addEventListener("pointercancel", end);
+  // The globe isn't draggable: it turns on its own and flies to picked churches.
 
   new ResizeObserver(resize).observe(canvas);
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) wake(); }).observe(canvas);
