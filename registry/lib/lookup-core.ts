@@ -1,4 +1,4 @@
-// Lookup by Here's My Church, headless core v0.2.0. Generated from @heresmychurch/lookup
+// Lookup by Here's My Church, headless core v0.3.0. Generated from @heresmychurch/lookup
 // (packages/sdk/src) by scripts/build-registry.mjs. MIT. https://lookup.heresmychurch.com/docs
 /* eslint-disable */
 

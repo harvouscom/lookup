@@ -22,10 +22,11 @@ Lookup by Here's My Church is a church search box for forms. People type a few l
    - `value="<saved id>"`: show a saved church on edit screens. Add `fill-on-load` to also fill the fields.
    - `lang`: en, es, fr, de, pt or pl.
    - `form="<id>"`: fill a form the element isn't inside.
-3. Tag existing inputs with `data-hmc-field`. Valid names only:
+   - Results: `limit` per page (default 8), and a Show more row reaches up to `max-results` (default 50). `density="comfortable"` for taller rows.
+3. Inputs named for the church already fill: `church_city`, `churchWebsite`, `church[phone]`, or `autocomplete="section-church tel"`. Tag any other input with `data-hmc-field`. Valid names only:
    name, street, city, region, regionName, postalCode, country, countryName, latitude, longitude, phone, email, website, denomination, serviceTimes, languages, ministries, pastorName, id.
-   Empty fields fill; typed values are kept unless the element has `overwrite`.
-4. Frameworks: it's a standard custom element. In React or Vue, attach `church-select` (detail.result.id) and `church-clear` listeners in an effect. Inputs are filled through the native setter plus `input`/`change` events, so controlled inputs stay in sync. Types: `import type {} from "@heresmychurch/lookup/react"` or `/vue`.
+   On a form that's only about the church, `fill="auto"` also fills plain names (city, state, zip, phone, website). Empty fields fill; typed values are kept unless the element has `overwrite`.
+4. Frameworks: it's a standard custom element. In React or Vue, attach `church-select` (detail.result.id), `church-clear` and `church-error` listeners in an effect. In Next.js, import `@heresmychurch/lookup/element` from a `"use client"` file. Inputs are filled through the native setter plus `input`/`change` events, so controlled inputs stay in sync. Types: `import type {} from "@heresmychurch/lookup/react"` or `/vue`.
 5. While testing, set `client="lookup-demo"`: shared corrections are checked but never sent. In production, set `client` to the app's name.
 6. Styling: set `--hmc-accent`, `--hmc-radius`, `--hmc-border`, `--hmc-input-border`, `--hmc-bg`, `--hmc-text` on `church-lookup`, or rely on shadcn-style tokens (`--background`, `--foreground`, `--accent`, `--border`, `--radius`) already on the page.
 
@@ -33,7 +34,7 @@ Lookup by Here's My Church is a church search box for forms. People type a few l
 Prefer the registry component over the element:
 1. `pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/church-lookup.json`
 2. In a React Hook Form `FormField` named `church_id`: `render={({ field }) => <ChurchLookup {...field} client="lookup-demo" onFill={setRecord} />}`
-3. Tag the inputs to fill with `data-hmc-field` (same names as above).
+3. Church-named inputs fill on their own; tag any others with `data-hmc-field` (same names as above).
 4. Optional share-fixes panel: add `https://lookup.heresmychurch.com/r/church-consent.json`, then `<ChurchConsent record={record} values={form.watch()} client="lookup-demo" />`.
 Docs: https://lookup.heresmychurch.com/docs/react.md
 
@@ -45,7 +46,7 @@ Docs: https://lookup.heresmychurch.com/docs/react.md
 
 ## Check
 - Type "grace comm", pick a result: tagged fields fill, and the form submits `church_id`.
-- Keyboard: arrows move, Enter picks, Escape closes.
+- Keyboard: arrows move, Enter picks, Escape closes. Down on "Show more results" loads more.
 
 ## API (no widget)
 `GET https://lookup.heresmychurch.com/v1/search?q=grace%20comm&client=my-app` and `GET /v1/churches/:id`. Open CORS, no key. Full reference: https://lookup.heresmychurch.com/docs/api.md

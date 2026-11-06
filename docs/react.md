@@ -11,7 +11,7 @@ Lookup has two front doors with one engine behind them:
 | Drop it in | Any page or framework, no build step, Sensible UI pages | `<church-lookup>` from one script tag. See [the widget](/docs/widget). |
 | Own the code | React apps with shadcn/ui, such as ones built with Lovable or v0 | Add components from the registry below. They're copied into your app, so you can change them. |
 
-Both use the same headless core, so search, fill and sharing fixes back behave the same way.
+Both use the same headless core for search, **Show more**, field matching and sharing fixes back, and take the same options. The React component is yours to edit, so the two can differ once you change it.
 
 :::prompt Add Lookup to my shadcn app
 Add a church picker to this React + shadcn/ui app using Lookup by Here's My Church.
@@ -20,8 +20,9 @@ Add a church picker to this React + shadcn/ui app using Lookup by Here's My Chur
    (it adds components/church-lookup.tsx, hooks/use-church-lookup.ts and lib/lookup-core.ts)
 2. In the form that asks for a church, render <ChurchLookup /> inside a React Hook Form FormField
    named church_id: render={({ field }) => <ChurchLookup {...field} client="lookup-demo" />}
-3. Add data-hmc-field to the inputs it should fill (name, street, city, regionName, postalCode,
-   phone, website, serviceTimes). Don't rename existing fields.
+3. Inputs named for the church (church_city, churchWebsite) fill on their own. Add data-hmc-field to
+   any others it should fill (name, street, city, regionName, postalCode, phone, website,
+   serviceTimes). Don't rename existing fields.
 4. Optional: pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/church-consent.json and render
    <ChurchConsent record={record} values={form.watch()} client="lookup-demo" /> under the fields,
    with record from ChurchLookup's onFill.
@@ -36,7 +37,7 @@ Check: type "grac", pick a church, the tagged fields fill and handleSubmit recei
 pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/church-lookup.json
 ```
 
-That adds three files, plus shadcn's `command` and `popover` if you don't have them:
+That adds three files, plus shadcn's `command` and `popover` if you don't have them. The component is a client component (`"use client"`), so it works in the Next.js app router.
 
 | File | What it is |
 |---|---|
@@ -46,7 +47,7 @@ That adds three files, plus shadcn's `command` and `popover` if you don't have t
 
 ## With React Hook Form
 
-Spread the field onto `ChurchLookup`. Tag the inputs it should fill with `data-hmc-field`; values are set the way typing sets them, so `register` and `Controller` fields both update.
+Spread the field onto `ChurchLookup`. Inputs named for the church, like `church_city`, fill on their own; tag any others with `data-hmc-field` (see [Fields](/docs/widget#fields)). Values are set the way typing sets them, so `register` and `Controller` fields both update.
 
 ```tsx
 <FormField
@@ -66,19 +67,41 @@ Spread the field onto `ChurchLookup`. Tag the inputs it should fill with `data-h
 <Input {...form.register("city")} data-hmc-field="city" />
 ```
 
-Without a form library, pass `name` and a hidden input submits the church ID, or use `value` and `onChange` for controlled state. To fill fields yourself, set `fill={false}` and read the record in `onFill`.
+Without a form library, pass `name` and a hidden input submits the church ID, add `required` if a church must be chosen, or use `value` and `onChange` for controlled state. To fill fields yourself, return `false` from `onFill`, or set `fill={false}`.
 
 ## Props
 
 | Prop | What it does |
 |---|---|
-| `value`, `onChange`, `onBlur`, `name` | Form field basics. `value` is the church ID; setting it shows that church. |
-| `onFill` | Called with the full record and what was filled. |
-| `fill` | Fill `data-hmc-field` inputs in the enclosing form. Defaults to `true`. |
+| `value`, `onChange`, `onBlur`, `name` | Form field basics. `value` is the church ID; setting it shows that church. A saved ID that moved calls `onChange` with the new one. |
+| `required` | The form won't submit until a church is chosen from the list. |
+| `onFill` | Called with the record and what will fill, before it fills. Return `false` to fill fields yourself. |
+| `fill` | Which fields to fill: tagged and church-named by default, `"auto"` adds plain names like `city`, `"tagged"` only tags, `false` none. |
+| `fillOnLoad` | Also fill from `value` when it's first shown. |
+| `form` | The id of the form to fill. Defaults to the enclosing form. |
 | `overwrite` | Replace fields that already have values. |
+| `onSelect`, `onClear`, `onError` | A church is about to be chosen (return `false` to cancel), the choice was cleared, or something failed to load. |
 | `client` | Your app's name. Use `lookup-demo` while testing. |
-| `region`, `country`, `near`, `limit`, `geo` | The same search options as the widget. |
+| `region`, `country`, `near`, `lat`, `lng`, `geo` | Where to search, as on the widget. |
+| `limit`, `maxResults` | Results per page, and the most **Show more** reaches (up to 50). |
+| `minChars`, `debounce`, `semantic` | When to search: characters first, milliseconds after typing, and `false` to skip the search after a pause. |
+| `density`, `icon`, `searchIcon`, `showDistance` | How results look: `"comfortable"` rows, your own icons (`icon={null}` hides it), and distances. |
+| `lang`, `strings` | The text's language, and any text to change. |
 | `label`, `placeholder` | The accessible name and the hint. |
+
+## Other languages
+
+English is built in. For Spanish, French, German, Portuguese and Polish, add the language file once and set `lang`, or let it follow the page's:
+
+```bash
+pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/lookup-strings.json
+```
+
+```tsx
+import "@/lib/lookup-strings"
+
+<ChurchLookup lang="es" />
+```
 
 ## Share fixes back
 
@@ -101,6 +124,7 @@ pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/use-church-lookup.
 ```tsx
 const lookup = useChurchLookup({ client: "my-app" })
 // lookup.search(text), lookup.results, lookup.active, lookup.move(1), lookup.choose(), lookup.loading
+// lookup.hasMore and lookup.more() for the next page, lookup.error and lookup.retry()
 ```
 
 See it working in [Kinship, built with shadcn/ui](/demo/shadcn/).

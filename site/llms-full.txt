@@ -57,7 +57,8 @@ Add a church search field to the form in this project where people enter a churc
    - `name` submits the chosen church's ID with the form. Store it so you can look the church up again.
    - Add `required` if a church must be chosen.
    - On an edit screen, set `value` to the saved ID.
-3. Tag the existing inputs with data-hmc-field. Use only these names:
+3. Inputs named for the church (church_city, churchWebsite) fill on their own. Tag the other
+   existing inputs with data-hmc-field. Use only these names:
    name, street, city, region, regionName, postalCode, country, countryName, latitude, longitude,
    phone, email, website, denomination, serviceTimes, languages, ministries, pastorName, id
    Don't create new inputs unless I ask. Don't rename existing ones.
@@ -86,7 +87,7 @@ Or set it up yourself. There's no key to request.
 
 ## 2. Put the search box in your form
 
-Tag the fields it should fill with `data-hmc-field`. Give it a `name` and the chosen church's ID submits with the form.
+Fields named for the church, like `church_city`, fill on their own. Tag any others with `data-hmc-field`. Give it a `name` and the chosen church's ID submits with the form.
 
 script tag:
 
@@ -173,11 +174,20 @@ It also asks for smarter results when people pause. Change the options below to 
 | `lang` | English, Spanish, French, German, Portuguese or Polish. Defaults to the page's language. Set the `strings` property to change any text. |
 | `region`, `country` | Limit results, such as `region="TX"` or `country="DE"`. |
 | `near` | Rank results near a place, such as `near="Dallas"`. |
+| `lat`, `lng` | Rank results near a point, such as the device's location. Set both. |
 | `geo="off"` | Don't use the visitor's approximate location. |
 | `form` | The id of the form to fill. Defaults to the enclosing form. |
+| `fill` | Which fields to fill. See [Fields](#fields). `auto` adds plain names like `city`, `tagged` uses only tags, `off` fills nothing. |
 | `overwrite` | Replace fields that already have values. |
-| `limit` | How many results to show, up to 20. Defaults to 8. |
+| `limit` | Results on the first page and each **Show more**. Defaults to 8. |
+| `max-results` | The most results **Show more** can reach, up to 50. Defaults to 50. Set it to `limit` to hide Show more. |
+| `density="comfortable"` | Taller rows with larger icons. Rows are compact by default. |
 | `icons="none"` | Hide the icon beside each result. |
+| `show-distance="off"` | Hide how far away each church is. |
+| `min-chars` | Characters typed before searching. Defaults to 2. |
+| `debounce` | Milliseconds to wait after typing before searching. Defaults to 150. |
+| `semantic="off"` | Skip the slower search after a pause, which can find churches by meaning. |
+| `disabled` | Turn the field off, like any input. A disabled `fieldset` does the same. |
 | `contribute="off"` | Don't offer to share corrections back to Here's My Church. |
 | `client` | Your app's name, sent with requests. Use `lookup-demo` while testing. |
 
@@ -198,6 +208,7 @@ html form:
 react:
 
 ```tsx
+"use client"; // Next.js: load the element in a client component.
 import "@heresmychurch/lookup/element";
 import type {} from "@heresmychurch/lookup/react";
 
@@ -220,7 +231,17 @@ function ChurchField({ onChange }) {
 
 ## Fields
 
-Use any of these in `data-hmc-field`: `name`, `street`, `city`, `region`, `regionName`, `postalCode`, `country`, `countryName`, `latitude`, `longitude`, `phone`, `email`, `website`, `denomination`, `serviceTimes`, `languages`, `ministries`, `pastorName` and `id`.
+Fields named for the church fill without any setup: `church_city`, `churchWebsite`, `church[phone]`, or `autocomplete="section-church address-level2"`. It reads the field's `name`, `id` and `autocomplete`, and skips address line 2, hidden fields and passwords.
+
+On a form that's only about the church, add `fill="auto"` and plain names fill too: `city`, `state`, `zip`, `phone`, `email`, `website`, or autocomplete tokens like `postal-code` and `tel`. A plain `name` or `id` never fills, since on most forms those are the person's.
+
+To say exactly which field gets what, tag it with `data-hmc-field`. A tag always wins, and `data-hmc-field="none"` leaves a field alone. Use any of these: `name`, `street`, `city`, `region`, `regionName`, `postalCode`, `country`, `countryName`, `latitude`, `longitude`, `phone`, `email`, `website`, `denomination`, `serviceTimes`, `languages`, `ministries`, `pastorName` and `id`.
+
+A `<select>` fills when one of its options matches by value or text, as a code or a name: `TX` or `Texas`, `US` or `United States`. For fields outside the form, set the `fieldMap` property to a field name and an element or selector each:
+
+```js
+document.querySelector("church-lookup").fieldMap = { website: "#site-url", phone: phoneInput };
+```
 
 ## Icons
 
@@ -237,16 +258,17 @@ Use the icons your design system already has. Put one with `slot="search-icon"` 
 
 | Event | When it fires |
 |---|---|
-| `church-results` | Results appeared. `detail` has `query`, `results` and `settled`. |
+| `church-results` | Results appeared. `detail` has `query`, `results`, `settled`, and `more` when they came from **Show more**. |
 | `church-select` | A church was chosen. Cancel it to stop the fill. |
 | `church-fill` | Fields are about to fill. Cancel it to fill them yourself from `detail.record`. |
 | `church-clear` | The choice was cleared, with the clear button or by editing the name. |
+| `church-error` | A search or a church's details failed to load. `detail` has `query` or `id`, plus `status`, `code`, `retryAfter` and the `error`. |
 | `church-contribute` | Someone chose Share. `detail` has `churchId` and `changes`. Cancel it to send them yourself, or not at all. |
 | `church-confirm` | Someone chose Still correct. Cancel it to skip the confirmation. |
 
 ## Accessibility
 
-An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. Results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.
+An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. **Show more** is the last option, so the arrow keys reach it too, and pressing down on it loads the next page. Results, added results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.
 
 
 ---
@@ -264,7 +286,7 @@ Lookup has two front doors with one engine behind them:
 | Drop it in | Any page or framework, no build step, Sensible UI pages | `<church-lookup>` from one script tag. See [the widget](/docs/widget). |
 | Own the code | React apps with shadcn/ui, such as ones built with Lovable or v0 | Add components from the registry below. They're copied into your app, so you can change them. |
 
-Both use the same headless core, so search, fill and sharing fixes back behave the same way.
+Both use the same headless core for search, **Show more**, field matching and sharing fixes back, and take the same options. The React component is yours to edit, so the two can differ once you change it.
 
 **Add Lookup to my shadcn app**
 
@@ -275,8 +297,9 @@ Add a church picker to this React + shadcn/ui app using Lookup by Here's My Chur
    (it adds components/church-lookup.tsx, hooks/use-church-lookup.ts and lib/lookup-core.ts)
 2. In the form that asks for a church, render <ChurchLookup /> inside a React Hook Form FormField
    named church_id: render={({ field }) => <ChurchLookup {...field} client="lookup-demo" />}
-3. Add data-hmc-field to the inputs it should fill (name, street, city, regionName, postalCode,
-   phone, website, serviceTimes). Don't rename existing fields.
+3. Inputs named for the church (church_city, churchWebsite) fill on their own. Add data-hmc-field to
+   any others it should fill (name, street, city, regionName, postalCode, phone, website,
+   serviceTimes). Don't rename existing fields.
 4. Optional: pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/church-consent.json and render
    <ChurchConsent record={record} values={form.watch()} client="lookup-demo" /> under the fields,
    with record from ChurchLookup's onFill.
@@ -291,7 +314,7 @@ Check: type "grac", pick a church, the tagged fields fill and handleSubmit recei
 pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/church-lookup.json
 ```
 
-That adds three files, plus shadcn's `command` and `popover` if you don't have them:
+That adds three files, plus shadcn's `command` and `popover` if you don't have them. The component is a client component (`"use client"`), so it works in the Next.js app router.
 
 | File | What it is |
 |---|---|
@@ -301,7 +324,7 @@ That adds three files, plus shadcn's `command` and `popover` if you don't have t
 
 ## With React Hook Form
 
-Spread the field onto `ChurchLookup`. Tag the inputs it should fill with `data-hmc-field`; values are set the way typing sets them, so `register` and `Controller` fields both update.
+Spread the field onto `ChurchLookup`. Inputs named for the church, like `church_city`, fill on their own; tag any others with `data-hmc-field` (see [Fields](/docs/widget#fields)). Values are set the way typing sets them, so `register` and `Controller` fields both update.
 
 ```tsx
 <FormField
@@ -321,19 +344,41 @@ Spread the field onto `ChurchLookup`. Tag the inputs it should fill with `data-h
 <Input {...form.register("city")} data-hmc-field="city" />
 ```
 
-Without a form library, pass `name` and a hidden input submits the church ID, or use `value` and `onChange` for controlled state. To fill fields yourself, set `fill={false}` and read the record in `onFill`.
+Without a form library, pass `name` and a hidden input submits the church ID, add `required` if a church must be chosen, or use `value` and `onChange` for controlled state. To fill fields yourself, return `false` from `onFill`, or set `fill={false}`.
 
 ## Props
 
 | Prop | What it does |
 |---|---|
-| `value`, `onChange`, `onBlur`, `name` | Form field basics. `value` is the church ID; setting it shows that church. |
-| `onFill` | Called with the full record and what was filled. |
-| `fill` | Fill `data-hmc-field` inputs in the enclosing form. Defaults to `true`. |
+| `value`, `onChange`, `onBlur`, `name` | Form field basics. `value` is the church ID; setting it shows that church. A saved ID that moved calls `onChange` with the new one. |
+| `required` | The form won't submit until a church is chosen from the list. |
+| `onFill` | Called with the record and what will fill, before it fills. Return `false` to fill fields yourself. |
+| `fill` | Which fields to fill: tagged and church-named by default, `"auto"` adds plain names like `city`, `"tagged"` only tags, `false` none. |
+| `fillOnLoad` | Also fill from `value` when it's first shown. |
+| `form` | The id of the form to fill. Defaults to the enclosing form. |
 | `overwrite` | Replace fields that already have values. |
+| `onSelect`, `onClear`, `onError` | A church is about to be chosen (return `false` to cancel), the choice was cleared, or something failed to load. |
 | `client` | Your app's name. Use `lookup-demo` while testing. |
-| `region`, `country`, `near`, `limit`, `geo` | The same search options as the widget. |
+| `region`, `country`, `near`, `lat`, `lng`, `geo` | Where to search, as on the widget. |
+| `limit`, `maxResults` | Results per page, and the most **Show more** reaches (up to 50). |
+| `minChars`, `debounce`, `semantic` | When to search: characters first, milliseconds after typing, and `false` to skip the search after a pause. |
+| `density`, `icon`, `searchIcon`, `showDistance` | How results look: `"comfortable"` rows, your own icons (`icon={null}` hides it), and distances. |
+| `lang`, `strings` | The text's language, and any text to change. |
 | `label`, `placeholder` | The accessible name and the hint. |
+
+## Other languages
+
+English is built in. For Spanish, French, German, Portuguese and Polish, add the language file once and set `lang`, or let it follow the page's:
+
+```bash
+pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/lookup-strings.json
+```
+
+```tsx
+import "@/lib/lookup-strings"
+
+<ChurchLookup lang="es" />
+```
 
 ## Share fixes back
 
@@ -356,6 +401,7 @@ pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/use-church-lookup.
 ```tsx
 const lookup = useChurchLookup({ client: "my-app" })
 // lookup.search(text), lookup.results, lookup.active, lookup.move(1), lookup.choose(), lookup.loading
+// lookup.hasMore and lookup.more() for the next page, lookup.error and lookup.retry()
 ```
 
 See it working in [Kinship, built with shadcn/ui](/demo/shadcn/).
@@ -406,8 +452,25 @@ Try it below. The right side has no Lookup CSS at all, only the page's tokens. P
 | `--hmc-active-bg`, `--hmc-active-text` | `--accent`, `--accent-foreground` | The highlighted result |
 | `--hmc-muted` | `--muted-foreground` | Secondary text |
 | `--hmc-radius` | `--radius` | Corners |
+| `--hmc-z` | | The results list's `z-index`. Defaults to 1000. |
 
-The widget also takes your page's font. For anything else, style its parts with `::part(label)`, `::part(input)` and `::part(popup)`.
+The widget also takes your page's font. Rows are compact by default; `density="comfortable"` makes them taller with larger icons.
+
+## Parts
+
+For anything else, style its parts with `::part()`, such as `church-lookup::part(option-name) { font-weight: 500 }`.
+
+| Part | What it is |
+|---|---|
+| `label`, `input`, `clear` | The label, the search box and its clear button |
+| `popup`, `listbox` | The results panel and the list inside it |
+| `option` | Each result row |
+| `option-name`, `option-detail`, `option-distance` | A result's name, its address line and its distance |
+| `more` | The **Show more** row |
+| `corrected` | The "Showing results for" line above corrected results |
+| `note`, `retry` | The no-results or error message, and its **Try again** button |
+| `footer` | The data credit under the results |
+| `consent` | The panel that offers to share fixes back |
 
 Want to see it fill a real form? [Open the full theming example](/examples/autofill).
 
@@ -431,9 +494,11 @@ Try it against the live API:
 | `q` | What the person typed. Place words like "in Dallas" or ", TX" are understood. |
 | `near`, `lat`, `lng` | Rank near a place or point. |
 | `country`, `region` | Only return churches there. |
-| `limit` | 1 to 20. Defaults to 8. |
+| `limit` | 1 to 50. Defaults to 8. |
 | `settled=1` | The person paused, so semantic search may run. |
 | `geo=off` | Don't use the request's approximate location. |
+
+The response has `results`, plus `hasMore` when more churches ranked past `limit`. To show more, ask again with a higher `limit` and add the results you haven't shown yet. A higher limit can search wider, so don't assume the first ones come back in the same order. It also has `place` (the place understood from the query, or `null`), `corrected` (the spelling searched instead, or `null`), `degraded` and `semantic`.
 
 ## GET /v1/churches/:id
 
@@ -476,9 +541,23 @@ curl -X POST https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145/contrib
 
 Ask a question about these docs. Send `{ question }` (up to 500 characters) and the answer streams back as server-sent events. It powers the Ask AI button and is limited to 10 questions a minute.
 
+## Errors
+
+Errors are JSON with a readable `error` and a stable `code` to check in your code:
+
+| Status | `code` |
+|---|---|
+| 400 | `invalid` |
+| 404 | `not_found` |
+| 405 | `method_not_allowed` |
+| 413 | `too_large` |
+| 429 | `rate_limited` |
+| 500 | `unavailable` |
+| 503 | `overloaded` |
+
 ## Limits
 
-120 searches and 30 semantic searches a minute per visitor, 5 contributions and 10 docs questions a minute. Over the limit returns `429`, a busy database returns `503`, and both send `Retry-After`.
+120 requests and 30 semantic searches a minute per visitor, 5 contributions and 10 docs questions a minute. Over the limit returns `429`, a busy database returns `503`, and both send `Retry-After`, which browsers on any origin can read.
 
 
 ---
