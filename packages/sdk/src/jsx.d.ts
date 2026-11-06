@@ -9,6 +9,8 @@ export interface ChurchLookupEventMap {
   "church-select": CustomEvent<{ result: SearchResult }>;
   "church-fill": CustomEvent<{ record: ChurchRecord; changes: FillChange[] }>;
   "church-clear": CustomEvent<Record<string, never>>;
+  "church-contribute": CustomEvent<{ churchId: string; changes: { field: string; value: string }[] }>;
+  "church-confirm": CustomEvent<{ churchId: string }>;
 }
 
 /** Attributes you can set on <church-lookup>. */
@@ -33,6 +35,7 @@ export interface ChurchLookupAttributes {
   lang?: string;
   client?: string;
   "base-url"?: string;
+  contribute?: "off";
   id?: string;
   class?: string;
   className?: string;

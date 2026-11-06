@@ -154,6 +154,40 @@
     </ul>
   </section>
 
+  <section id="paths" aria-labelledby="paths-h">
+    <h2 id="paths-h">Choose your path</h2>
+    <p>One engine, two front doors. Drop the element into any page, or own the code in a React app.</p>
+    <div class="frame"><div class="frame-in code" data-tabs>
+      <div class="code-bar">
+        <div role="tablist" aria-label="Choose your path" class="tabs">
+          <button role="tab" aria-selected="true" aria-controls="path-html" id="path-html-t">HTML · Sensible UI</button>
+          <button role="tab" aria-selected="false" aria-controls="path-react" id="path-react-t" tabindex="-1">React · shadcn/ui</button>
+        </div>
+        <button class="copy" type="button">copy</button>
+      </div>
+      <pre tabindex="0" role="tabpanel" id="path-html" aria-labelledby="path-html-t"><code><span class="c">&lt;!-- Any page, no build. Sensible UI is optional: its tokens style the widget. --&gt;</span>
+<span class="t">&lt;link</span> <span class="a">rel</span>=<span class="s">"stylesheet"</span> <span class="a">href</span>=<span class="s">"https://cdn.jsdelivr.net/npm/@faith-tools/sensible-ui@1.7.0/dist/sensible-ui.min.css"</span><span class="t">&gt;</span>
+<span class="t">&lt;script</span> <span class="a">type</span>=<span class="s">"module"</span> <span class="a">src</span>=<span class="s">"https://lookup.heresmychurch.com/element.js"</span><span class="t">&gt;&lt;/script&gt;</span>
+
+<span class="t">&lt;form&gt;</span>
+  <span class="t">&lt;church-lookup</span> <span class="a">name</span>=<span class="s">"church_id"</span> <span class="a">label</span>=<span class="s">"Your church"</span><span class="t">&gt;&lt;/church-lookup&gt;</span>
+  <span class="t">&lt;input</span> <span class="a">name</span>=<span class="s">"city"</span> <span class="a">data-hmc-field</span>=<span class="s">"city"</span><span class="t">&gt;</span>
+<span class="t">&lt;/form&gt;</span></code></pre>
+      <pre tabindex="0" role="tabpanel" id="path-react" aria-labelledby="path-react-t" hidden><code><span class="c"># Copies the component, a hook and the engine into your app</span>
+pnpm dlx shadcn@latest add <span class="s">https://lookup.heresmychurch.com/r/church-lookup.json</span>
+
+<span class="t">&lt;FormField</span> <span class="a">name</span>=<span class="s">"church_id"</span> <span class="a">render</span>={({ field }) =&gt; (
+  <span class="t">&lt;ChurchLookup</span> {...field} <span class="a">client</span>=<span class="s">"my-app"</span> <span class="a">onFill</span>={setRecord} <span class="t">/&gt;</span>
+)} <span class="t">/&gt;</span>
+<span class="t">&lt;Input</span> {...form.register(<span class="s">"city"</span>)} <span class="a">data-hmc-field</span>=<span class="s">"city"</span> <span class="t">/&gt;</span></code></pre>
+    </div></div>
+    <div class="path-notes">
+      <p><b>Drop it in.</b> One script tag, no build, any framework. On a page using <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://cameronpak.com">Cam Pak</a>, or any shadcn-style tokens, it matches your theme with no setup.</p>
+      <p><b>Own the code.</b> A shadcn registry gives you a <code>ChurchLookup</code> built from Command and Popover, plus a hook and a share-fixes panel. It works with React Hook Form. <a href="/demo/shadcn/">See it in Kinship</a>.</p>
+    </div>
+    <p class="more"><a href="/docs/react">React and shadcn docs<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+  </section>
+
   <section id="widget" aria-labelledby="widget-h">
     <h2 id="widget-h">Every option, live</h2>
     <p><code>&lt;church-lookup&gt;</code> is an accessible combobox and a real form field. Change an option and the preview, the HTML and the events update.</p>

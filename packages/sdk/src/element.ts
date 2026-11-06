@@ -2,16 +2,14 @@
 // form-associated element: with a `name`, the chosen church's ID submits like any input.
 /// <reference path="./jsx.d.ts" />
 import { createLookup, type ChurchRecord, type FieldStatus, type Lookup, type Meta, type SearchResult } from "./client.ts";
+import { applyFill, consentDiff, contributable, createLookupController, fieldValue, findTargets, planFill, type ControllerState, type FillChange } from "./core.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
 import { LANGS, registry, stringsFor, type Strings } from "./strings.ts";
 
-export type { Strings };
+export type { Strings, FillChange };
 
-export { setNativeValue };
+export { setNativeValue, fieldValue };
 
-const DEBOUNCE_MS = 150;
-const SETTLE_MS = 700;
-const SETTLED_MIN = 4;
 const ADD_URL = "https://heresmychurch.com";
 
 // Each token falls back to the shadcn/ui names that Sensible UI (sensibleui.com, by Cam Pak) uses, so a
@@ -65,16 +63,6 @@ let uid = 0;
 interface WatchRow { field: string; el: FieldTarget; label: string; was: string; review: "live" | "moderated"; soon: boolean }
 interface Snapshot { id: string; rows: WatchRow[]; sent: Map<string, string>; dismissed: string; confirmed: boolean; off: () => void }
 
-export interface FillChange { field: string; element: FieldTarget; value: string }
-
-export function fieldValue(record: ChurchRecord, field: string): string | null {
-  const v = field === "id" ? record.id : record.fields[field];
-  if (v == null) return null;
-  if (Array.isArray(v)) return v.length ? v.join(", ") : null;
-  if (typeof v === "object") return (v as { raw?: string | null }).raw ?? null;
-  return String(v);
-}
-
 export class ChurchLookup extends HTMLElement {
   static formAssociated = true;
   /** Map of record field to an element or selector. Merged over data-hmc-field elements. */
@@ -82,7 +70,6 @@ export class ChurchLookup extends HTMLElement {
   lookup: Lookup | null = null;
   private internals: ElementInternals | null = null;
   private fallback: HTMLInputElement | null = null;
-  private chosen: SearchResult | null = null;
   private current = "";
   private overrides: Partial<Strings> = {};
   private clearBtn!: HTMLButtonElement;
@@ -94,13 +81,26 @@ export class ChurchLookup extends HTMLElement {
   private pop!: HTMLDivElement;
   private note!: HTMLDivElement;
   private live!: HTMLDivElement;
-  private results: SearchResult[] = [];
-  private active = -1;
   private composing = false;
-  private timers: ReturnType<typeof setTimeout>[] = [];
-  private ctrl: AbortController | null = null;
-  private seq = 0;
   private key = `hmc-${++uid}`;
+  /** The search engine; this element only renders it. See @heresmychurch/lookup/core. */
+  private ctl = createLookupController({
+    lookup: () => this.client(),
+    params: () => {
+      const a = (n: string) => this.getAttribute(n) ?? undefined;
+      return { region: a("region"), country: a("country"), near: a("near"), limit: Number(a("limit")) || 8, geo: a("geo") !== "off" };
+    },
+    text: () => this.input?.value ?? "",
+    onShow: (st) => this.show(st),
+    onChange: (st) => this.sync(st),
+    // For hosts that want to show results elsewhere too, such as pins on a map.
+    onResults: (detail) => this.dispatchEvent(new CustomEvent("church-results", { detail, bubbles: true, composed: true })),
+    onSelect: (result) => {
+      if (!this.dispatchEvent(new CustomEvent("church-select", { detail: { result }, cancelable: true, bubbles: true, composed: true }))) return false;
+      this.input.value = result.name;
+      this.setValue(result.id);
+    },
+  });
 
   constructor() {
     super();
@@ -111,7 +111,7 @@ export class ChurchLookup extends HTMLElement {
   get value(): string { return this.current; }
   set value(id: string) { void this.prefill(id); }
   /** The chosen church as a search result, or null. */
-  get selected(): SearchResult | null { return this.chosen; }
+  get selected(): SearchResult | null { return this.ctl.state.selected; }
   /** Override any text, such as { label: "Your parish" }. */
   get strings(): Partial<Strings> { return this.overrides; }
   set strings(v: Partial<Strings>) { this.overrides = v ?? {}; this.applyText(); }
@@ -204,9 +204,8 @@ export class ChurchLookup extends HTMLElement {
   clear(): void {
     const had = Boolean(this.current);
     this.unwatch();
-    this.chosen = null;
+    this.ctl.reset();
     this.input.value = "";
-    this.results = [];
     this.close();
     this.setValue("");
     if (had) this.dispatchEvent(new CustomEvent("church-clear", { bubbles: true, composed: true }));
@@ -220,7 +219,7 @@ export class ChurchLookup extends HTMLElement {
       const record = await this.client().getChurch(id);
       const name = String(record.fields.name ?? "");
       this.input.value = name;
-      this.chosen = { id: record.id, name, label: name, locationLabel: "" } as SearchResult;
+      this.ctl.select({ id: record.id, name, label: name, locationLabel: "" } as SearchResult);
       this.setValue(record.id);
       if (this.hasAttribute("fill-on-load")) this.fillFrom(record);
     } catch {
@@ -239,59 +238,33 @@ export class ChurchLookup extends HTMLElement {
     return this.lookup ??= createLookup({ baseUrl: this.getAttribute("base-url") ?? undefined, client: this.getAttribute("client") ?? undefined });
   }
 
-  private clearTimers(): void {
-    for (const t of this.timers) clearTimeout(t);
-    this.timers = [];
-  }
-
   private onInput(): void {
     if (this.composing) return;
-    this.clearTimers();
-    const q = this.input.value.trim();
+    this.ctl.input(this.input.value);
     // Typing after a pick starts over: the old choice no longer matches what's in the box.
-    if (this.current && q !== this.chosen?.name) { this.chosen = null; this.setValue(""); }
-    if (q.length < 2) { this.ctrl?.abort(); this.results = []; this.close(); return; }
-    this.timers.push(setTimeout(() => this.run(q, false), DEBOUNCE_MS));
-    if (q.length >= SETTLED_MIN) this.timers.push(setTimeout(() => this.run(q, true), SETTLE_MS));
+    if (this.current && !this.ctl.state.selected) this.setValue("");
   }
 
-  private async run(q: string, settled: boolean): Promise<void> {
-    this.ctrl?.abort();
-    const ctrl = (this.ctrl = new AbortController());
-    const seq = ++this.seq;
-    const a = (n: string) => this.getAttribute(n) ?? undefined;
-    try {
-      const res = await this.client().search(q, {
-        settled, signal: ctrl.signal, region: a("region"), country: a("country"), near: a("near"),
-        limit: Number(a("limit")) || 8, geo: a("geo") !== "off",
-      });
-      if (seq !== this.seq || this.input.value.trim() !== q) return;
-      this.show(res.results);
-      // For hosts that want to show results elsewhere too, such as pins on a map.
-      this.dispatchEvent(new CustomEvent("church-results", { detail: { query: q, results: this.results, settled }, bubbles: true, composed: true }));
-    } catch (e) {
-      if ((e as Error).name === "AbortError" || seq !== this.seq) return;
-      this.show([], this.t.error);
-    }
+  /** Keep the popup's open state and the highlighted option in step with the controller. */
+  private sync(st: Readonly<ControllerState>): void {
+    if (!this.pop) return;
+    this.pop.hidden = !st.open;
+    this.input.setAttribute("aria-expanded", String(st.open));
+    if (st.open) this.mark();
+    else this.input.removeAttribute("aria-activedescendant");
   }
 
-  /** Render results. The highlighted church keeps its place when settled results arrive. */
-  private show(next: SearchResult[], error?: string): void {
-    const pinned = this.results[this.active];
-    if (pinned) {
-      const at = this.active;
-      next = next.filter((r) => r.id !== pinned.id);
-      next.splice(Math.min(at, next.length), 0, pinned);
-      this.active = Math.min(at, next.length - 1);
-    } else this.active = -1;
-    this.results = next;
+  /** Render results. The controller has already kept the highlighted church in its place. */
+  private show(st: Readonly<ControllerState>): void {
+    const next = st.results;
+    const error = st.error ? this.t.error : undefined;
     this.placeIcons(next.length);
     this.list.replaceChildren(...next.map((r, i) => {
       const li = document.createElement("li");
       li.id = `${this.key}-o${i}`;
       li.setAttribute("role", "option");
       li.setAttribute("part", "option");
-      li.setAttribute("aria-selected", String(i === this.active));
+      li.setAttribute("aria-selected", String(i === st.active));
       li.dataset.i = String(i);
       li.innerHTML = `<span class="ic"><slot name="hmc-ic-${i}">${CHURCH}</slot></span><span class="t"><span class="n"></span><span class="sub"></span></span><span class="d"></span>`;
       li.querySelector(".n")!.textContent = r.name;
@@ -312,25 +285,21 @@ export class ChurchLookup extends HTMLElement {
         this.note.append(link);
       }
     }
-    this.open();
     this.say(error ?? (next.length ? this.t.found(next.length) : this.t.noneShort));
-    this.mark();
-  }
-
-  private open(): void {
-    this.pop.hidden = false;
-    this.input.setAttribute("aria-expanded", "true");
   }
 
   close(): void {
+    this.ctl.close();
+    if (!this.pop) return;
     this.pop.hidden = true;
     this.input.setAttribute("aria-expanded", "false");
     this.input.removeAttribute("aria-activedescendant");
   }
 
   private mark(): void {
-    this.list.querySelectorAll("li").forEach((li, i) => li.setAttribute("aria-selected", String(i === this.active)));
-    const li = this.active >= 0 ? this.list.children[this.active] : null;
+    const active = this.ctl.state.active;
+    this.list.querySelectorAll("li").forEach((li, i) => li.setAttribute("aria-selected", String(i === active)));
+    const li = active >= 0 ? this.list.children[active] : null;
     if (li) {
       this.input.setAttribute("aria-activedescendant", li.id);
       li.scrollIntoView?.({ block: "nearest" });
@@ -338,17 +307,17 @@ export class ChurchLookup extends HTMLElement {
   }
 
   private onKey(e: KeyboardEvent): void {
-    const n = this.results.length;
+    const { results, active } = this.ctl.state;
+    const n = results.length;
     const isOpen = !this.pop.hidden;
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
-      if (!isOpen) { if (n) this.open(); if (e.altKey) return; }
+      if (!isOpen) { if (n) this.ctl.open(); if (e.altKey) return; }
       if (!n) return;
-      this.active = e.key === "ArrowDown" ? (this.active + 1) % n : this.active <= 0 ? n - 1 : this.active - 1;
-      this.mark();
-    } else if (e.key === "Enter" && isOpen && this.active >= 0) {
+      this.ctl.move(e.key === "ArrowDown" ? 1 : -1);
+    } else if (e.key === "Enter" && isOpen && active >= 0) {
       e.preventDefault();
-      this.choose(this.active);
+      void this.choose(active);
     } else if (e.key === "Escape" && isOpen) {
       e.preventDefault();
       this.close();
@@ -386,9 +355,7 @@ export class ChurchLookup extends HTMLElement {
 
   private targets(): Map<string, FieldTarget> {
     const scopeId = this.getAttribute("form");
-    const scope: ParentNode = (scopeId && document.getElementById(scopeId)) || this.closest("form") || document;
-    const out = new Map<string, FieldTarget>();
-    scope.querySelectorAll<FieldTarget>("[data-hmc-field]").forEach((el) => out.set(el.dataset.hmcField!, el));
+    const out = findTargets((scopeId && document.getElementById(scopeId)) || this.closest("form") || document);
     for (const [field, t] of Object.entries(this.fieldMap)) {
       const el = typeof t === "string" ? document.querySelector<FieldTarget>(t) : t;
       if (el) out.set(field, el);
@@ -397,40 +364,20 @@ export class ChurchLookup extends HTMLElement {
   }
 
   private async choose(i: number): Promise<void> {
-    const result = this.results[i];
-    if (!result) return;
-    this.clearTimers();
-    this.close();
-    // A new search after choosing starts fresh, with nothing pinned.
-    this.results = [];
-    this.active = -1;
-    if (!this.dispatchEvent(new CustomEvent("church-select", { detail: { result }, cancelable: true, bubbles: true, composed: true }))) return;
-    this.input.value = result.name;
-    this.chosen = result;
-    this.setValue(result.id);
-    let record: ChurchRecord;
+    let record: ChurchRecord | null;
     try {
-      record = await this.client().getChurch(result.id);
+      record = await this.ctl.choose(i);
     } catch {
       this.say(this.t.loadFail);
       return;
     }
-    this.fillFrom(record);
+    if (record) this.fillFrom(record);
   }
 
   private fillFrom(record: ChurchRecord): void {
-    const overwrite = this.hasAttribute("overwrite");
-    const changes: FillChange[] = [];
-    const empty: string[] = [];
-    for (const [field, element] of this.targets()) {
-      const value = fieldValue(record, field);
-      if (value == null) { empty.push(field); continue; }
-      if (!overwrite && element.value.trim()) continue;
-      if (element instanceof HTMLSelectElement && ![...element.options].some((o) => o.value === value)) continue;
-      changes.push({ field, element, value });
-    }
+    const { changes, empty } = planFill(record, this.targets(), { overwrite: this.hasAttribute("overwrite") });
     if (!this.dispatchEvent(new CustomEvent("church-fill", { detail: { record, changes }, cancelable: true, bubbles: true, composed: true }))) return;
-    for (const c of changes) setNativeValue(c.element, c.value);
+    applyFill(changes);
     this.say(this.t.filled(changes.length, empty));
     void this.watch(record);
   }
@@ -452,8 +399,8 @@ export class ChurchLookup extends HTMLElement {
     const country = String(record.fields.country ?? "");
     const rows: WatchRow[] = [];
     for (const [field, el] of this.targets()) {
-      const rule = meta.contributableFields[field === "street" ? "address" : field];
-      if (!rule || (rule.countries !== "all" && !rule.countries.includes(country))) continue;
+      const rule = contributable(meta, field, country);
+      if (!rule) continue;
       const label = (el.labels?.[0]?.textContent ?? el.getAttribute("aria-label") ?? field).trim();
       rows.push({ field, el, label, was: (fieldValue(record, field) ?? "").trim(), review: rule.review, soon: rule.status === "coming_soon" });
     }
@@ -465,7 +412,7 @@ export class ChurchLookup extends HTMLElement {
 
   private changed(): WatchRow[] {
     const s = this.snap!;
-    return s.rows.filter((r) => { const v = r.el.value.trim(); return v && v !== r.was && s.sent.get(r.field) !== v; });
+    return consentDiff(s.rows.map((r) => ({ ...r, value: r.el.value })), s.sent);
   }
 
   private renderPanel(result?: Map<string, { status: FieldStatus; message?: string }>, sandbox?: boolean): void {

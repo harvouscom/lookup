@@ -886,3 +886,9 @@ p.num::after { margin-left: 2px; }
 .ex-steeple .ext-site { background: #1A1A17; border-left-color: rgba(255,255,255,.08); background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px); background-size: 8px 8px; }
 .ex-steeple .ext-hero { height: 56px; background: radial-gradient(circle at 72% 78%, #E8A64B 0 14px, transparent 15px), linear-gradient(180deg, #0F2A1F, #1F4D3A 60%, #B5864A); }
 .ex-steeple .ext-site i { background: #FBF8F2; opacity: .8; }
+
+/* Choose your path */
+.path-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+.path-notes p { margin: 0; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); font-size: .9375rem; }
+.path-notes b { color: var(--text); font-weight: 600; }
+@media (max-width: 720px) { .path-notes { grid-template-columns: 1fr; } }

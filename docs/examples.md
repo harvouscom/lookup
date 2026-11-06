@@ -10,6 +10,7 @@ Each example is a working app using the real widget and live data, in demo mode 
 - [Kinship, a church management app](/#example/kinship): React with controlled inputs. Add a partner church and watch React's state fill in.
 - [Harvest Table, a food pantry network](/#example/harvest): A plain HTML sign-up that registers churches as distribution sites, posting `church_id` with the form.
 - [Steeple, a church website builder](/#example/steeple): Pick your church and a live website preview builds itself from its details.
+- [Kinship, built with shadcn/ui](/demo/shadcn/): The same partner-church form using the registry component and React Hook Form.
 :::
 
 ## What each one shows

@@ -69,8 +69,12 @@ export interface Meta {
 }
 
 export class LookupError extends Error {
-  constructor(public status: number, message: string, public retryAfter?: number) {
+  status: number;
+  retryAfter?: number;
+  constructor(status: number, message: string, retryAfter?: number) {
     super(message);
+    this.status = status;
+    this.retryAfter = retryAfter;
   }
 }
 

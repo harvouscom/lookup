@@ -8,8 +8,10 @@
   "scripts": {
     "test": "vitest run --config worker/vitest.config.ts && pnpm --filter @heresmychurch/lookup test",
     "typecheck": "tsc -p worker/tsconfig.json --noEmit",
-    "deploy": "pnpm run build:sdk && pnpm run build:docs && wrangler deploy --config worker/wrangler.jsonc",
+    "deploy": "pnpm run build:sdk && pnpm run build:registry && pnpm run build:docs && wrangler deploy --config worker/wrangler.jsonc",
     "build:docs": "node scripts/build-docs.mjs",
+    "build:registry": "node scripts/build-registry.mjs",
+    "build:shadcn-demo": "npm --prefix examples/shadcn-demo run build",
     "eval": "node eval/run.mjs",
     "build:sdk": "pnpm --filter @heresmychurch/lookup build && node scripts/copy-assets.mjs"
   },

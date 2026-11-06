@@ -1,6 +1,6 @@
 {
   "name": "@heresmychurch/lookup",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Church typeahead and autofill from the Here's My Church directory: a small client and a <church-lookup> element.",
   "license": "MIT",
   "type": "module",
@@ -13,6 +13,10 @@
     ".": {
       "types": "./src/client.ts",
       "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./src/core.ts",
+      "default": "./dist/core.js"
     },
     "./element": {
       "types": "./src/element.ts",

@@ -29,6 +29,14 @@ Lookup by Here's My Church is a church search box for forms. People type a few l
 5. While testing, set `client="lookup-demo"`: shared corrections are checked but never sent. In production, set `client` to the app's name.
 6. Styling: set `--hmc-accent`, `--hmc-radius`, `--hmc-border`, `--hmc-input-border`, `--hmc-bg`, `--hmc-text` on `church-lookup`, or rely on shadcn-style tokens (`--background`, `--foreground`, `--accent`, `--border`, `--radius`) already on the page.
 
+## React + shadcn/ui apps (Lovable, v0, Vite)
+Prefer the registry component over the element:
+1. `pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/church-lookup.json`
+2. In a React Hook Form `FormField` named `church_id`: `render={({ field }) => <ChurchLookup {...field} client="lookup-demo" onFill={setRecord} />}`
+3. Tag the inputs to fill with `data-hmc-field` (same names as above).
+4. Optional share-fixes panel: add `https://lookup.heresmychurch.com/r/church-consent.json`, then `<ChurchConsent record={record} values={form.watch()} client="lookup-demo" />`.
+Docs: https://lookup.heresmychurch.com/docs/react.md
+
 ## Rules
 - Don't invent attributes or field names beyond the lists above.
 - Don't send email or pastor name back to Here's My Church; the widget never offers them.

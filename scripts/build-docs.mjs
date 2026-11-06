@@ -9,7 +9,7 @@ const SITE = "https://lookup.heresmychurch.com";
 const REPO = "https://github.com/harvouscom/lookup";
 const NAV = [
   { title: "Get started", pages: ["index", "quickstart", "examples"] },
-  { title: "Widget", pages: ["widget", "service-times", "theming"] },
+  { title: "Widget", pages: ["widget", "react", "service-times", "theming"] },
   { title: "API", pages: ["api"] },
   { title: "How it works", pages: ["how-search-works", "data"] },
 ];
