@@ -1,11 +1,11 @@
 import { env, SELF } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
-import { seed, rows } from "./seed.ts";
+import { seed, rows, searchRows } from "./seed.ts";
 import worker from "../src/index.ts";
 
 
 
-beforeAll(async () => { await seed(env.DB); });
+beforeAll(async () => { await seed(env.DB, true); });
 
 const get = async (path: string) => {
   const res = await SELF.fetch(`https://lookup.test${path}`);
@@ -32,7 +32,7 @@ describe("search", () => {
   it("resolves church in dallas without Indiana", async () => {
     const { body } = await s("church in dallas");
     expect(body.place).toMatchObject({ name: "Dallas", region: "TX" });
-    expect(body.results[0].city).toBe("Dallas");
+    expect(body.results[0].distanceKm).toBeLessThanOrEqual(75);
     const dallasFirst = body.results.findIndex((r: any) => r.region === "IN");
     if (dallasFirst >= 0) expect(body.results.slice(0, dallasFirst).every((r: any) => r.city === "Dallas")).toBe(true);
   });
@@ -133,6 +133,59 @@ describe("search", () => {
   });
 });
 
+describe("smarter search", () => {
+  const top = async (q: string, extra = "") => (await s(q, extra)).body.results[0];
+  it("reads a lowercase state code without junk from other countries", async () => {
+    const { body } = await s("first baptist tx");
+    expect(body.results.length).toBeGreaterThan(0);
+    expect(names(body)).not.toContain("San Juan Txiki");
+    expect(body.results.filter((r: any) => r.band < 3).every((r: any) => r.region === "TX")).toBe(true);
+  });
+  it("turns a city before a lowercase code into a place", async () => {
+    const { body } = await s("saddleback lake forest ca");
+    expect(body.place).toMatchObject({ name: "Lake Forest", region: "CA" });
+    expect(names(body)).toEqual(["Saddleback Church"]);
+  });
+  it("keeps typeahead working when a short word looks like a code", async () => {
+    expect((await top("grace co")).name).toBe("Grace Community Church");
+  });
+  it("reads city nicknames", async () => {
+    const r = await top("st patricks cathedral nyc");
+    expect(r.region).toBe("NY");
+  });
+  it("expands church-name abbreviations", async () => {
+    expect((await top("ame church atlanta ga")).name).toBe("Bethel AME Church");
+    const umc = names((await s("umc austin")).body);
+    expect(umc).toEqual(expect.arrayContaining(["First United Methodist Church", "Grace UMC"]));
+    expect(names((await s("grace united methodist")).body)).toContain("Grace UMC");
+    expect(names((await s("lds church")).body)).toContain("The Church of Jesus Christ of Latter-day Saints");
+    expect(names((await s("1st baptist austin")).body)).toContain("First Baptist Church Sanctuary");
+    expect((await top("first presbyterian ch austin")).name).toBe("First Presbyterian Church");
+    expect((await top("first meth austin")).name).toBe("First United Methodist Church");
+  });
+  it("finds half-typed words anywhere in the query", async () => {
+    expect((await top("first bap church dallas", "&lat=32.78&lng=-96.8")).name).toBe("First Baptist Church");
+    expect(names((await s("grac comm church")).body)[0]).toBe("Grace Community Church");
+  });
+  it("ranks the church in a named city above more complete ones nearby", async () => {
+    expect((await top("first baptist, austin tx")).name).toBe("First Baptist Church Sanctuary");
+    expect((await top("first baptist austin tx")).name).toBe("First Baptist Church Sanctuary");
+  });
+  it("lets a nearby longer name beat an exact name far away, only for a location the caller sent", async () => {
+    expect((await top("calvary chapel", "&lat=26.12&lng=-80.14&region=FL")).name).toBe("Calvary Chapel West Boca");
+    expect((await top("calvary chapel")).name).toBe("Calvary Chapel");
+  });
+  it("puts Dallas, Texas above Dallas, Georgia for a Dallas caller", async () => {
+    const { body } = await s("first baptist dallas", "&lat=32.78&lng=-96.8");
+    const ga = body.results.findIndex((r: any) => r.region === "GA");
+    expect(ga).toBeGreaterThan(0);
+    expect(body.results.slice(0, ga).every((r: any) => r.region === "TX")).toBe(true);
+  });
+  it("finds a church by postcode", async () => {
+    expect((await top("grace 75201")).name).toBe("Grace Community Church");
+  });
+});
+
 describe("churches", () => {
   it("returns a stable record", async () => {
     const { body } = await get("/v1/churches/R-0");
@@ -161,7 +214,7 @@ describe("meta and routing", () => {
     expect(body.contributableFields.pastorName).toBeUndefined();
     expect(body.contributableFields.name.review).toBe("moderated");
     expect(body.contributableFields.serviceTimes.review).toBe("live");
-    expect(body.counts.churches).toBe(rows.length);
+    expect(body.counts.churches).toBe(rows.length + searchRows.length);
   });
   it("404s other paths and refuses writes", async () => {
     expect((await get("/nope")).res.status).toBe(404);

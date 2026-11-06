@@ -188,6 +188,43 @@ export function geoText(lat: number, lng: number, country: string, region: strin
   return `g3${geohash(lat, lng, 3)} g4${geohash(lat, lng, 4)} cc${country.toLowerCase()} r${region.toLowerCase()}`;
 }
 
+// ── Location text ──
+
+/** Two-letter codes left out of `loc`: stopwords, and `mt`, which is also "mount". */
+const LOC_CODE_SKIP = new Set(["in", "on", "de", "la", "mt"]);
+const AU_SHORT: Record<string, string> = { AUNSW: "nsw", AUQLD: "qld", AUVIC: "vic", AUTAS: "tas", AUWA: "wa", AUSA: "sa", AUNT: "nt" };
+
+/** The short code people type for a region ("tx", "nsw"), or null when it would collide with a word. */
+export function regionToken(region: string, country: string): string | null {
+  if ((country === "US" || country === "CA") && /^[A-Z]{2}$/.test(region)) {
+    const t = region.toLowerCase();
+    return LOC_CODE_SKIP.has(t) ? null : t;
+  }
+  return AU_SHORT[region] ?? null;
+}
+
+/** Postcode tokens: a US ZIP's first five digits; elsewhere each part of 3+ characters and the parts joined. */
+export function postalTokens(postalCode: string | null | undefined, country: string): string[] {
+  const p = postalCode?.trim();
+  if (!p) return [];
+  if (country === "US") { const m = p.match(/^\d{5}/); return m ? [m[0]] : []; }
+  const parts = tokenize(p);
+  const out = new Set(parts.filter((t) => t.length >= 3));
+  if (parts.length > 1 && parts.join("").length >= 3) out.add(parts.join(""));
+  return [...out];
+}
+
+/** What the `loc` column holds: place, postcode, region name and code, country. */
+export function locText(p: { city: string | null; near: string | null; postalCode: string | null; region: string; country: string }, info: RegionInfo): string {
+  const place = p.city ?? p.near ?? "";
+  return [place, ...postalTokens(p.postalCode, p.country), info.regionName, regionToken(p.region, p.country), info.countryName].filter(Boolean).join(" ");
+}
+
+/** One church_fts row. Every writer (build, sync, reindex, tests) goes through this, so they always agree. */
+export function ftsRow(p: { name: string; city: string | null; near: string | null; postalCode: string | null; region: string; country: string; lat: number; lng: number }, info: RegionInfo): { name: string; loc: string; geo: string } {
+  return { name: tokenize(p.name).join(" "), loc: tokenize(locText(p, info)).join(" "), geo: geoText(p.lat, p.lng, p.country, p.region) };
+}
+
 // ── Hashes ──
 
 /** cyrb53-style 64-bit string hash. Only used to detect changed rows, so it needn't be cryptographic. */
@@ -254,11 +291,10 @@ export function project(c: ExportChurch, region: string, info: RegionInfo, near:
     pastorName: clean(c.pastorName),
     lastVerified: Number.isFinite(c.lastVerified) ? (c.lastVerified as number) : null,
   };
-  const place = base.city ?? base.near ?? "";
   return {
     ...base,
     completeness: completeness(base),
-    loc: [place, info.regionName, info.countryName].filter(Boolean).join(" "),
+    loc: locText(base, info),
     geo: geoText(c.lat, c.lng, c.country, region),
     docHash: hash64(JSON.stringify(base)),
     embedHash: hash64(embedText(base, info)),

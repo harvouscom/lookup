@@ -7,6 +7,7 @@ import { COUNTRIES, REGIONS } from "./regions.generated.ts";
 import { search } from "./search.ts";
 import { EMBED_COLUMNS, upsertRows, type EmbedRow } from "./embed.ts";
 import { tick } from "./sync.ts";
+import { reindexRange } from "./reindex.ts";
 
 export interface Env {
   DB: D1Database;
@@ -191,7 +192,7 @@ function sameKey(a: string, b: string): boolean {
   return d === 0;
 }
 
-/** Operator routes: backfill embeddings, run a sync now, read sync state. Behind ADMIN_KEY. */
+/** Operator routes: backfill embeddings, rewrite the search index, run a sync now, read sync state. Behind ADMIN_KEY. */
 async function handleAdmin(request: Request, env: Env, path: string): Promise<Response> {
   const key = request.headers.get("x-admin-key") ?? "";
   if (!env.ADMIN_KEY || !sameKey(key, env.ADMIN_KEY)) return fail(404, "not found");
@@ -203,6 +204,11 @@ async function handleAdmin(request: Request, env: Env, path: string): Promise<Re
     const { results } = await env.DB.prepare(`SELECT ${EMBED_COLUMNS} FROM church WHERE rowid >= ? AND rowid < ?`).bind(from, to).all<EmbedRow>();
     const n = await upsertRows({ AI: env.AI, VEC: env.VEC }, results);
     return json({ from, to, embedded: n }, 200, { "cache-control": "no-store" });
+  }
+  if (path === "/internal/reindex" && request.method === "POST") {
+    const from = Number(body.from), to = Number(body.to);
+    if (!Number.isInteger(from) || !Number.isInteger(to) || to <= from || to - from > 1000) return fail(400, "from and to must span 1 to 1000 rowids");
+    return json({ from, to, ...(await reindexRange(env.DB, from, to)) }, 200, { "cache-control": "no-store" });
   }
   if (path === "/internal/sync" && request.method === "POST") {
     if (!env.AI || !env.VEC) return fail(503, "AI is not bound");

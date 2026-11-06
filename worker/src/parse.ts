@@ -20,12 +20,16 @@ export const STOPWORDS: ReadonlySet<string> = new Set([
 
 const CONNECTORS = new Set(["in", "near", "at", "around"]);
 
+// The full form comes first: `canonical` compares by it.
 const SYNONYM_GROUPS = [
   ["saint", "st", "sankt"], ["sainte", "ste"], ["saints", "sts", "ss"], ["mount", "mt"], ["mountain", "mtn"], ["fort", "ft"],
   ["heilig", "hl", "heilige", "heiligen"], ["swietego", "sw", "swietej"], ["san", "sant"],
+  ["first", "1st"], ["second", "2nd"], ["third", "3rd"], ["fourth", "4th"], ["fifth", "5th"], ["seventh", "7th"],
+  ["baptist", "bapt"], ["methodist", "meth"], ["presbyterian", "presb", "presby", "pres"], ["lutheran", "luth"],
+  ["episcopal", "episc", "epis"], ["church", "ch"], ["assembly", "assemblies", "assy"], ["center", "centre", "ctr"],
+  ["international", "intl"],
 ];
-const SYNONYMS = new Map<string, string[]>();
-for (const g of SYNONYM_GROUPS) for (const t of g) SYNONYMS.set(t, g);
+export const SYNONYMS: ReadonlyMap<string, string[]> = new Map(SYNONYM_GROUPS.flatMap((g) => g.map((t) => [t, g] as const)));
 
 /** Other spellings a token may be indexed under: synonyms, and German `ue` for an indexed `u`. */
 export function variants(token: string): string[] {
@@ -48,7 +52,32 @@ export interface ParsedQuery {
   countryHint: string | null;
   /** The tokens to fall back to if the place words turn out not to be a place. */
   fallbackTokens: string[];
+  /**
+   * A lowercase trailing code such as "tx". It stays in `tokens` (it may be a word being typed, like
+   * "grace co"), and only adds rows in that region as matches and a small ranking bonus.
+   */
+  softRegion: string | null;
+  /**
+   * Words before a trailing region that may name a city ("dallas" in "first baptist dallas tx"), longest
+   * first. `rest` is what to search for if that key turns out to be a place in the region.
+   */
+  placeCandidates: { key: string; rest: string[] }[];
 }
+
+/** Codes read without a comma when lowercase: US and Canadian ones that aren't stopwords, plus a few short forms. */
+const REGION_ALIASES: Record<string, string> = { NSW: "AUNSW", QLD: "AUQLD", VIC: "AUVIC", TAS: "AUTAS", NRW: "DENW" };
+const SOFT_ALIASES = new Set(["nsw", "qld", "nrw"]);
+
+/** City nicknames read as a place at the end of a query, with a word before them ("st patricks nyc"). */
+const IMPLICIT_ALIASES = new Set(["nyc", "philly", "okc", "slc", "nola", "atl", "sf", "kc"]);
+/** Place-key spellings for nicknames. "la" and "vegas" are only read after a comma or connector. */
+const CITY_ALIASES: Record<string, string> = {
+  nyc: "new york", philly: "philadelphia", okc: "oklahoma city", slc: "salt lake city", nola: "new orleans",
+  atl: "atlanta", sf: "san francisco", kc: "kansas city", la: "los angeles", vegas: "las vegas",
+};
+const PLACE_SYNONYM_GROUPS = [["saint", "st", "ste", "sainte"], ["fort", "ft"], ["mount", "mt"], ["north", "n"], ["south", "s"], ["east", "e"], ["west", "w"]];
+const PLACE_SYNONYMS = new Map(PLACE_SYNONYM_GROUPS.flatMap((g) => g.map((t) => [t, g] as const)));
+const MAX_PLACE_KEYS = 12;
 
 function matchRegionSuffix(words: string[], preferCc?: string): { code: string | null; cc: string | null; used: number } {
   for (let n = Math.min(4, words.length); n >= 1; n--) {
@@ -64,13 +93,36 @@ function matchRegionSuffix(words: string[], preferCc?: string): { code: string |
   return { code: null, cc: null, used: 0 };
 }
 
-/** Only an uppercase code counts, unless the caller has already seen a comma or connector. */
+/** Only an uppercase or dotted code ("N.C.") counts, unless the caller has already seen a comma or connector. */
 function regionCode(word: string, allowLower: boolean): string | null {
+  const dotted = /^[a-z]\.[a-z]\.?,?$/i.test(word);
   const w = word.replace(/[.,]/g, "");
-  if (!allowLower && w !== w.toUpperCase()) return null;
+  if (!allowLower && !dotted && w !== w.toUpperCase()) return null;
   const up = w.toUpperCase();
-  if (/^D\.?C\.?$/.test(up)) return "DC";
+  if (up === "DC") return "DC";
+  if (REGION_ALIASES[up]) return REGION_ALIASES[up]!;
   return REGIONS[up] && /^[A-Z0-9]{2,6}$/.test(up) ? up : null;
+}
+
+/** A lowercase trailing code, read softly: a US or Canadian two-letter code that isn't a stopword, or nsw/qld/nrw. */
+function softCode(word: string): string | null {
+  const w = fold(word).replace(/[.,]/g, "");
+  if (SOFT_ALIASES.has(w)) return REGION_ALIASES[w.toUpperCase()]!;
+  if (!/^[a-z]{2}$/.test(w) || STOPWORDS.has(w)) return null;
+  const up = w.toUpperCase();
+  const r = REGIONS[up];
+  return r && (r.cc === "US" || r.cc === "CA") ? up : null;
+}
+
+/** The last 1-3 words as possible city names, always leaving one real search word. */
+function candidates(words: string[]): ParsedQuery["placeCandidates"] {
+  const out: ParsedQuery["placeCandidates"] = [];
+  for (let n = Math.min(3, words.length - 1); n >= 1; n--) {
+    const rest = toks(words.slice(0, words.length - n));
+    const key = toks(words.slice(-n)).join(" ");
+    if (key && rest.some((t) => !STOPWORDS.has(t))) out.push({ key, rest });
+  }
+  return out;
 }
 
 const toks = (words: string[]) => tokenize(words.join(" "));
@@ -101,7 +153,8 @@ function readPlace(words: string[], preferCc?: string, afterComma = false): Pick
 export function parseQuery(raw: string, preferCc?: string): ParsedQuery {
   const text = raw.trim().replace(/\s+/g, " ");
   const all = tokenize(text);
-  const plain = (): ParsedQuery => ({ tokens: all, placeKey: null, regionHint: null, countryHint: null, fallbackTokens: all });
+  const none = { softRegion: null, placeCandidates: [] };
+  const plain = (): ParsedQuery => ({ tokens: all, placeKey: null, regionHint: null, countryHint: null, fallbackTokens: all, ...none });
 
   // 1. Comma: everything after the first comma is place.
   const comma = text.indexOf(",");
@@ -110,7 +163,7 @@ export function parseQuery(raw: string, preferCc?: string): ParsedQuery {
     const after = text.slice(comma + 1).replace(/,/g, " ").trim();
     if (after) {
       const place = readPlace(after.split(" "), preferCc, true);
-      return { tokens: tokenize(before), ...place, fallbackTokens: all };
+      return { tokens: tokenize(before), ...place, fallbackTokens: all, ...none };
     }
     return plain();
   }
@@ -121,20 +174,34 @@ export function parseQuery(raw: string, preferCc?: string): ParsedQuery {
   for (let i = words.length - 2; i >= 0; i--) {
     if (CONNECTORS.has(fold(words[i]!))) {
       const place = readPlace(words.slice(i + 1), preferCc);
-      return { tokens: toks(words.slice(0, i)), ...place, fallbackTokens: all };
+      return { tokens: toks(words.slice(0, i)), ...place, fallbackTokens: all, ...none };
     }
   }
 
-  // 3. Trailing uppercase code, unless the whole query is shouting.
+  const last = words[words.length - 1]!;
+  const before = words.slice(0, -1);
+  const hasWord = (ws: string[]) => toks(ws).some((t) => !STOPWORDS.has(t));
+
+  // 3. Trailing uppercase or dotted code, unless the whole query is shouting.
   if (words.length > 1 && text !== text.toUpperCase()) {
-    const code = regionCode(words[words.length - 1]!, false);
-    if (code) return { tokens: toks(words.slice(0, -1)), placeKey: null, regionHint: code, countryHint: REGIONS[code]!.cc, fallbackTokens: all };
+    const code = regionCode(last, false);
+    if (code) return { tokens: toks(before), placeKey: null, regionHint: code, countryHint: REGIONS[code]!.cc, fallbackTokens: all, softRegion: null, placeCandidates: candidates(before) };
+  }
+
+  // 3b. A lowercase code is read softly: it may be the start of a word ("grace co" for Community).
+  const soft = words.length > 1 && hasWord(before) ? softCode(last) : null;
+  if (soft) return { tokens: all, placeKey: null, regionHint: null, countryHint: null, fallbackTokens: all, softRegion: soft, placeCandidates: candidates(before) };
+
+  // 3c. A trailing city nickname ("st patricks cathedral nyc").
+  if (words.length > 1 && IMPLICIT_ALIASES.has(fold(last)) && hasWord(before)) {
+    return { tokens: toks(before), placeKey: fold(last), regionHint: null, countryHint: null, fallbackTokens: all, ...none };
   }
 
   // 4. Trailing full region or country name, with search words left over.
   const m = matchRegionSuffix(words, preferCc);
   if (m.used && m.used < words.length) {
-    return { tokens: toks(words.slice(0, words.length - m.used)), placeKey: null, regionHint: m.code, countryHint: m.cc, fallbackTokens: all };
+    const rest = words.slice(0, words.length - m.used);
+    return { tokens: toks(rest), placeKey: null, regionHint: m.code, countryHint: m.cc, fallbackTokens: all, softRegion: null, placeCandidates: m.code ? candidates(rest) : [] };
   }
   return plain();
 }
@@ -145,10 +212,14 @@ export function requiredTokens(tokens: string[]): string[] {
   return kept.length ? kept : tokens;
 }
 
-/** Key spellings to try for a place, since `st louis` may be stored as `saint louis`. */
+/** Key spellings to try for a place: `st louis` may be stored as `saint louis`, `ft worth` as `fort worth`, `nyc` as `new york`. */
 export function placeKeys(key: string): string[] {
-  const parts = key.split(" ");
-  const out = new Set([key]);
-  if (SYNONYMS.has(parts[0]!)) for (const v of SYNONYMS.get(parts[0]!)!) out.add([v, ...parts.slice(1)].join(" "));
-  return [...out];
+  let keys = [""];
+  for (const part of key.split(" ")) {
+    const alts = PLACE_SYNONYMS.get(part) ?? [part];
+    keys = keys.flatMap((k) => alts.map((a) => (k ? `${k} ${a}` : a))).slice(0, MAX_PLACE_KEYS);
+  }
+  const out = new Set([key, ...keys]);
+  if (CITY_ALIASES[key]) out.add(CITY_ALIASES[key]!);
+  return [...out].slice(0, MAX_PLACE_KEYS);
 }

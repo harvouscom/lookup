@@ -1,0 +1,216 @@
+{
+ "system": "lookup-local",
+ "split": "all",
+ "overall": {
+  "n": 229,
+  "top1": 0.786,
+  "top5": 0.878,
+  "mrr": 0.822,
+  "zero": 0.004,
+  "errors": 0,
+  "p50": 134,
+  "p95": 267
+ },
+ "resolvable": {
+  "n": 203,
+  "top1": 0.867,
+  "top5": 0.931,
+  "mrr": 0.895,
+  "zero": 0.005,
+  "errors": 0,
+  "p50": 139,
+  "p95": 260
+ },
+ "commonNameNoLocation": {
+  "n": 26,
+  "top1": 0.154,
+  "top5": 0.462,
+  "mrr": 0.256,
+  "zero": 0,
+  "errors": 0,
+  "p50": 118,
+  "p95": 277
+ },
+ "byClass": {
+  "full-name": {
+   "n": 30,
+   "top1": 0.6,
+   "top5": 0.767,
+   "mrr": 0.663,
+   "zero": 0,
+   "errors": 0,
+   "p50": 116,
+   "p95": 241
+  },
+  "typeahead": {
+   "n": 30,
+   "top1": 0.667,
+   "top5": 0.767,
+   "mrr": 0.708,
+   "zero": 0,
+   "errors": 0,
+   "p50": 116,
+   "p95": 440
+  },
+  "typo": {
+   "n": 30,
+   "top1": 0.633,
+   "top5": 0.833,
+   "mrr": 0.697,
+   "zero": 0,
+   "errors": 0,
+   "p50": 176,
+   "p95": 236
+  },
+  "name-and-place": {
+   "n": 30,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 190,
+   "p95": 275
+  },
+  "must-work": {
+   "n": 9,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 127,
+   "p95": 355
+  },
+  "place": {
+   "n": 16,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 139,
+   "p95": 260
+  },
+  "saint": {
+   "n": 8,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 112,
+   "p95": 168
+  },
+  "abbreviation": {
+   "n": 15,
+   "top1": 0.867,
+   "top5": 1,
+   "mrr": 0.933,
+   "zero": 0,
+   "errors": 0,
+   "p50": 119,
+   "p95": 695
+  },
+  "diacritics": {
+   "n": 8,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 115,
+   "p95": 131
+  },
+  "common-word": {
+   "n": 12,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 99,
+   "p95": 154
+  },
+  "typo-hand": {
+   "n": 14,
+   "top1": 0.571,
+   "top5": 0.643,
+   "mrr": 0.607,
+   "zero": 0,
+   "errors": 0,
+   "p50": 189,
+   "p95": 478
+  },
+  "translation": {
+   "n": 5,
+   "top1": 0.6,
+   "top5": 0.6,
+   "mrr": 0.6,
+   "zero": 0,
+   "errors": 0,
+   "p50": 119,
+   "p95": 151
+  },
+  "state-code": {
+   "n": 8,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 128,
+   "p95": 272
+  },
+  "city-alias": {
+   "n": 3,
+   "top1": 1,
+   "top5": 1,
+   "mrr": 1,
+   "zero": 0,
+   "errors": 0,
+   "p50": 237,
+   "p95": 302
+  },
+  "typeahead-mid": {
+   "n": 3,
+   "top1": 0.333,
+   "top5": 1,
+   "mrr": 0.667,
+   "zero": 0,
+   "errors": 0,
+   "p50": 149,
+   "p95": 250
+  },
+  "ranking": {
+   "n": 3,
+   "top1": 0.667,
+   "top5": 1,
+   "mrr": 0.75,
+   "zero": 0,
+   "errors": 0,
+   "p50": 169,
+   "p95": 176
+  },
+  "postal": {
+   "n": 1,
+   "top1": 0,
+   "top5": 0,
+   "mrr": 0,
+   "zero": 1,
+   "errors": 0,
+   "p50": 155,
+   "p95": 155
+  },
+  "implicit-place": {
+   "n": 4,
+   "top1": 0.5,
+   "top5": 0.75,
+   "mrr": 0.625,
+   "zero": 0,
+   "errors": 0,
+   "p50": 137,
+   "p95": 227
+  }
+ }
+}

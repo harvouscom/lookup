@@ -21,6 +21,7 @@ mkdirSync(OUT_DIR, { recursive: true });
 const outFile = `${OUT_DIR}/${system}.jsonl`;
 
 const fold = (s) => (s ?? "").toLowerCase().replace(/ł/g, "l").replace(/ß/g, "ss").normalize("NFD").replace(/\p{M}/gu, "");
+const words = (s) => fold(s).replace(/['\u2019]s\b/g, "s").split(/[^\p{L}\p{N}]+/u).filter(Boolean).join(" ");
 const km = (a, lat, lng) => { const x = (lng - a.lng) * Math.cos(((a.lat + lat) / 2) * Math.PI / 180), y = lat - a.lat; return Math.sqrt(x * x + y * y) * 111.32; };
 
 /** Is this result relevant? Generated queries name acceptable ids; hand-written ones state a rule. */
@@ -32,6 +33,8 @@ function relevant(g, r) {
   if (w.nameAll && !w.nameAll.every((t) => name.includes(fold(t)))) return false;
   if (w.nameAny && !w.nameAny.some((t) => name.includes(fold(t)))) return false;
   if (w.anyField && !w.anyField.some((t) => any.includes(fold(t)))) return false;
+  // Whole words, so "ame" doesn't match "James".
+  if (w.nameWordsAny && !w.nameWordsAny.some((t) => ` ${words(r.name)} `.includes(` ${words(t)} `))) return false;
   if (w.region && r.region !== w.region && r.state !== w.region) return false;
   if (w.country && r.country !== w.country) return false;
   if (w.near) {

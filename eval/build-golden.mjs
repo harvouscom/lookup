@@ -5,7 +5,8 @@ const lines = (f) => readFileSync(f, "utf8").split("\n").filter(Boolean).map((l)
 const hash = (s) => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.codePointAt(0), 16777619); return (h >>> 0) % 100; };
 const all = [...lines("eval/golden-generated.jsonl"), ...lines("eval/golden-hand.jsonl")]
   // Must-work queries are checked as a release gate, so they sit outside the split.
-  .map((o) => ({ ...o, split: o.class === "must-work" ? "gate" : hash(o.id) < 60 ? "dev" : "test" }));
+  // Probes were written from failures already seen, so they stay out of the held-out split too.
+  .map((o) => ({ ...o, split: o.class === "must-work" ? "gate" : o.probe ? "probe" : hash(o.id) < 60 ? "dev" : "test" }));
 const ids = new Set();
 for (const o of all) { if (ids.has(o.id)) throw new Error(`duplicate ${o.id}`); ids.add(o.id); }
 writeFileSync("eval/golden.jsonl", all.map((o) => JSON.stringify(o)).join("\n") + "\n");

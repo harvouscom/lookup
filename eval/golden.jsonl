@@ -199,3 +199,31 @@
 {"id":"trans-church-pl","q":"church poznan","class":"translation","want":{"near":{"lat":52.41,"lng":16.93,"km":40}},"split":"dev"}
 {"id":"trans-church-fr","q":"church paris","class":"translation","want":{"near":{"lat":48.86,"lng":2.35,"km":40}},"split":"dev"}
 {"id":"trans-mormon","q":"mormon","class":"translation","want":{"anyField":["latter","lds"]},"split":"dev"}
+{"id":"code-lower-fbc-tx","q":"first baptist tx","class":"state-code","want":{"nameAll":["first","baptist"],"region":"TX"},"probe":true,"split":"probe"}
+{"id":"code-lower-saddleback","q":"saddleback lake forest ca","class":"state-code","want":{"nameAll":["saddleback"],"near":{"lat":33.65,"lng":-117.69,"km":30}},"probe":true,"split":"probe"}
+{"id":"code-lower-ame-atl","q":"ame church atlanta ga","class":"state-code","want":{"nameWordsAny":["ame","african methodist"],"near":{"lat":33.75,"lng":-84.39,"km":40}},"probe":true,"split":"probe"}
+{"id":"code-lower-ctk-dallas","q":"christ the king catholic dallas tx","class":"state-code","want":{"nameAll":["christ","king"],"near":{"lat":32.78,"lng":-96.8,"km":30}},"probe":true,"split":"probe"}
+{"id":"code-dotted-nc","q":"first baptist raleigh n.c.","class":"state-code","want":{"nameAll":["first","baptist"],"near":{"lat":35.78,"lng":-78.64,"km":30}},"probe":true,"split":"probe"}
+{"id":"code-alias-nsw","q":"st marys nsw","class":"state-code","want":{"nameAll":["mary"],"region":"AUNSW"},"probe":true,"split":"probe"}
+{"id":"code-guard-iglesia-de","q":"iglesia de","class":"state-code","loc":{"lat":40.42,"lng":-3.7},"want":{"nameAll":["iglesia"]},"probe":true,"split":"probe"}
+{"id":"code-guard-grace-co","q":"grace co","class":"state-code","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["grace","co"]},"probe":true,"split":"probe"}
+{"id":"alias-nyc","q":"st patricks cathedral nyc","class":"city-alias","want":{"nameAll":["patrick","cathedral"],"near":{"lat":40.76,"lng":-73.98,"km":15}},"probe":true,"split":"probe"}
+{"id":"alias-in-la","q":"grace church in la","class":"city-alias","want":{"nameAll":["grace"],"near":{"lat":34.05,"lng":-118.24,"km":50}},"probe":true,"split":"probe"}
+{"id":"alias-philly","q":"first baptist philly","class":"city-alias","want":{"nameAll":["first","baptist"],"near":{"lat":39.95,"lng":-75.17,"km":30}},"probe":true,"split":"probe"}
+{"id":"abbr-fbc-dallas","q":"fbc dallas","class":"abbreviation","loc":{"lat":32.78,"lng":-96.8},"want":{"nameWordsAny":["first baptist","fbc"],"near":{"lat":32.78,"lng":-96.8,"km":40}},"probe":true,"split":"probe"}
+{"id":"abbr-umc-austin","q":"umc austin","class":"abbreviation","want":{"nameWordsAny":["united methodist","umc"],"near":{"lat":30.27,"lng":-97.74,"km":40}},"probe":true,"split":"probe"}
+{"id":"abbr-first-umc-houston","q":"first umc houston","class":"abbreviation","want":{"nameAll":["first"],"nameWordsAny":["united methodist","umc"],"near":{"lat":29.76,"lng":-95.37,"km":40}},"probe":true,"split":"probe"}
+{"id":"abbr-1st-baptist","q":"1st baptist dallas","class":"abbreviation","want":{"nameWordsAny":["first baptist","1st baptist"],"near":{"lat":32.78,"lng":-96.8,"km":40}},"probe":true,"split":"probe"}
+{"id":"abbr-first-meth","q":"first meth houston","class":"abbreviation","want":{"nameAll":["first","methodist"],"near":{"lat":29.76,"lng":-95.37,"km":40}},"probe":true,"split":"probe"}
+{"id":"abbr-pres-ch","q":"first presbyterian ch austin","class":"abbreviation","want":{"nameAll":["first","presbyterian"],"near":{"lat":30.27,"lng":-97.74,"km":40}},"probe":true,"split":"probe"}
+{"id":"mid-first-bap-church","q":"first bap church dallas","class":"typeahead-mid","want":{"nameAll":["first","baptist"],"near":{"lat":32.78,"lng":-96.8,"km":40}},"probe":true,"split":"probe"}
+{"id":"mid-grac-comm-church","q":"grac comm church","class":"typeahead-mid","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["grace","community"]},"probe":true,"split":"probe"}
+{"id":"mid-first-bapt-church","q":"first bapt church dallas","class":"typeahead-mid","want":{"nameAll":["first","baptist"],"near":{"lat":32.78,"lng":-96.8,"km":40}},"probe":true,"split":"probe"}
+{"id":"rank-calvary-fll","q":"calvary chapel","class":"ranking","loc":{"lat":26.12,"lng":-80.14},"want":{"nameAll":["calvary","chapel"],"near":{"lat":26.12,"lng":-80.14,"km":50}},"probe":true,"split":"probe"}
+{"id":"rank-fbc-dallas-place","q":"first baptist, dallas tx","class":"ranking","want":{"nameAll":["first","baptist"],"near":{"lat":32.78,"lng":-96.8,"km":12}},"probe":true,"split":"probe"}
+{"id":"rank-guard-lakewood","q":"lakewood church","class":"ranking","loc":{"lat":32.78,"lng":-96.8},"want":{"nameAll":["lakewood"],"near":{"lat":29.68,"lng":-95.43,"km":20}},"probe":true,"split":"probe"}
+{"id":"postal-grace-75201","q":"grace 75201","class":"postal","want":{"nameAll":["grace"],"near":{"lat":32.79,"lng":-96.8,"km":10}},"probe":true,"split":"probe"}
+{"id":"implicit-calvary-fll","q":"calvary chapel fort lauderdale","class":"implicit-place","want":{"nameAll":["calvary","chapel"],"near":{"lat":26.12,"lng":-80.14,"km":30}},"probe":true,"split":"probe"}
+{"id":"implicit-fbc-dallas","q":"first baptist dallas","class":"implicit-place","want":{"nameAll":["first","baptist"],"near":{"lat":32.78,"lng":-96.8,"km":30}},"probe":true,"split":"probe"}
+{"id":"implicit-guard-new-hope","q":"new hope baptist","class":"implicit-place","want":{"nameAll":["new","hope","baptist"]},"probe":true,"split":"probe"}
+{"id":"implicit-guard-st-paul","q":"st paul lutheran","class":"implicit-place","want":{"nameAny":["st","saint"],"nameAll":["paul","lutheran"]},"probe":true,"split":"probe"}

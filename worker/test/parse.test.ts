@@ -44,7 +44,52 @@ describe("parseQuery", () => {
   });
 });
 
+describe("lowercase codes and city names", () => {
+  it("keeps a lowercase code as a word but reads it softly", () => {
+    const p = parseQuery("first baptist tx");
+    expect(p).toMatchObject({ tokens: ["first", "baptist", "tx"], softRegion: "TX", regionHint: null });
+    expect(p.placeCandidates.map((c) => c.key)).toEqual(["baptist"]);
+  });
+  it("offers the words before a code as a city", () => {
+    const p = parseQuery("saddleback lake forest ca");
+    expect(p.softRegion).toBe("CA");
+    expect(p.placeCandidates).toEqual([
+      { key: "lake forest", rest: ["saddleback"] },
+      { key: "forest", rest: ["saddleback", "lake"] },
+    ]);
+    expect(parseQuery("first baptist dallas TX")).toMatchObject({ regionHint: "TX", tokens: ["first", "baptist", "dallas"] });
+    expect(parseQuery("first baptist dallas TX").placeCandidates[0]).toEqual({ key: "baptist dallas", rest: ["first"] });
+  });
+  it("leaves words being typed alone", () => {
+    expect(parseQuery("grace co")).toMatchObject({ softRegion: "CO", placeCandidates: [] });
+    for (const q of ["church in", "iglesia de", "grace church la", "tx"]) expect(parseQuery(q).softRegion, q).toBeNull();
+  });
+  it("reads dotted codes and short forms like uppercase", () => {
+    expect(parseQuery("first baptist n.c.")).toMatchObject({ regionHint: "NC", tokens: ["first", "baptist"] });
+    expect(parseQuery("kirche NRW")).toMatchObject({ regionHint: "DENW" });
+    expect(parseQuery("st marys nsw")).toMatchObject({ softRegion: "AUNSW" });
+  });
+  it("reads a trailing city nickname as a place", () => {
+    expect(parseQuery("st patricks cathedral nyc")).toMatchObject({ placeKey: "nyc", tokens: ["st", "patricks", "cathedral"] });
+    expect(parseQuery("grace, la")).toMatchObject({ regionHint: "LA", placeKey: null });
+    expect(parseQuery("grace in la")).toMatchObject({ placeKey: "la" });
+  });
+  it("tries every spelling of a place", () => {
+    expect(placeKeys("ft worth")).toContain("fort worth");
+    expect(placeKeys("n charleston")).toContain("north charleston");
+    expect(placeKeys("nyc")).toContain("new york");
+    expect(placeKeys("la")).toContain("los angeles");
+    expect(placeKeys("st louis")).toContain("saint louis");
+  });
+});
+
 describe("helpers", () => {
+  it("knows common short forms", () => {
+    expect(canonical("bapt")).toBe("baptist");
+    expect(canonical("1st")).toBe("first");
+    expect(variants("1st")).toContain("first");
+    expect(variants("pres")).toContain("presbyterian");
+  });
   it("drops stopwords only when something remains", () => {
     expect(requiredTokens(["church", "of", "christ"])).toEqual(["church", "christ"]);
     expect(requiredTokens(["the"])).toEqual(["the"]);

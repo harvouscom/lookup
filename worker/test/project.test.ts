@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanServiceTimes, cellsAround, completeness, exclusionReason, fold, geohash, hash64, isOfficeHours, project, stripPostcode, tokenize } from "../src/project.ts";
+import { cleanServiceTimes, cellsAround, completeness, exclusionReason, fold, ftsRow, geohash, hash64, isOfficeHours, postalTokens, project, regionToken, stripPostcode, tokenize } from "../src/project.ts";
 
 const info = { regionName: "Texas", countryName: "United States" };
 const base = { id: "TX-1", name: "Grace Church", country: "US", lat: 32.7, lng: -96.8 };
@@ -78,12 +78,32 @@ describe("project", () => {
     const p = project(base, "TX", info, "Dallas");
     expect(p.city).toBeNull();
     expect(p.near).toBe("Dallas");
-    expect(p.loc).toBe("Dallas Texas United States");
+    expect(p.loc).toBe("Dallas Texas tx United States");
   });
   it("ignores near when a city exists", () => {
     const p = project({ ...base, city: "Plano" }, "TX", info, "Dallas");
     expect(p.near).toBeNull();
-    expect(p.loc).toBe("Plano Texas United States");
+    expect(p.loc).toBe("Plano Texas tx United States");
+  });
+  it("puts postcodes and short region codes in loc", () => {
+    expect(project({ ...base, city: "Dallas", postcode: "75201-1234" }, "TX", info).loc).toBe("Dallas 75201 Texas tx United States");
+    expect(postalTokens("M5V 3L9", "CA")).toEqual(["m5v", "3l9", "m5v3l9"]);
+    expect(postalTokens("SW1A 1AA", "GB")).toEqual(["sw1a", "1aa", "sw1a1aa"]);
+    expect(postalTokens("80331", "DE")).toEqual(["80331"]);
+    expect(postalTokens(null, "US")).toEqual([]);
+  });
+  it("leaves out region codes that collide with words", () => {
+    expect(regionToken("TX", "US")).toBe("tx");
+    expect(regionToken("IN", "US")).toBeNull();
+    expect(regionToken("MT", "US")).toBeNull();
+    expect(regionToken("ON", "CA")).toBeNull();
+    expect(regionToken("AUNSW", "AU")).toBe("nsw");
+    expect(regionToken("DEBY", "DE")).toBeNull();
+  });
+  it("builds the same fts row every writer uses", () => {
+    const row = ftsRow({ name: "St. Mary's", city: "Dallas", near: null, postalCode: "75201", region: "TX", country: "US", lat: 32.78, lng: -96.8 }, info);
+    expect(row).toMatchObject({ name: "st marys", loc: "dallas 75201 texas tx united states" });
+    expect(row.geo).toContain("rtx");
   });
   it("doc hash changes with content, embed hash only with embedded text", () => {
     const a = project(base, "TX", info);
