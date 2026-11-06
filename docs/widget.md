@@ -26,7 +26,7 @@ It also asks for smarter results when people pause. Change the options below to 
           <div class="wo-f" role="group" aria-label="near"><code>near</code><div class="wo-chips">
             <button type="button" class="ba-chip" data-near="" aria-pressed="true">visitor</button><button type="button" class="ba-chip" data-near="Dallas" aria-pressed="false">Dallas</button><button type="button" class="ba-chip" data-near="Toronto" aria-pressed="false">Toronto</button><button type="button" class="ba-chip" data-near="London" aria-pressed="false">London</button>
           </div></div>
-          <label class="wo-f"><code>limit</code><span class="wo-range"><input type="range" data-opt="limit" min="1" max="20" value="8"><output id="wo-limit">8</output></span></label>
+          <label class="wo-f"><code>limit</code><span class="wo-range"><input type="range" data-opt="limit" min="1" max="50" value="8"><output id="wo-limit">8</output></span></label>
         </div>
         <div class="wo-sec">
           <span class="ba-l">behavior</span>
@@ -56,11 +56,20 @@ It also asks for smarter results when people pause. Change the options below to 
 | `lang` | English, Spanish, French, German, Portuguese or Polish. Defaults to the page's language. Set the `strings` property to change any text. |
 | `region`, `country` | Limit results, such as `region="TX"` or `country="DE"`. |
 | `near` | Rank results near a place, such as `near="Dallas"`. |
+| `lat`, `lng` | Rank results near a point, such as the device's location. Set both. |
 | `geo="off"` | Don't use the visitor's approximate location. |
 | `form` | The id of the form to fill. Defaults to the enclosing form. |
+| `fill` | Which fields to fill. See [Fields](#fields). `auto` adds plain names like `city`, `tagged` uses only tags, `off` fills nothing. |
 | `overwrite` | Replace fields that already have values. |
-| `limit` | How many results to show, up to 20. Defaults to 8. |
+| `limit` | Results on the first page and each **Show more**. Defaults to 8. |
+| `max-results` | The most results **Show more** can reach, up to 50. Defaults to 50. Set it to `limit` to hide Show more. |
+| `density="comfortable"` | Taller rows with larger icons. Rows are compact by default. |
 | `icons="none"` | Hide the icon beside each result. |
+| `show-distance="off"` | Hide how far away each church is. |
+| `min-chars` | Characters typed before searching. Defaults to 2. |
+| `debounce` | Milliseconds to wait after typing before searching. Defaults to 150. |
+| `semantic="off"` | Skip the slower search after a pause, which can find churches by meaning. |
+| `disabled` | Turn the field off, like any input. A disabled `fieldset` does the same. |
 | `contribute="off"` | Don't offer to share corrections back to Here's My Church. |
 | `client` | Your app's name, sent with requests. Use `lookup-demo` while testing. |
 
@@ -78,6 +87,7 @@ It's a real form field. Give it a `name` and the chosen church's ID submits with
 <!-- Posts church_id=CA-ON-56994145&city=Thorold -->
 ```
 ```tsx title="react"
+"use client"; // Next.js: load the element in a client component.
 import "@heresmychurch/lookup/element";
 import type {} from "@heresmychurch/lookup/react";
 
@@ -101,7 +111,17 @@ function ChurchField({ onChange }) {
 
 ## Fields
 
-Use any of these in `data-hmc-field`: `name`, `street`, `city`, `region`, `regionName`, `postalCode`, `country`, `countryName`, `latitude`, `longitude`, `phone`, `email`, `website`, `denomination`, `serviceTimes`, `languages`, `ministries`, `pastorName` and `id`.
+Fields named for the church fill without any setup: `church_city`, `churchWebsite`, `church[phone]`, or `autocomplete="section-church address-level2"`. It reads the field's `name`, `id` and `autocomplete`, and skips address line 2, hidden fields and passwords.
+
+On a form that's only about the church, add `fill="auto"` and plain names fill too: `city`, `state`, `zip`, `phone`, `email`, `website`, or autocomplete tokens like `postal-code` and `tel`. A plain `name` or `id` never fills, since on most forms those are the person's.
+
+To say exactly which field gets what, tag it with `data-hmc-field`. A tag always wins, and `data-hmc-field="none"` leaves a field alone. Use any of these: `name`, `street`, `city`, `region`, `regionName`, `postalCode`, `country`, `countryName`, `latitude`, `longitude`, `phone`, `email`, `website`, `denomination`, `serviceTimes`, `languages`, `ministries`, `pastorName` and `id`.
+
+A `<select>` fills when one of its options matches by value or text, as a code or a name: `TX` or `Texas`, `US` or `United States`. For fields outside the form, set the `fieldMap` property to a field name and an element or selector each:
+
+```js
+document.querySelector("church-lookup").fieldMap = { website: "#site-url", phone: phoneInput };
+```
 
 ## Icons
 
@@ -118,13 +138,14 @@ Use the icons your design system already has. Put one with `slot="search-icon"` 
 
 | Event | When it fires |
 |---|---|
-| `church-results` | Results appeared. `detail` has `query`, `results` and `settled`. |
+| `church-results` | Results appeared. `detail` has `query`, `results`, `settled`, and `more` when they came from **Show more**. |
 | `church-select` | A church was chosen. Cancel it to stop the fill. |
 | `church-fill` | Fields are about to fill. Cancel it to fill them yourself from `detail.record`. |
 | `church-clear` | The choice was cleared, with the clear button or by editing the name. |
+| `church-error` | A search or a church's details failed to load. `detail` has `query` or `id`, plus `status`, `code`, `retryAfter` and the `error`. |
 | `church-contribute` | Someone chose Share. `detail` has `churchId` and `changes`. Cancel it to send them yourself, or not at all. |
 | `church-confirm` | Someone chose Still correct. Cancel it to skip the confirmation. |
 
 ## Accessibility
 
-An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. Results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.
+An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. **Show more** is the last option, so the arrow keys reach it too, and pressing down on it loads the next page. Results, added results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.

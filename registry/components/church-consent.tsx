@@ -13,12 +13,13 @@ import {
   consentDiff,
   contributable,
   createLookup,
-  EN,
   fieldValue,
+  stringsFor,
   type ChurchRecord,
   type FieldStatus,
   type Lookup,
   type Meta,
+  type Strings,
 } from "@/lib/lookup-core"
 
 export interface ChurchConsentProps {
@@ -33,13 +34,23 @@ export interface ChurchConsentProps {
   baseUrl?: string
   lookup?: Lookup
   onShared?: (results: { field: string; status: FieldStatus; message?: string }[], sandbox: boolean) => void
+  /** Text language, such as "es". Defaults to the page's. Load other languages with @/lib/lookup-strings. */
+  lang?: string
+  /** Override any text. */
+  strings?: Partial<Strings>
   className?: string
 }
 
 type Result = { status: FieldStatus; message?: string }
 
-export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lookup: own, onShared, className }: ChurchConsentProps) {
+export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lookup: own, onShared, lang, strings, className }: ChurchConsentProps) {
   const lookup = React.useMemo(() => own ?? createLookup({ client, baseUrl }), [own, client, baseUrl])
+  const t = React.useMemo<Strings>(
+    () => ({ ...stringsFor(lang ?? (typeof document === "undefined" ? "" : document.documentElement.lang)), ...strings }),
+    [lang, strings]
+  )
+  // Unique per instance, so two panels on a page don't share ids.
+  const uid = React.useId()
   const [meta, setMeta] = React.useState<Meta | null>(null)
   const [checked, setChecked] = React.useState<Record<string, boolean>>({})
   const [sent, setSent] = React.useState<Map<string, string>>(new Map())
@@ -110,15 +121,15 @@ export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lo
   if (!changed.length && !results) {
     if (dismissed === "confirm") return null
     return (
-      <div className={box} role="region" aria-label={EN.confirmQ}>
+      <div className={box} role="region" aria-label={t.confirmQ}>
         {confirm ? (
-          <p role="status">{confirm === "done" ? EN.thanks : EN.st.try_again}</p>
+          <p role="status">{confirm === "done" ? t.thanks : t.st.try_again}</p>
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p>{EN.confirmQ}</p>
+            <p>{t.confirmQ}</p>
             <div className="flex gap-2">
-              <Button type="button" size="sm" onClick={stillCorrect}>{EN.stillCorrect}</Button>
-              <Button type="button" size="sm" variant="ghost" onClick={() => setDismissed("confirm")}>{EN.notNow}</Button>
+              <Button type="button" size="sm" onClick={stillCorrect}>{t.stillCorrect}</Button>
+              <Button type="button" size="sm" variant="ghost" onClick={() => setDismissed("confirm")}>{t.notNow}</Button>
             </div>
           </div>
         )}
@@ -130,17 +141,17 @@ export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lo
   const nothingLeft = results && !changed.some((r) => r.rule.status !== "coming_soon")
 
   return (
-    <div className={box} role="region" aria-labelledby="hmc-consent-h">
-      <h3 id="hmc-consent-h" className="font-medium">{EN.shareTitle}</h3>
-      <p className="text-muted-foreground mt-1">{EN.shareBody}</p>
+    <div className={box} role="region" aria-labelledby={`${uid}-h`}>
+      <h3 id={`${uid}-h`} className="font-medium">{t.shareTitle}</h3>
+      <p className="text-muted-foreground mt-1">{t.shareBody}</p>
       <ul className="mt-3 grid gap-2">
         {shown.map((r) => {
           const res = results?.get(r.field)
           const soon = r.rule.status === "coming_soon"
-          const id = `hmc-consent-${r.field}`
+          const id = `${uid}-${r.field}`
           const badge = res
-            ? res.status === "rejected" && res.message ? `${EN.st.rejected}: ${res.message}` : EN.st[res.status]
-            : soon ? EN.soon : r.rule.review === "moderated" ? EN.reviewed : EN.goesLive
+            ? res.status === "rejected" && res.message ? `${t.st.rejected}: ${res.message}` : t.st[res.status]
+            : soon ? t.soon : r.rule.review === "moderated" ? t.reviewed : t.goesLive
           return (
             <li key={r.field} className="bg-background flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-3 py-2">
               <Checkbox
@@ -159,14 +170,14 @@ export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lo
         })}
       </ul>
       <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
-        {sandbox && <p className="text-muted-foreground mr-auto text-xs">{EN.sandbox}</p>}
+        {sandbox && <p className="text-muted-foreground mr-auto text-xs">{t.sandbox}</p>}
         {!nothingLeft && (
           <Button type="button" size="sm" onClick={share} disabled={!canShare || busy}>
-            {busy ? EN.sending : EN.share}
+            {busy ? t.sending : t.share}
           </Button>
         )}
         <Button type="button" size="sm" variant="ghost" onClick={() => { setDismissed(sig); setResults(null) }}>
-          {nothingLeft ? EN.done : EN.notNow}
+          {nothingLeft ? t.done : t.notNow}
         </Button>
       </div>
     </div>

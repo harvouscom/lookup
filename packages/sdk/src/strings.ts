@@ -12,6 +12,14 @@ export interface Strings {
   noneShort: string;
   error: string;
   found: (n: number) => string;
+  /** The row after the results that loads more, and its text while loading. */
+  more: string;
+  loading: string;
+  /** Announced when more results are added. */
+  moreFound: (n: number) => string;
+  /** Shown above the results when a misspelling was searched as something else. */
+  corrected: (q: string) => string;
+  retry: string;
   filled: (n: number, missing: string[]) => string;
   loadFail: string;
   dataFrom: string;
@@ -39,7 +47,7 @@ export interface Strings {
 
 /** Shared across separately loaded bundles, so a language file can register into the element. */
 const REG_KEY = "__hmcLookupStrings";
-type Registry = Record<string, Strings>;
+type Registry = Record<string, Partial<Strings>>;
 export const registry = (): Registry => ((globalThis as unknown as Record<string, Registry>)[REG_KEY] ??= {});
 
 const list = (m: string[], label: string) => (m.length ? ` ${label} ${m.join(", ")}.` : "");
@@ -52,6 +60,11 @@ export const EN: Strings = {
     noneShort: "No matching church.",
     error: "Search isn't available right now. You can keep typing your church's details.",
     found: (n) => `${n} ${n === 1 ? "church" : "churches"} found. Use up and down arrows to choose.`,
+    more: "Show more results",
+    loading: "Loading…",
+    moreFound: (n) => `${n} more ${n === 1 ? "church" : "churches"}.`,
+    corrected: (q) => `Showing results for “${q}”`,
+    retry: "Try again",
     filled: (n, m) => `Filled ${n} ${n === 1 ? "field" : "fields"}.${list(m, "Not available:")}`,
     loadFail: "Couldn't load that church's details. You can type them in.",
     dataFrom: "Data from",
@@ -79,13 +92,13 @@ export const EN: Strings = {
 export const LANGS = ["es", "fr", "de", "pt", "pl"];
 
 /** Add or replace a language. Elements already on the page pick it up. */
-export function registerStrings(lang: string, strings: Strings): void {
+export function registerStrings(lang: string, strings: Partial<Strings>): void {
   registry()[lang] = strings;
   if (typeof document !== "undefined") document.dispatchEvent(new Event("hmc-strings"));
 }
 
-/** The strings for a language tag such as "es-MX", falling back to English. */
+/** The strings for a language tag such as "es-MX". Anything a language leaves out is English. */
 export function stringsFor(lang: string | null | undefined): Strings {
   const base = (lang ?? "").toLowerCase().split("-")[0]!;
-  return registry()[base] ?? EN;
+  return { ...EN, ...registry()[base] };
 }

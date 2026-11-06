@@ -21,9 +21,30 @@ describe("client", () => {
     expect(f.calls[0]).toBe("http://localhost:8787/v1/churches/TX%2F1%202");
   });
   it("throws LookupError with retry-after", async () => {
-    const f = fake({ error: "overloaded" }, 503, { "retry-after": "2" });
+    const f = fake({ error: "overloaded", code: "overloaded" }, 503, { "retry-after": "2" });
     const err = await createLookup({ fetch: f.fetch }).search("grace").catch((e) => e);
     expect(err).toBeInstanceOf(LookupError);
-    expect(err).toMatchObject({ status: 503, message: "overloaded", retryAfter: 2 });
+    expect(err).toMatchObject({ name: "LookupError", status: 503, message: "overloaded", retryAfter: 2, code: "overloaded" });
+  });
+  it("survives an error body that isn't JSON", async () => {
+    const fetch = (async () => new Response("<html>Bad gateway</html>", { status: 502, statusText: "Bad Gateway" })) as unknown as typeof globalThis.fetch;
+    const err = await createLookup({ fetch }).search("grace").catch((e) => e);
+    expect(err).toMatchObject({ status: 502, message: "Bad Gateway", code: undefined });
+  });
+  it("follows a church that moved, unless asked not to", async () => {
+    const calls: string[] = [];
+    const fetch = (async (url: string) => {
+      calls.push(url);
+      return Response.json(url.endsWith("/OLD") ? { id: "OLD", movedTo: "NEW" } : { id: "NEW", fields: { name: "Grace" } });
+    }) as unknown as typeof globalThis.fetch;
+    const lookup = createLookup({ fetch });
+    expect(await lookup.getChurch("OLD")).toMatchObject({ id: "NEW", movedFrom: "OLD", fields: { name: "Grace" } });
+    expect(await lookup.getChurch("OLD", { follow: false })).toEqual({ id: "OLD", movedTo: "NEW" });
+    expect(calls).toHaveLength(3);
+  });
+  it("sends lat and lng", async () => {
+    const f = fake({ results: [] });
+    await createLookup({ fetch: f.fetch }).search("grace", { lat: 32.78, lng: -96.8 });
+    expect(new URL(f.calls[0]!).searchParams.get("lat")).toBe("32.78");
   });
 });

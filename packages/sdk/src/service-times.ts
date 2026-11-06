@@ -83,7 +83,10 @@ button{cursor:pointer;font-weight:500}
 const opt = (values: [string, string][], selected: string) =>
   values.map(([v, t]) => `<option value="${v}"${v === selected ? " selected" : ""}>${t}</option>`).join("");
 
-export class ChurchServiceTimes extends HTMLElement {
+// Importing on a server, as Next.js does while rendering, defines the class without registering it.
+const Base = (typeof HTMLElement === "undefined" ? class {} : HTMLElement) as typeof HTMLElement;
+
+export class ChurchServiceTimes extends Base {
   entries: ServiceEntry[] = [];
   private field: HTMLInputElement | HTMLTextAreaElement | null = null;
   private box!: HTMLDivElement;

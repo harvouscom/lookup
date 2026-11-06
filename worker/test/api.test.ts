@@ -108,6 +108,25 @@ describe("search", () => {
     expect(res.headers.get("access-control-allow-origin")).toBe("*");
     expect(body.attribution).toContain("OpenStreetMap");
   });
+  it("allows up to 50 results and says when there are more", async () => {
+    expect((await s("church", "&limit=50")).res.status).toBe(200);
+    const over = await s("church", "&limit=51");
+    expect(over.res.status).toBe(400);
+    expect(over.body.code).toBe("invalid");
+    expect(over.body.error).toContain("50");
+    const few = await s("church", "&limit=2");
+    expect(few.body.results).toHaveLength(2);
+    expect(few.body.hasMore).toBe(true);
+    const all = await s("church", "&limit=50");
+    expect(all.body.hasMore).toBe(false);
+    expect(all.body.results.slice(0, 2).map((r: any) => r.id)).toEqual(few.body.results.map((r: any) => r.id));
+    expect((await s("g")).body).toMatchObject({ results: [], hasMore: false, semantic: "skipped" });
+  });
+  it("exposes the headers the SDK reads to other origins", async () => {
+    const { res } = await s("grace");
+    expect(res.headers.get("access-control-expose-headers")).toContain("retry-after");
+    expect(res.headers.get("access-control-expose-headers")).toContain("x-lookup-degraded");
+  });
   it("orders bands", async () => {
     const { body } = await s("grace");
     for (let i = 1; i < body.results.length; i++) expect(body.results[i].band).toBeGreaterThanOrEqual(body.results[i - 1].band);
@@ -127,7 +146,11 @@ describe("churches", () => {
     expect(body.fields.regionName).toBe("Texas");
   });
   it("reports moved ids", async () => expect((await get("/v1/churches/OLD-1")).body.movedTo).toBe("R-0"));
-  it("404s unknown ids", async () => expect((await get("/v1/churches/nope")).res.status).toBe(404));
+  it("404s unknown ids", async () => {
+    const { res, body } = await get("/v1/churches/nope");
+    expect(res.status).toBe(404);
+    expect(body.code).toBe("not_found");
+  });
 });
 
 describe("meta and routing", () => {
@@ -156,7 +179,7 @@ describe("failure handling", () => {
     const res = await call("D1_ERROR: D1 DB is overloaded. Too many resources consumed within a 10 second window", "overloadtest");
     expect(res.status).toBe(503);
     expect(res.headers.get("retry-after")).toBe("2");
-    expect(((await res.json()) as any).error).toBe("overloaded");
+    expect(((await res.json()) as any)).toMatchObject({ error: "overloaded", code: "overloaded" });
   });
   it("hides other errors", async () => {
     const res = await call("no such table: secret_table", "errortest");
@@ -167,5 +190,6 @@ describe("failure handling", () => {
     const res = await worker.fetch(new Request("https://lookup.test/v1/search?q=grace"), { DB: env.DB, RL_SEARCH: { limit: async () => ({ success: false }) } as unknown as RateLimit }, ctx);
     expect(res.status).toBe(429);
     expect(res.headers.get("retry-after")).toBe("60");
+    expect(((await res.json()) as any).code).toBe("rate_limited");
   });
 });

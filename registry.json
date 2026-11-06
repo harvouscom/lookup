@@ -8,12 +8,27 @@
       "type": "registry:component",
       "title": "Church Lookup",
       "description": "A church search box that fills your form from Here's My Church. Built on Command and Popover; works with React Hook Form.",
-      "dependencies": ["lucide-react", "cmdk"],
-      "registryDependencies": ["command", "popover"],
+      "dependencies": [
+        "lucide-react",
+        "cmdk"
+      ],
+      "registryDependencies": [
+        "command",
+        "popover"
+      ],
       "files": [
-        { "path": "registry/components/church-lookup.tsx", "type": "registry:component" },
-        { "path": "registry/hooks/use-church-lookup.ts", "type": "registry:hook" },
-        { "path": "registry/lib/lookup-core.ts", "type": "registry:lib" }
+        {
+          "path": "registry/components/church-lookup.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/hooks/use-church-lookup.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/lib/lookup-core.ts",
+          "type": "registry:lib"
+        }
       ]
     },
     {
@@ -22,8 +37,14 @@
       "title": "useChurchLookup",
       "description": "Lookup's search engine as a React hook, for building your own church picker.",
       "files": [
-        { "path": "registry/hooks/use-church-lookup.ts", "type": "registry:hook" },
-        { "path": "registry/lib/lookup-core.ts", "type": "registry:lib" }
+        {
+          "path": "registry/hooks/use-church-lookup.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/lib/lookup-core.ts",
+          "type": "registry:lib"
+        }
       ]
     },
     {
@@ -31,10 +52,36 @@
       "type": "registry:component",
       "title": "Church Consent",
       "description": "Offer to share corrections back to Here's My Church after a fill. Every change starts unchecked.",
-      "registryDependencies": ["checkbox", "badge", "button"],
+      "registryDependencies": [
+        "checkbox",
+        "badge",
+        "button"
+      ],
       "files": [
-        { "path": "registry/components/church-consent.tsx", "type": "registry:component" },
-        { "path": "registry/lib/lookup-core.ts", "type": "registry:lib" }
+        {
+          "path": "registry/components/church-consent.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/lib/lookup-core.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "lookup-strings",
+      "type": "registry:lib",
+      "title": "Lookup languages",
+      "description": "Spanish, French, German, Portuguese and Polish text for ChurchLookup and ChurchConsent. Import it once, then set lang.",
+      "files": [
+        {
+          "path": "registry/lib/lookup-strings.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/lib/lookup-core.ts",
+          "type": "registry:lib"
+        }
       ]
     }
   ]

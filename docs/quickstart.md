@@ -16,7 +16,8 @@ Add a church search field to the form in this project where people enter a churc
    - `name` submits the chosen church's ID with the form. Store it so you can look the church up again.
    - Add `required` if a church must be chosen.
    - On an edit screen, set `value` to the saved ID.
-3. Tag the existing inputs with data-hmc-field. Use only these names:
+3. Inputs named for the church (church_city, churchWebsite) fill on their own. Tag the other
+   existing inputs with data-hmc-field. Use only these names:
    name, street, city, region, regionName, postalCode, country, countryName, latitude, longitude,
    phone, email, website, denomination, serviceTimes, languages, ministries, pastorName, id
    Don't create new inputs unless I ask. Don't rename existing ones.
@@ -45,7 +46,7 @@ Or set it up yourself. There's no key to request.
 
 ## 2. Put the search box in your form
 
-Tag the fields it should fill with `data-hmc-field`. Give it a `name` and the chosen church's ID submits with the form.
+Fields named for the church, like `church_city`, fill on their own. Tag any others with `data-hmc-field`. Give it a `name` and the chosen church's ID submits with the form.
 
 :::tabs Install method
 ```html title="script tag"
