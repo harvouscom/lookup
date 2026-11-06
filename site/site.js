@@ -64,25 +64,23 @@ function placeTags(screen) {
     // The church card sits beside its pin (right, or left near the edge) so it never covers the
     // search above. Where neither side fits, as on phones, it sits above the pin.
     if (t.big) {
-      const side = p.x + 22 + w <= W - 8 ? "right" : p.x - 22 - w >= 8 ? "left" : "";
-      if (side) {
-        const x = side === "right" ? p.x + 22 : p.x - 22 - w;
-        const y = Math.max(p.y - ht / 2, 8, minY);
-        t.el.dataset.side = side;
-        t.el.style.setProperty("--stem-y", `${Math.min(Math.max(p.y - y, 12), ht - 12)}px`);
-        t.el.style.transform = `translate(${x}px, ${y}px)`;
+      // Narrow layers (too narrow for a full-width card beside the pin): always below the pin, so
+      // the card never jumps between placements as its details load.
+      if (W < 2 * (290 + 30)) {
+        const x = Math.min(Math.max(p.x, w / 2 + 8), W - w / 2 - 8);
+        t.el.style.setProperty("--stem", `${p.x - x}px`);
+        t.el.dataset.side = "bottom";
+        t.el.style.transform = `translate(${x}px, ${Math.max(p.y + 18, minY)}px) translate(-50%, 0)`;
         return;
       }
-      const x = Math.min(Math.max(p.x, w / 2 + 8), W - w / 2 - 8);
-      t.el.style.setProperty("--stem", `${p.x - x}px`);
-      // Above the pin if there's room under the search; otherwise below it.
-      if (p.y - 18 - ht >= minY) {
-        t.el.dataset.side = "top";
-        t.el.style.transform = `translate(${x}px, ${p.y}px) translate(-50%, calc(-100% - 18px))`;
-      } else {
-        t.el.dataset.side = "bottom";
-        t.el.style.transform = `translate(${x}px, ${p.y + 18}px) translate(-50%, 0)`;
-      }
+      // Wider: pick a side once per church and keep it, sliding to stay on screen.
+      if (!t.side && p.visible) t.side = p.x + 22 + w <= W - 8 ? "right" : "left";
+      const side = t.side ?? "right";
+      const x = Math.min(Math.max(side === "right" ? p.x + 22 : p.x - 22 - w, 8), W - w - 8);
+      const y = Math.max(p.y - ht / 2, 8, minY);
+      t.el.dataset.side = side;
+      t.el.style.setProperty("--stem-y", `${Math.min(Math.max(p.y - y, 12), ht - 12)}px`);
+      t.el.style.transform = `translate(${x}px, ${y}px)`;
       return;
     }
     // Keep the label inside the globe's width; its stem still points at the pin.
