@@ -608,3 +608,4 @@ p.num::after { margin-left: 2px; }
 .oss-more { margin-top: 18px; font-size: .9375rem; }
 @media (max-width: 720px) { .oss { grid-template-columns: 1fr; } .oss-main .oss-facts { grid-template-columns: 1fr; } }
 .oss-facts div { align-content: start; }
+.cc-top { align-items: flex-start; }
