@@ -42,7 +42,6 @@
     <p class="lede">One search box for any church app. Pick from <span data-stat="churches">587,842</span> churches and the address, website and service times fill in.</p>
     <div class="try">
       <church-lookup id="hero-search" label="Find a church" placeholder="Search for a church" form="result-form" overwrite limit="6"></church-lookup>
-      <p class="chips"><span>Try</span><button type="button" data-try="grace comm">grace comm</button><button type="button" data-try="kosciol">kosciol</button><button type="button" data-try="church in dallas">church in dallas</button><button type="button" data-try="gracee">gracee</button></p>
     </div>
   </div>
   <div class="horizon" aria-hidden="true">
@@ -293,6 +292,7 @@ npm install @heresmychurch/lookup</code></pre>
     <p class="num" aria-hidden="true"><span>08</span>data</p>
     <h2 id="data-h">Data and review</h2>
     <p>Lookup reads Here's My Church's reviewed listings and re-syncs changed regions every 5 minutes. Searches aren't logged, and approximate location is only used in memory to rank nearby churches.</p>
+    <p class="note">Why fewer churches than Here's My Church shows? Its map counts every listing, about 655,000. Lookup leaves out about 68,000 that have no real name yet, such as "Unnamed church", since nobody can find those by typing. Once a listing gets a name on Here's My Church, the next sync adds it.</p>
     <h3>Sharing fixes back <span class="soon">coming next</span></h3>
     <dl class="defs">
       <div><dt>Service times, denomination, languages, ministries</dt><dd>Everywhere. Live on one vote.</dd></div>

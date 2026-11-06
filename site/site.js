@@ -238,13 +238,26 @@ const setTheme = (dark) => {
 themeBtn.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
 themeBtn.addEventListener("click", () => setTheme(document.documentElement.dataset.theme !== "dark"));
 
-$$("[data-try]").forEach((b) => b.addEventListener("click", () => {
+// ── The search's placeholder types out example searches, one after another ──
+const EXAMPLES = ["grace comm", "church in dallas", "kosciol", "first baptist, TX", "gracee", "st mary"];
+(function rotatePlaceholder() {
   const input = hero.shadowRoot?.querySelector("input");
-  if (!input) return;
-  input.value = b.dataset.try;
-  input.focus();
-  input.dispatchEvent(new Event("input"));
-}));
+  if (!input) { requestAnimationFrame(rotatePlaceholder); return; }
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let n = 0, len = 0, deleting = false;
+  const step = () => {
+    const word = EXAMPLES[n % EXAMPLES.length];
+    // Nothing to animate while the placeholder is hidden behind typed text.
+    if (input.value) { setTimeout(step, 600); return; }
+    if (!deleting && len < word.length) len++;
+    else if (!deleting) { deleting = true; setTimeout(step, 1800); return; }
+    else if (len > 0) len--;
+    else { deleting = false; n++; setTimeout(step, 350); return; }
+    input.placeholder = `Try \u201C${word.slice(0, len)}\u201D`;
+    setTimeout(step, deleting ? 28 : 70);
+  };
+  setTimeout(step, 900);
+})();
 
 // ── Copy buttons ──
 $$(".copy").forEach((btn) => btn.addEventListener("click", async () => {
