@@ -79,6 +79,39 @@ function churchStmt(db: D1Database, rid: number, d: ProjectedChurch): D1Prepared
     d.website, d.denomination, d.serviceTimes, list(d.languages), list(d.ministries), d.pastorName, d.lastVerified, d.completeness, d.docHash, d.embedHash);
 }
 
+/** The church row and its FTS row, replaced together. */
+function rowWrites(db: D1Database, rid: number, d: ProjectedChurch): D1PreparedStatement[] {
+  return [
+    churchStmt(db, rid, d),
+    db.prepare("DELETE FROM church_fts WHERE rowid = ?").bind(rid),
+    db.prepare("INSERT INTO church_fts (rowid,name,loc,geo) VALUES (?,?,?,?)").bind(rid, tokenize(d.name).join(" "), tokenize(d.loc).join(" "), d.geo),
+  ];
+}
+
+export type WriteResult = { id: string; written: "inserted" | "updated" | "unchanged" } | { id: string; written: "skipped"; reason: string };
+
+/**
+ * Write one church from Here's My Church's export shape straight into D1: the row, its FTS row and,
+ * when the embedded text changed, a place in the embed queue. Used after a contribution goes live,
+ * a confirmation and an add, so search and the record show the change before the next sync tick.
+ * A row the export would leave out (no name, no location, relocated) is skipped; sync handles those.
+ */
+export async function writeChurch(env: { DB: D1Database }, c: ExportChurch, region: string): Promise<WriteResult> {
+  const why = exclusionReason(c);
+  if (why) return { id: c.id, written: "skipped", reason: why };
+  const info = { regionName: REGIONS[region]?.n ?? region, countryName: COUNTRIES[c.country] ?? c.country };
+  const near = await nearestPlaces(env.DB, [c]);
+  const d = project(c, region, info, near.get(c.id) ?? null);
+  const cur = await env.DB.prepare("SELECT rowid AS rid, doc_hash, embed_hash FROM church WHERE id = ?").bind(d.id)
+    .first<{ rid: number; doc_hash: string; embed_hash: string }>();
+  if (cur && cur.doc_hash === d.docHash) return { id: d.id, written: "unchanged" };
+  const rid = cur?.rid ?? ((await env.DB.prepare("SELECT max(rowid) AS m FROM church").first<{ m: number }>())?.m ?? 0) + 1;
+  const stmts = rowWrites(env.DB, rid, d);
+  if (!cur || cur.embed_hash !== d.embedHash) stmts.push(env.DB.prepare("INSERT OR IGNORE INTO embed_pending (id) VALUES (?)").bind(d.id));
+  await env.DB.batch(stmts);
+  return { id: d.id, written: cur ? "updated" : "inserted" };
+}
+
 export async function syncRegion(env: SyncEnv, cc: string, region: string): Promise<RegionResult> {
   const result: RegionResult = { region, source: 0, kept: 0, inserted: 0, updated: 0, deleted: 0, embedQueued: 0, deletesSkipped: 0 };
   const res = await hmc(env, `/region/${cc}/${region}`);
@@ -106,9 +139,7 @@ export async function syncRegion(env: SyncEnv, cc: string, region: string): Prom
     if (cur && cur.doc_hash === d.docHash) continue;
     // New rows go to the end. Rowid order is completeness order only as of the last full build.
     const rid = cur?.rid ?? nextRid++;
-    stmts.push(churchStmt(env.DB, rid, d));
-    stmts.push(env.DB.prepare("DELETE FROM church_fts WHERE rowid = ?").bind(rid));
-    stmts.push(env.DB.prepare("INSERT INTO church_fts (rowid,name,loc,geo) VALUES (?,?,?,?)").bind(rid, tokenize(d.name).join(" "), tokenize(d.loc).join(" "), d.geo));
+    stmts.push(...rowWrites(env.DB, rid, d));
     if (cur) result.updated++; else result.inserted++;
     if (!cur || cur.embed_hash !== d.embedHash) toEmbed.push(d.id);
   }
