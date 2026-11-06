@@ -212,7 +212,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .nav.scrolled:not(.solid) { background: rgba(5,2,15,.62); border-color: rgba(255,255,255,.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 
 /* ── The header as a big inset card, built in layers ── */
-.hdr { margin: 10px; border-radius: 28px; border: 1px solid rgba(255,255,255,.06); box-shadow: 0 30px 80px -40px rgba(76,29,149,.6); isolation: isolate; }
+.hdr { margin: 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,.06); box-shadow: 0 30px 80px -40px rgba(76,29,149,.6); isolation: isolate; }
 .hdr::after { display: none; }
 .hdr::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
   background: radial-gradient(1px 1px at 12% 22%, rgba(255,255,255,.5), transparent), radial-gradient(1px 1px at 78% 14%, rgba(255,255,255,.4), transparent),
@@ -241,7 +241,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .hud-l { left: 18px; display: flex; align-items: center; gap: 7px; }
 .hud-l i { width: 6px; height: 6px; border-radius: 999px; background: #4ADE80; box-shadow: 0 0 0 3px rgba(74,222,128,.18); }
 .hud-r { right: 18px; max-width: 46%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-@media (max-width: 640px) { .hdr { margin: 6px; border-radius: 22px; } .hud-r { display: none; } .orbit { display: none; } }
+@media (max-width: 640px) { .hdr { margin: 6px; border-radius: 16px; } .hud-r { display: none; } .orbit { display: none; } }
 @media (prefers-reduced-motion: no-preference) { .hud-l i { animation: blink 2.4s ease-in-out infinite; } @keyframes blink { 50% { opacity: .35; } } }
 
 /* ── A bigger globe that starts right under the search ── */
