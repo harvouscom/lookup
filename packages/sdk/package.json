@@ -6,7 +6,8 @@
   "type": "module",
   "sideEffects": [
     "./dist/element.js",
-    "./dist/service-times.js"
+    "./dist/service-times.js",
+    "./dist/strings-*.js"
   ],
   "exports": {
     ".": {
@@ -26,6 +27,10 @@
     },
     "./vue": {
       "types": "./src/vue.d.ts"
+    },
+    "./strings/*": {
+      "types": "./src/strings-*.ts",
+      "default": "./dist/strings-*.js"
     }
   },
   "files": [

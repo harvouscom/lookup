@@ -1,6 +1,7 @@
 // hmc-lookup Worker. Search, the autofill record, metadata, and the cron sync.
 // Queries are never logged: invocation logs are off, and request location stays in memory.
-import { COMPLETENESS_WEIGHTS, CONTRIBUTABLE_FIELDS, RECORD_FIELDS, toRecord, type ChurchRow } from "./record.ts";
+import { confirm, contribute, contributableFields } from "./contribute.ts";
+import { COMPLETENESS_WEIGHTS, RECORD_FIELDS, toRecord, type ChurchRow } from "./record.ts";
 import { COUNTRIES, REGIONS } from "./regions.generated.ts";
 import { search } from "./search.ts";
 import { EMBED_COLUMNS, upsertRows, type EmbedRow } from "./embed.ts";
@@ -13,6 +14,7 @@ export interface Env {
   HMC_API?: Fetcher;
   RL_SEARCH?: RateLimit;
   RL_SEMANTIC?: RateLimit;
+  RL_CONTRIB?: RateLimit;
   CF_VERSION_METADATA?: WorkerVersionMetadata;
   LOOKUP_INTERNAL_KEY?: string;
   /** Enables the /internal admin routes. Unset means they 404. */
@@ -20,6 +22,9 @@ export interface Env {
   /** Kill switches. Anything but "true" turns the feature off. */
   SEMANTIC_ENABLED?: string;
   SYNC_ENABLED?: string;
+  CONTRIBUTIONS_ENABLED?: string;
+  NAME_CONTRIBUTIONS?: string;
+  CONTRIBUTIONS_DAILY_CAP?: string;
 }
 
 export const ATTRIBUTION = "Church data from OpenStreetMap contributors (ODbL) and Here's My Church contributors.";
@@ -28,7 +33,7 @@ const MAX_LIMIT = 20;
 const DEFAULT_LIMIT = 8;
 const CACHE_SECONDS = { search: 300, church: 300, meta: 3600 };
 
-const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, OPTIONS", "access-control-allow-headers": "content-type", "access-control-max-age": "86400" };
+const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type", "access-control-max-age": "86400" };
 
 function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
@@ -144,7 +149,7 @@ async function handleMeta(request: Request, env: Env, ctx: ExecutionContext): Pr
     const build = row ? JSON.parse(row.value) : null;
     return json({
       fields: RECORD_FIELDS,
-      contributableFields: CONTRIBUTABLE_FIELDS,
+      contributableFields: contributableFields(env),
       completenessWeights: COMPLETENESS_WEIGHTS,
       counts: build?.counts ?? null,
       fieldFill: build?.fill ?? null,
@@ -152,6 +157,23 @@ async function handleMeta(request: Request, env: Env, ctx: ExecutionContext): Pr
       attribution: ATTRIBUTION,
     });
   });
+}
+
+/** Contributions and confirmations. Never cached; each field reports its own status. */
+async function handleWrite(request: Request, env: Env, id: string, kind: "contributions" | "confirm"): Promise<Response> {
+  const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
+  const text = await request.text();
+  if (text.length > 16_000) return fail(413, "request too large");
+  let input: unknown;
+  try { input = text ? JSON.parse(text) : {}; } catch { return fail(400, "body must be JSON"); }
+  try {
+    const out = kind === "contributions" ? await contribute(env, id, ip, input) : await confirm(env, id, ip, input);
+    const retry: Record<string, string> = out.status === 503 || out.status === 429 ? { "retry-after": "60" } : {};
+    return json({ ...(out.body as object), attribution: ATTRIBUTION }, out.status, { "cache-control": "no-store", ...retry });
+  } catch (e) {
+    if (isOverload(e)) return fail(503, "overloaded", { "retry-after": "2" });
+    return fail(500, "contributions are unavailable");
+  }
 }
 
 function sameKey(a: string, b: string): boolean {
@@ -201,6 +223,11 @@ export default {
       catch (e) { return fail(500, String((e as Error).message ?? e).slice(0, 300)); }
     }
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
+    const writeMatch = url.pathname.replace(/\/+$/, "").match(/^\/v1\/churches\/([^/]+)\/(contributions|confirm)$/);
+    if (writeMatch) {
+      if (request.method !== "POST") return fail(405, "method not allowed", { allow: "POST, OPTIONS" });
+      return handleWrite(request, env, decodeURIComponent(writeMatch[1]!), writeMatch[2] as "contributions" | "confirm");
+    }
     if (request.method !== "GET" && request.method !== "HEAD") return fail(405, "method not allowed", { allow: "GET, OPTIONS" });
 
     const path = url.pathname.replace(/\/+$/, "");

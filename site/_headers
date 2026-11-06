@@ -19,3 +19,8 @@
   Cache-Control: public, max-age=300
 /aurora.js
   Cache-Control: public, max-age=300
+/strings-*.js
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300
+/demo/*
+  Cache-Control: public, max-age=300

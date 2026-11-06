@@ -53,6 +53,21 @@ export interface ChurchRecord {
   attribution: string;
 }
 
+/** What happened to one contributed field. See the API docs for each status. */
+export type FieldStatus = "live" | "in_review" | "not_applied" | "rejected" | "try_again" | "coming_soon";
+export interface ContributionResult {
+  churchId: string;
+  sandbox?: boolean;
+  results: { field: string; status: FieldStatus; message?: string }[];
+}
+export interface ConfirmResult { churchId: string; sandbox?: boolean; status: "confirmed" | FieldStatus; message?: string; lastVerified?: number }
+export interface Meta {
+  fields: string[];
+  contributableFields: Record<string, { countries: "all" | string[]; review: "live" | "moderated"; status?: "coming_soon" }>;
+  completenessWeights: Record<string, number>;
+  attribution: string;
+}
+
 export class LookupError extends Error {
   constructor(public status: number, message: string, public retryAfter?: number) {
     super(message);
@@ -70,12 +85,15 @@ export function createLookup(opts: LookupOptions = {}) {
   const base = (opts.baseUrl ?? "https://lookup.heresmychurch.com").replace(/\/+$/, "") + "/v1";
   const f = opts.fetch ?? fetch.bind(globalThis);
 
-  async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
-    const res = await f(base + path, { signal });
+  async function get<T>(path: string, signal?: AbortSignal, init?: RequestInit): Promise<T> {
+    const res = await f(base + path, { signal, ...init });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined);
     return body;
   }
+
+  const post = <T>(path: string, body: unknown) =>
+    get<T>(path, undefined, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
 
   return {
     search(q: string, o: SearchOptions = {}): Promise<SearchResponse> {
@@ -88,6 +106,18 @@ export function createLookup(opts: LookupOptions = {}) {
     },
     getChurch(id: string, o: { signal?: AbortSignal } = {}): Promise<ChurchRecord> {
       return get(`/churches/${encodeURIComponent(id)}`, o.signal);
+    },
+    /** Field names, which fields can be contributed and how each is reviewed. */
+    meta(): Promise<Meta> {
+      return get("/meta");
+    },
+    /** Send corrections. Each field comes back live, in review, or with a reason. */
+    contribute(id: string, changes: { field: string; value: unknown }[]): Promise<ContributionResult> {
+      return post(`/churches/${encodeURIComponent(id)}/contributions`, { client: opts.client ?? "unknown", changes });
+    },
+    /** "Still correct": bumps the church's last-verified date. */
+    confirm(id: string): Promise<ConfirmResult> {
+      return post(`/churches/${encodeURIComponent(id)}/confirm`, { client: opts.client ?? "unknown" });
     },
   };
 }

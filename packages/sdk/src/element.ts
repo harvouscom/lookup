@@ -1,9 +1,9 @@
 // <church-lookup>: an ARIA 1.2 combobox that searches Here's My Church and autofills a form. It's a
 // form-associated element: with a `name`, the chosen church's ID submits like any input.
 /// <reference path="./jsx.d.ts" />
-import { createLookup, type ChurchRecord, type Lookup, type SearchResult } from "./client.ts";
+import { createLookup, type ChurchRecord, type FieldStatus, type Lookup, type Meta, type SearchResult } from "./client.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
-import { stringsFor, type Strings } from "./strings.ts";
+import { LANGS, registry, stringsFor, type Strings } from "./strings.ts";
 
 export type { Strings };
 
@@ -45,6 +45,12 @@ li:hover,li[aria-selected=true]{background:var(--_active);color:var(--_active-fg
 a{color:var(--_ring);font-weight:500;text-underline-offset:3px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:480px){.foot i{display:none}li{grid-template-columns:32px 1fr auto;gap:10px;min-height:48px;padding:6px 8px}.ic{width:32px;height:32px}.ic svg{width:16px;height:16px}.n{font-size:.9375rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sub{font-size:.8125rem}.d{font-size:.75rem}input{min-height:48px;font-size:1rem}}
+.cs{margin-top:10px;padding:12px 14px;border:1px solid var(--_line);border-radius:var(--_r);background:color-mix(in oklab,var(--_ring) 5%,var(--_bg));font-size:.875rem}.cs[hidden]{display:none}
+.cs h3{margin:0;font-size:.9375rem;font-weight:600}.cs>p{margin:4px 0 10px;font-size:.8125rem}.cs .q{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}.cs .q p{margin:0;flex:1;min-width:12em}
+.cs ul{max-height:none;overflow:visible;gap:4px;margin:0 0 10px}.cs li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;min-height:44px;padding:6px 4px;cursor:default;align-items:start}.cs li:hover{background:none}
+.cs input[type=checkbox]{width:20px;height:20px;min-height:0;margin:2px 0 0;padding:0;accent-color:var(--_ring)}.cs label{font-weight:600}.cs .v{grid-column:2;display:flex;flex-wrap:wrap;gap:4px 8px;color:var(--_muted);overflow-wrap:anywhere}.cs s{opacity:.75}.cs ins{text-decoration:none;color:inherit}
+.cs .b{grid-column:2;justify-self:start;padding:1px 8px;border-radius:999px;font-size:.75rem;background:color-mix(in oklab,var(--_ring) 12%,transparent);color:var(--_ring)}.cs .b.m{background:color-mix(in oklab,var(--_muted) 14%,transparent);color:inherit}
+.cs .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.cs .bt{min-height:40px;padding:0 14px;border-radius:calc(var(--_r) - 2px);font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--_ring);background:var(--_ring);color:#fff}.cs .bt.g{background:transparent;color:inherit;border-color:var(--_input)}.cs .bt:disabled{opacity:.6;cursor:default}.cs .bt:focus-visible,.cs input:focus-visible{outline:2px solid var(--_ring);outline-offset:2px}.cs .note{padding:0;margin:8px 0 0}
 @media (prefers-reduced-motion:reduce){input{transition:none}}
 @media (forced-colors:active){li[aria-selected=true]{background:Highlight;color:HighlightText;forced-color-adjust:none}input,.pop{border:1px solid CanvasText}input:focus-visible{outline:2px solid Highlight}}
 `;
@@ -55,6 +61,9 @@ const CLEAR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const CHURCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v5M10 4h4M6 21V11l6-4 6 4v10M3 21h18M10 21v-4a2 2 0 0 1 4 0v4"/></svg>`;
 
 let uid = 0;
+
+interface WatchRow { field: string; el: FieldTarget; label: string; was: string; review: "live" | "moderated"; soon: boolean }
+interface Snapshot { id: string; rows: WatchRow[]; sent: Map<string, string>; dismissed: string; confirmed: boolean; off: () => void }
 
 export interface FillChange { field: string; element: FieldTarget; value: string }
 
@@ -77,6 +86,9 @@ export class ChurchLookup extends HTMLElement {
   private current = "";
   private overrides: Partial<Strings> = {};
   private clearBtn!: HTMLButtonElement;
+  private panel!: HTMLDivElement;
+  private meta: Promise<Meta | null> | null = null;
+  private snap: Snapshot | null = null;
   private input!: HTMLInputElement;
   private list!: HTMLUListElement;
   private pop!: HTMLDivElement;
@@ -108,24 +120,41 @@ export class ChurchLookup extends HTMLElement {
   checkValidity(): boolean { return this.internals?.checkValidity() ?? true; }
   reportValidity(): boolean { return this.internals?.reportValidity() ?? true; }
 
+  private get uiLang(): string {
+    return (this.getAttribute("lang") ?? this.closest("[lang]")?.getAttribute("lang") ?? "en").toLowerCase().split("-")[0]!;
+  }
   private get t(): Strings {
-    const lang = this.getAttribute("lang") ?? this.closest("[lang]")?.getAttribute("lang") ?? null;
-    return { ...stringsFor(lang), ...this.overrides };
+    return { ...stringsFor(this.uiLang), ...this.overrides };
+  }
+  private onStrings = () => this.applyText();
+
+  /** Load a language file that sits next to element.js, unless it's already registered. */
+  private loadLang(): void {
+    const lang = this.uiLang;
+    if (!LANGS.includes(lang) || registry()[lang]) return;
+    import(/* @vite-ignore */ new URL(`./strings-${lang}.js`, import.meta.url).href).catch(() => { /* stay in English */ });
+  }
+
+  disconnectedCallback(): void {
+    document.removeEventListener("hmc-strings", this.onStrings);
   }
 
   connectedCallback(): void {
     if (this.shadowRoot) return;
     const root = this.attachShadow({ mode: "open" });
     const id = this.key;
-    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field"><slot name="search-icon">${SEARCH}</slot><input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"><button class="x" part="clear" type="button" hidden>${CLEAR}</button></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">${HMC}<span><i class="df"></i><b><a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></b></span><a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div></div><div class="sr" role="status" aria-live="polite"></div>`;
+    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field"><slot name="search-icon">${SEARCH}</slot><input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"><button class="x" part="clear" type="button" hidden>${CLEAR}</button></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">${HMC}<span><i class="df"></i><b><a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></b></span><a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div></div><div class="cs" part="consent" role="region" hidden></div><div class="sr" role="status" aria-live="polite"></div>`;
     this.input = root.querySelector("input")!;
     this.list = root.querySelector("ul")!;
     this.pop = root.querySelector(".pop")!;
     this.note = root.querySelector(".note")!;
     this.live = root.querySelector("[role=status]")!;
     this.clearBtn = root.querySelector(".x")!;
+    this.panel = root.querySelector(".cs")!;
     this.clearBtn.addEventListener("click", () => { this.clear(); this.input.focus(); });
     this.applyText();
+    document.addEventListener("hmc-strings", this.onStrings);
+    this.loadLang();
     this.input.addEventListener("input", () => this.onInput());
     this.input.addEventListener("compositionstart", () => (this.composing = true));
     this.input.addEventListener("compositionend", () => { this.composing = false; this.onInput(); });
@@ -174,6 +203,7 @@ export class ChurchLookup extends HTMLElement {
   /** Forget the chosen church. Fields it filled keep their values. */
   clear(): void {
     const had = Boolean(this.current);
+    this.unwatch();
     this.chosen = null;
     this.input.value = "";
     this.results = [];
@@ -402,6 +432,137 @@ export class ChurchLookup extends HTMLElement {
     if (!this.dispatchEvent(new CustomEvent("church-fill", { detail: { record, changes }, cancelable: true, bubbles: true, composed: true }))) return;
     for (const c of changes) setNativeValue(c.element, c.value);
     this.say(this.t.filled(changes.length, empty));
+    void this.watch(record);
+  }
+
+  // ── Consent: share corrections back to Here's My Church, only when the person chooses to ──
+
+  private unwatch(): void {
+    this.snap?.off();
+    this.snap = null;
+    if (this.panel) this.panel.hidden = true;
+  }
+
+  /** After a fill, watch the mapped fields Lookup can contribute, against what the record said. */
+  private async watch(record: ChurchRecord): Promise<void> {
+    this.unwatch();
+    if (this.getAttribute("contribute") === "off") return;
+    const meta = await (this.meta ??= this.client().meta().catch(() => null));
+    if (!meta?.contributableFields) return;
+    const country = String(record.fields.country ?? "");
+    const rows: WatchRow[] = [];
+    for (const [field, el] of this.targets()) {
+      const rule = meta.contributableFields[field === "street" ? "address" : field];
+      if (!rule || (rule.countries !== "all" && !rule.countries.includes(country))) continue;
+      const label = (el.labels?.[0]?.textContent ?? el.getAttribute("aria-label") ?? field).trim();
+      rows.push({ field, el, label, was: (fieldValue(record, field) ?? "").trim(), review: rule.review, soon: rule.status === "coming_soon" });
+    }
+    const render = () => this.renderPanel();
+    rows.forEach((r) => r.el.addEventListener("change", render));
+    this.snap = { id: record.id, rows, sent: new Map(), dismissed: "", confirmed: false, off: () => rows.forEach((r) => r.el.removeEventListener("change", render)) };
+    this.renderPanel();
+  }
+
+  private changed(): WatchRow[] {
+    const s = this.snap!;
+    return s.rows.filter((r) => { const v = r.el.value.trim(); return v && v !== r.was && s.sent.get(r.field) !== v; });
+  }
+
+  private renderPanel(result?: Map<string, { status: FieldStatus; message?: string }>, sandbox?: boolean): void {
+    const s = this.snap;
+    const p = this.panel;
+    if (!s) { p.hidden = true; return; }
+    const t = this.t;
+    const changed = this.changed();
+    const sig = changed.map((r) => `${r.field}=${r.el.value.trim()}`).join("|");
+    const h = `${this.key}-cs`;
+    p.setAttribute("aria-labelledby", h);
+    if (!changed.length && !result) {
+      // Nothing changed: offer "Still correct" once per pick.
+      if (s.confirmed || s.dismissed === "confirm") { p.hidden = true; return; }
+      p.innerHTML = `<div class="q"><p id="${h}"></p><span class="row"><button type="button" class="bt">${""}</button><button type="button" class="bt g"></button></span></div>`;
+      p.querySelector("p")!.textContent = t.confirmQ;
+      const [yes, no] = p.querySelectorAll<HTMLButtonElement>("button");
+      yes!.textContent = t.stillCorrect;
+      no!.textContent = t.notNow;
+      yes!.onclick = () => void this.sendConfirm();
+      no!.onclick = () => { s.dismissed = "confirm"; p.hidden = true; };
+      p.hidden = false;
+      return;
+    }
+    if (!result && s.dismissed === sig) { p.hidden = true; return; }
+    const wasHidden = p.hidden || !p.querySelector("ul");
+    p.innerHTML = `<h3 id="${h}"></h3><p></p><ul></ul><div class="row"><button type="button" class="bt"></button><button type="button" class="bt g"></button></div>`;
+    p.querySelector("h3")!.textContent = t.shareTitle;
+    p.querySelector("p")!.textContent = t.shareBody;
+    const ul = p.querySelector("ul")!;
+    const shown = result ? s.rows.filter((r) => result.has(r.field)).concat(changed.filter((r) => !result.has(r.field))) : changed;
+    shown.forEach((r, i) => {
+      const li = document.createElement("li");
+      const id = `${h}-${i}`;
+      const res = result?.get(r.field);
+      li.innerHTML = `<input type="checkbox" id="${id}"><label for="${id}"></label><span class="v"><s></s><span aria-hidden="true">→</span><ins></ins></span><span class="b"></span>`;
+      const box = li.querySelector("input")!;
+      box.dataset.field = r.field;
+      box.disabled = r.soon || (Boolean(res) && res!.status !== "try_again");
+      li.querySelector("label")!.textContent = r.label;
+      li.querySelector("s")!.textContent = r.was || "—";
+      li.querySelector("ins")!.textContent = res ? (s.sent.get(r.field) ?? r.el.value.trim()) : r.el.value.trim();
+      const b = li.querySelector<HTMLElement>(".b")!;
+      b.textContent = res ? (res.message && res.status === "rejected" ? `${t.st.rejected}: ${res.message}` : t.st[res.status]) : r.soon ? t.soon : r.review === "moderated" ? t.reviewed : t.goesLive;
+      b.classList.toggle("m", r.soon || r.review === "moderated" || (Boolean(res) && res!.status !== "live"));
+      ul.append(li);
+    });
+    const [share, later] = p.querySelectorAll<HTMLButtonElement>(".row button");
+    share!.textContent = t.share;
+    later!.textContent = t.notNow;
+    share!.onclick = () => void this.sendShare();
+    later!.onclick = () => { s.dismissed = sig; p.hidden = true; };
+    // After a share with nothing left to send, one button closes the panel.
+    if (result && !p.querySelector("input[type=checkbox]:not(:disabled)")) { share!.hidden = true; later!.textContent = t.done; }
+    if (sandbox) {
+      const n = document.createElement("p");
+      n.className = "note";
+      n.textContent = t.sandbox;
+      p.append(n);
+    }
+    p.hidden = false;
+    if (wasHidden && !result) this.say(t.changedNote(changed.length));
+  }
+
+  private async sendShare(): Promise<void> {
+    const s = this.snap!;
+    const p = this.panel;
+    const picked = [...p.querySelectorAll<HTMLInputElement>("input[type=checkbox]:checked:not(:disabled)")]
+      .map((b) => s.rows.find((r) => r.field === b.dataset.field)!).filter(Boolean);
+    if (!picked.length) return;
+    const changes = picked.map((r) => ({ field: r.field, value: r.el.value.trim() }));
+    if (!this.dispatchEvent(new CustomEvent("church-contribute", { detail: { churchId: s.id, changes }, cancelable: true, bubbles: true, composed: true }))) return;
+    const btn = p.querySelector<HTMLButtonElement>(".row .bt")!;
+    btn.disabled = true;
+    btn.textContent = this.t.sending;
+    let out: { sandbox?: boolean; results: { field: string; status: FieldStatus; message?: string }[] };
+    try { out = await this.client().contribute(s.id, changes); }
+    catch { out = { results: changes.map((c) => ({ field: c.field, status: "try_again" as const })) }; }
+    if (this.snap !== s) return;
+    const result = new Map(out.results.map((r) => [r.field, r]));
+    for (const c of changes) if (result.get(c.field)?.status !== "try_again") s.sent.set(c.field, c.value);
+    this.renderPanel(result, out.sandbox);
+    const done = out.results.filter((r) => r.status === "live" || r.status === "in_review").length;
+    this.say(`${this.t.shared(done)} ${out.results.map((r) => `${r.field}: ${this.t.st[r.status]}`).join(". ")}.`);
+  }
+
+  private async sendConfirm(): Promise<void> {
+    const s = this.snap!;
+    if (!this.dispatchEvent(new CustomEvent("church-confirm", { detail: { churchId: s.id }, cancelable: true, bubbles: true, composed: true }))) return;
+    let ok = false;
+    try { ok = (await this.client().confirm(s.id)).status === "confirmed"; } catch { ok = false; }
+    if (this.snap !== s) return;
+    s.confirmed = ok;
+    const msg = ok ? this.t.thanks : this.t.st.try_again;
+    this.panel.querySelector("p")!.textContent = msg;
+    this.panel.querySelectorAll("button").forEach((b) => { b.hidden = ok; });
+    this.say(msg);
   }
 }
 

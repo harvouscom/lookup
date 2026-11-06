@@ -52,7 +52,7 @@
     <h1>Church details, filled in.</h1>
     <p class="lede">One search box for any church app. Pick from <span data-stat="churches">587,842</span> churches and the address, website and service times fill in.</p>
     <div class="try">
-      <church-lookup id="hero-search" name="church" label="Find a church" placeholder="Search for a church" form="result-form" overwrite limit="6"></church-lookup>
+      <church-lookup id="hero-search" name="church" contribute="off" label="Find a church" placeholder="Search for a church" form="result-form" overwrite limit="6"></church-lookup>
     </div>
   </div>
   <div class="horizon" aria-hidden="true">
@@ -142,11 +142,11 @@
   <section id="overview" aria-labelledby="overview-h">
     <p class="num" aria-hidden="true"><span>01</span></p>
     <h2 id="overview-h">Stop retyping church details</h2>
-    <p class="lead">Church tools keep asking people for the same details. Lookup fills them in from <a href="https://heresmychurch.com">Here's My Church</a>, an open directory of 587,842 churches in 19 countries. Because every pick comes from the same open directory, each app that uses Lookup helps keep church data accurate, and soon the corrections people make in your app will flow back to it too.</p>
+    <p class="lead">Church tools keep asking people for the same details. Lookup fills them in from <a href="https://heresmychurch.com">Here's My Church</a>, an open directory of 587,842 churches in 19 countries. Because every pick comes from the same open directory, each app that uses Lookup helps keep church data accurate. When someone corrects a detail in your app, they can choose to share the fix back.</p>
     <ul class="features">
       <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 12.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM14.5 14.5l-3.6-3.6"/></svg></span><b>Search as you type</b><span>Prefixes, typos and places like "church in dallas" all work, nearby churches first.</span></li>
       <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h6M11 11.5l1.5 1.5 2.5-3"/></svg></span><b>Fill your form</b><span>Pick a church and empty fields fill in. Anything already typed is left alone.</span></li>
-      <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 6A5.5 5.5 0 0 0 3.2 4.6M2.5 2v3h3M2.5 10a5.5 5.5 0 0 0 10.3 1.4M13.5 14v-3h-3"/></svg></span><b>Share fixes back <em>next</em></b><span>Corrections made in your app flow back to the directory.</span></li>
+      <li><span class="fi"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 6A5.5 5.5 0 0 0 3.2 4.6M2.5 2v3h3M2.5 10a5.5 5.5 0 0 0 10.3 1.4M13.5 14v-3h-3"/></svg></span><b>Share fixes back</b><span>When someone corrects a detail, they can share it back to the directory, one checked box at a time.</span></li>
     </ul>
   </section>
 
@@ -189,6 +189,7 @@ npm install @heresmychurch/lookup</code></pre>
         <div class="wide"><span class="lbl" id="d-times-l">Service times</span><church-service-times label="Service times"><textarea data-hmc-field="serviceTimes" aria-labelledby="d-times-l"></textarea></church-service-times></div>
       </div>
     </form></div>
+    <p>See it in real forms: <a href="/demo/chms">a React church management app</a>, <a href="/demo/retreat">a retreat sign-up</a> and <a href="/demo/builder">a church website builder</a>. Each one shows the share panel when you correct a detail.</p>
   </section>
 
   <section id="widget" aria-labelledby="widget-h">
@@ -210,6 +211,7 @@ npm install @heresmychurch/lookup</code></pre>
       <div><dt><code>overwrite</code></dt><dd>Replace fields that already have values.</dd></div>
       <div><dt><code>limit</code></dt><dd>How many results to show, up to 20. Defaults to 8.</dd></div>
       <div><dt><code>icons="none"</code></dt><dd>Hide the icon beside each result.</dd></div>
+      <div><dt><code>contribute="off"</code></dt><dd>Don&#8217;t offer to share corrections back to Here&#8217;s My Church.</dd></div>
     </dl>
     <h3>In your form</h3>
     <p>It&#8217;s a real form field. Give it a <code>name</code> and the chosen church&#8217;s ID submits with your form, so you can store the ID and look the church up again later. React and Vue get types for the tag and its events.</p>
@@ -258,6 +260,8 @@ npm install @heresmychurch/lookup</code></pre>
       <div><dt><code>church-select</code></dt><dd>A church was chosen. Cancel it to stop the fill.</dd></div>
       <div><dt><code>church-fill</code></dt><dd>Fields are about to fill. Cancel it to fill them yourself from <code>detail.record</code>.</dd></div>
       <div><dt><code>church-clear</code></dt><dd>The choice was cleared, with the clear button or by editing the name.</dd></div>
+      <div><dt><code>church-contribute</code></dt><dd>Someone chose Share. <code>detail</code> has <code>churchId</code> and <code>changes</code>. Cancel it to send them yourself, or not at all.</dd></div>
+      <div><dt><code>church-confirm</code></dt><dd>Someone chose Still correct. Cancel it to skip the confirmation.</dd></div>
     </dl>
     <p class="note">An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. Results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.</p>
   </section>
@@ -362,7 +366,20 @@ npm install @heresmychurch/lookup</code></pre>
     <p>The autofill record. Every key in <code>fields</code> is always present, with <code>null</code> or <code>[]</code> when empty, plus <code>missing</code>, <code>completeness</code> and <code>hints</code>.</p>
     <h3><span class="verb">GET</span> /v1/meta</h3>
     <p>Field names, what can be contributed and how it's reviewed, completeness weights, counts and attribution.</p>
-    <p class="note">120 searches and 30 semantic searches a minute per visitor. Over the limit returns <code>429</code>, a busy database returns <code>503</code>, and both send <code>Retry-After</code>.</p>
+    <h3><span class="verb post">POST</span> /v1/churches/:id/contributions</h3>
+    <p>Send corrections as <code>{ client, changes: [{ field, value }] }</code>. Each field comes back with its own status:</p>
+    <dl class="defs">
+      <div><dt><code>live</code></dt><dd>Applied now. These fields go live on one vote.</dd></div>
+      <div><dt><code>in_review</code></dt><dd>Waits for a Here&#8217;s My Church moderator.</dd></div>
+      <div><dt><code>not_applied</code></dt><dd>Accepted, but the listed value didn&#8217;t change, such as when it was already the same.</dd></div>
+      <div><dt><code>rejected</code></dt><dd>Not accepted, with a <code>message</code> saying why.</dd></div>
+      <div><dt><code>try_again</code></dt><dd>A temporary problem, such as maintenance or a rate limit. Nothing was refused.</dd></div>
+      <div><dt><code>coming_soon</code></dt><dd>A field Lookup will accept soon. Name is coming soon.</dd></div>
+    </dl>
+    <p>Test with <code>client: "lookup-demo"</code>: changes are checked the same way but never sent, and responses say <code>sandbox: true</code>.</p>
+    <h3><span class="verb post">POST</span> /v1/churches/:id/confirm</h3>
+    <p>&#8220;Still correct.&#8221; Send <code>{ client }</code> to mark a listing as checked today.</p>
+    <p class="note">120 searches and 30 semantic searches a minute per visitor, and 5 contributions a minute. Over the limit returns <code>429</code>, a busy database returns <code>503</code>, and both send <code>Retry-After</code>.</p>
   </section>
 
   <section id="how-search-works" aria-labelledby="how-h">
@@ -384,6 +401,13 @@ npm install @heresmychurch/lookup</code></pre>
       </tbody>
     </table></div></div>
     <p class="note">Semantic search helped two queries in 78 and hurt none. It doesn't fix translations such as "trinity church munich", and common names with no location stay hard. <a href="https://github.com/harvouscom/lookup/tree/main/eval/results">Full write-up</a>.</p>
+    <h3>Where AI is used, and where it isn&#8217;t</h3>
+    <dl class="defs">
+      <div><dt>Semantic search</dt><dd>One AI model, bge-m3 on Cloudflare Workers AI and Vectorize, runs only when no name matches every word. On the held-out test it moved &#8220;in top 5&#8221; from 85% to 87% and &#8220;no results&#8221; from 1% to 0%. That&#8217;s the only place we credit AI.</dd></div>
+      <div><dt>Ranking</dt><dd>A formula, not AI, orders results: 60% how well the name matches, 25% how near the church is, and 15% how complete its listing is. That&#8217;s why complete listings rank higher.</dd></div>
+      <div><dt>Church details</dt><dd>AI never writes or changes them. Every fill comes from Here&#8217;s My Church, and every shared fix goes through its review rules.</dd></div>
+      <div><dt>Searches</dt><dd>Lookup doesn&#8217;t log them.</dd></div>
+    </dl>
   </section>
 
   <section id="data" aria-labelledby="data-h">
@@ -391,11 +415,13 @@ npm install @heresmychurch/lookup</code></pre>
     <h2 id="data-h">Data and review</h2>
     <p>Lookup reads Here's My Church's reviewed listings and re-syncs changed regions every 5 minutes. Searches aren't logged, and approximate location is only used in memory to rank nearby churches.</p>
     <p class="note">Why fewer churches than Here's My Church shows? Its map counts every listing, about 655,000. Lookup leaves out about 68,000 that have no real name yet, such as "Unnamed church", since nobody can find those by typing. Once a listing gets a name on Here's My Church, the next sync adds it.</p>
-    <h3>Sharing fixes back <span class="soon">coming next</span></h3>
+    <h3>Sharing fixes back</h3>
+    <p>When someone changes a detail Lookup filled, the widget offers to share it. Every change starts unchecked, says whether it goes live or waits for a moderator, and nothing is sent until they choose Share. Your form&#8217;s own submit is never blocked.</p>
     <dl class="defs">
       <div><dt>Service times, denomination, languages, ministries</dt><dd>Everywhere. Live on one vote.</dd></div>
       <div><dt>Phone</dt><dd>US and Canada. Live on one vote.</dd></div>
-      <div><dt>Name, website</dt><dd>Everywhere. Waits for a moderator.</dd></div>
+      <div><dt>Website</dt><dd>Everywhere. Waits for a moderator.</dd></div>
+      <div><dt>Name</dt><dd>Coming soon. It will wait for a moderator.</dd></div>
       <div><dt>Address</dt><dd>US. Waits for a moderator.</dd></div>
       <div><dt>Email, pastor name</dt><dd>Not accepted, so personal details in a host's form can't go live.</dd></div>
     </dl>

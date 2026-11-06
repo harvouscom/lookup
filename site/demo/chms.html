@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>React ChMS · Lookup demo</title>
+<meta name="description" content="A React church management form with Lookup filling controlled inputs.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght,ROND@6..144,400..700,0..100&family=Geist+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/demo/demo.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the demo</a>
+<nav class="nav solid" aria-label="Site">
+  <div class="brand-wrap"><a class="brand" href="/" aria-label="Lookup home"><img src="/brand/mark.svg" alt="" width="24" height="24"><span>Lookup</span></a><a class="brand-by" href="https://heresmychurch.com">by Here&#8217;s My Church</a></div>
+  <ul class="nav-links">
+    <li><a href="/#quickstart">docs</a></li>
+    <li><a href="/#api">api</a></li>
+    <li><a href="https://github.com/harvouscom/lookup">github</a></li>
+  </ul>
+  <div class="nav-end"><a class="btn" href="/#quickstart">Get started</a></div>
+</nav>
+<main class="dm" id="main">
+  <nav class="dm-tabs" aria-label="Demos"><a href="/demo/chms" aria-current="page">React ChMS</a><a href="/demo/retreat">Retreat signup</a><a href="/demo/builder">Website builder</a></nav>
+  <header class="dm-head">
+    <span class="dm-eyebrow">React · controlled inputs</span>
+    <h1>Kinship: add a member church</h1>
+    <p>A church management app built with React. Every input is controlled by React state, and Lookup fills them the way typing would, so state stays in sync.</p>
+  </header>
+  <div class="dm-grid">
+    <div class="frame"><div class="frame-in demo dm-form" id="app"><p class="dm-note">Loading the React app…</p></div></div>
+    <aside class="dm-aside">
+      <div class="dm-card">
+        <h2>Try it</h2>
+        <ol>
+          <li>Search for a church, such as <b>grace comm</b>, and pick one.</li>
+          <li>Watch React&#8217;s state on the right update with each filled field.</li>
+          <li>Change the denomination or website, then leave the field.</li>
+          <li>Check a change and choose <b>Share</b> to see what would happen.</li>
+        </ol>
+      </div>
+      <div class="dm-card">
+        <h2>Demo mode</h2>
+        <p>This page uses <code>client="lookup-demo"</code>, so shares are checked the same way but never sent to Here&#8217;s My Church.</p>
+      </div>
+      <div class="dm-card"><h2>React state</h2><pre class="dm-state" id="state" aria-live="off">{}</pre></div>
+    </aside>
+  </div>
+</main>
+<script type="module" src="/element.js"></script>
+<script type="module" src="/service-times.js"></script>
+<script type="module">
+import React, { useEffect, useRef, useState } from "https://esm.sh/react@18.3.1";
+import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
+import htm from "https://esm.sh/htm@3.1.1";
+const html = htm.bind(React.createElement);
+const empty = { church_id: "", street: "", city: "", regionName: "", postalCode: "", website: "", phone: "", denomination: "", serviceTimes: "" };
+
+function Field({ k, label, form, set, wide }) {
+  return html`<label class=${wide ? "wide" : ""}><span>${label}</span><input data-hmc-field=${k} value=${form[k]} onChange=${(e) => set(k, e.target.value)} /></label>`;
+}
+
+function App() {
+  const [form, setForm] = useState(empty);
+  const [saved, setSaved] = useState("");
+  const ref = useRef(null);
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  useEffect(() => {
+    const el = ref.current;
+    const pick = (e) => set("church_id", e.detail.result.id);
+    const clear = () => set("church_id", "");
+    el.addEventListener("church-select", pick);
+    el.addEventListener("church-clear", clear);
+    return () => { el.removeEventListener("church-select", pick); el.removeEventListener("church-clear", clear); };
+  }, []);
+  useEffect(() => { document.getElementById("state").textContent = JSON.stringify(form, null, 2); }, [form]);
+  const submit = (e) => { e.preventDefault(); setSaved(form.church_id ? `Saved church ${form.church_id}` : "Pick a church first"); };
+  return html`<form id="chms" onSubmit=${submit}>
+    <h2>New member church</h2>
+    <p>Fields marked by Lookup fill from Here’s My Church. Anything you type is kept.</p>
+    <church-lookup ref=${ref} name="church_id" client="lookup-demo" label="Church" placeholder="Search for a church"></church-lookup>
+    <fieldset><legend>Address</legend><div class="dm-row">
+      <${Field} k="street" label="Street" form=${form} set=${set} wide />
+      <${Field} k="city" label="City" form=${form} set=${set} />
+      <${Field} k="regionName" label="State or region" form=${form} set=${set} />
+      <${Field} k="postalCode" label="Postal code" form=${form} set=${set} />
+    </div></fieldset>
+    <fieldset><legend>Details</legend><div class="dm-row">
+      <${Field} k="website" label="Website" form=${form} set=${set} />
+      <${Field} k="phone" label="Phone" form=${form} set=${set} />
+      <${Field} k="denomination" label="Denomination" form=${form} set=${set} />
+      <${Field} k="serviceTimes" label="Service times" form=${form} set=${set} />
+    </div></fieldset>
+    <div class="dm-actions"><output>${saved}</output><button type="button" class="dm-btn ghost" onClick=${() => { setForm(empty); setSaved(""); ref.current.clear(); }}>Reset</button><button class="dm-btn">Save church</button></div>
+  </form>`;
+}
+createRoot(document.getElementById("app")).render(html`<${App} />`);
+</script>
+</body>
+</html>

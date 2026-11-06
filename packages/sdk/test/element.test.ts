@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChurchLookup, fieldValue, setNativeValue } from "../src/element.ts";
 import { createLookup } from "../src/client.ts";
+import "../src/strings-es.ts";
+import "../src/strings-pl.ts";
 
 const result = (id: string, name: string) => ({ id, name, label: `${name}, Dallas, Texas`, locationLabel: "Dallas, Texas", street: null, city: "Dallas", nearestPlace: null, region: "TX", regionName: "Texas", country: "US", countryName: "United States", latitude: 1, longitude: 2, denomination: null, completeness: 50, distanceKm: null, band: 1, source: "lexical" as const });
 const record = {
@@ -326,5 +328,110 @@ describe("languages", () => {
     expect(el.shadowRoot!.querySelector("label")!.textContent).toBe("Kościół");
     el.strings = { label: "Twoja parafia" };
     expect(el.shadowRoot!.querySelector("label")!.textContent).toBe("Twoja parafia");
+  });
+});
+
+describe("consent", () => {
+  const meta = { fields: [], completenessWeights: {}, attribution: "", contributableFields: {
+    name: { countries: "all", review: "moderated", status: "coming_soon" },
+    website: { countries: "all", review: "moderated" },
+    denomination: { countries: "all", review: "live" },
+    phone: { countries: ["US", "CA"], review: "live" },
+  } };
+  let posts: { path: string; body: any }[] = [];
+  function mountConsent(attrs = "", reply: any = { churchId: "R-1", results: [{ field: "website", status: "in_review" }] }) {
+    posts = [];
+    document.body.innerHTML = `<form><church-lookup client="acme" ${attrs}></church-lookup>
+      <label for="w">Website</label><input id="w" data-hmc-field="website">
+      <label for="d">Denomination</label><input id="d" data-hmc-field="denomination">
+      <label for="n">Church name</label><input id="n" data-hmc-field="name"></form>`;
+    const el = document.querySelector("church-lookup") as ChurchLookup;
+    el.lookup = createLookup({
+      client: "acme",
+      fetch: (async (url: string, init?: RequestInit) => {
+        const u = new URL(url);
+        if (init?.method === "POST") { posts.push({ path: u.pathname, body: JSON.parse(String(init.body)) }); return Response.json(u.pathname.endsWith("/confirm") ? { churchId: "R-1", status: "confirmed" } : reply); }
+        if (u.pathname === "/v1/meta") return Response.json(meta);
+        if (u.pathname.startsWith("/v1/churches/")) return Response.json({ ...record, fields: { ...record.fields, country: "US", denomination: null } });
+        return Response.json({ query: "grac", results: [result("R-1", "Grace Church")], corrected: null, degraded: false, attribution: "" });
+      }) as typeof fetch,
+    });
+    return { el, input: el.shadowRoot!.querySelector("input")!, panel: el.shadowRoot!.querySelector<HTMLElement>("[part=consent]")! };
+  }
+  const pick = async (input: HTMLInputElement) => { type(input, "grac"); await flush(160); key(input, "ArrowDown"); key(input, "Enter"); await flush(20); };
+  const edit = (id: string, v: string) => { const f = document.getElementById(id) as HTMLInputElement; f.value = v; f.dispatchEvent(new Event("change")); };
+
+  it("offers Still correct after a fill, and confirms on click", async () => {
+    const { input, panel } = mountConsent();
+    await pick(input);
+    expect(panel.hidden).toBe(false);
+    expect(panel.textContent).toContain("Still correct?");
+    panel.querySelector<HTMLButtonElement>("button")!.click();
+    await flush(10);
+    expect(posts).toEqual([{ path: "/v1/churches/R-1/confirm", body: { client: "acme" } }]);
+    expect(panel.textContent).toContain("Thanks for confirming.");
+  });
+  it("lists edits unchecked and sends nothing without a click", async () => {
+    const { input, panel } = mountConsent();
+    await pick(input);
+    edit("w", "https://new.example");
+    const boxes = panel.querySelectorAll<HTMLInputElement>("input[type=checkbox]");
+    expect(boxes).toHaveLength(1);
+    expect(boxes[0]!.checked).toBe(false);
+    expect(panel.textContent).toContain("https://grace.example");
+    expect(panel.textContent).toContain("https://new.example");
+    expect(panel.textContent).toContain("A moderator reviews it");
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    expect(posts).toHaveLength(0);
+  });
+  it("shares checked rows, fires church-contribute, and shows each result", async () => {
+    const { el, input, panel } = mountConsent("", { churchId: "R-1", sandbox: true, results: [{ field: "website", status: "in_review" }, { field: "denomination", status: "live" }] });
+    const seen: any[] = [];
+    el.addEventListener("church-contribute", (e) => seen.push((e as CustomEvent).detail));
+    await pick(input);
+    edit("w", "https://new.example");
+    edit("d", "Baptist");
+    panel.querySelectorAll<HTMLInputElement>("input[type=checkbox]").forEach((b) => { b.checked = true; });
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    expect(seen[0]).toEqual({ churchId: "R-1", changes: [{ field: "website", value: "https://new.example" }, { field: "denomination", value: "Baptist" }] });
+    expect(posts[0]).toEqual({ path: "/v1/churches/R-1/contributions", body: { client: "acme", changes: seen[0].changes } });
+    expect(panel.textContent).toContain("Sent for review");
+    expect(panel.textContent).toContain("Live now");
+    expect(panel.textContent).toContain("Demo only: nothing was sent.");
+  });
+  it("lets the host cancel the send", async () => {
+    const { el, input, panel } = mountConsent();
+    el.addEventListener("church-contribute", (e) => e.preventDefault());
+    await pick(input);
+    edit("w", "https://new.example");
+    panel.querySelector<HTMLInputElement>("input[type=checkbox]")!.checked = true;
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    expect(posts).toHaveLength(0);
+  });
+  it("shows name as coming soon and can't send it", async () => {
+    const { input, panel } = mountConsent();
+    await pick(input);
+    edit("n", "Grace Church Dallas");
+    const box = panel.querySelector<HTMLInputElement>("input[type=checkbox]")!;
+    expect(box.disabled).toBe(true);
+    expect(panel.textContent).toContain("Coming soon");
+  });
+  it("stays hidden with contribute=off", async () => {
+    const { input, panel } = mountConsent(`contribute="off"`);
+    await pick(input);
+    edit("w", "https://new.example");
+    expect(panel.hidden).toBe(true);
+  });
+  it("hides on Not now until something else changes", async () => {
+    const { input, panel } = mountConsent();
+    await pick(input);
+    edit("w", "https://new.example");
+    panel.querySelectorAll<HTMLButtonElement>(".row .bt")[1]!.click();
+    expect(panel.hidden).toBe(true);
+    edit("d", "Baptist");
+    expect(panel.hidden).toBe(false);
   });
 });

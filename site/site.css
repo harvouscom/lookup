@@ -708,3 +708,5 @@ p.num::after { margin-left: 2px; }
 /* Nav contents line up with the docs container (1120px, 24px gutters). */
 .nav { padding-left: max(24px, calc((100% - 1120px) / 2 + 24px)); padding-right: max(24px, calc((100% - 1120px) / 2 + 24px)); }
 @media (max-width: 640px) { .nav { padding-left: 14px; padding-right: 14px; } }
+.verb.post { background: rgba(124,58,237,.12); color: #6D28D9; }
+:root[data-theme=dark] .verb.post { color: #C4B5FD; }
