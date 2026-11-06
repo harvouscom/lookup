@@ -17,3 +17,5 @@
   Cache-Control: public, max-age=300
 /sky.js
   Cache-Control: public, max-age=300
+/aurora.js
+  Cache-Control: public, max-age=300

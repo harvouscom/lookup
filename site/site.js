@@ -2,6 +2,7 @@
 // the section index, and the API playground. No dependencies.
 import { createGlobe } from "/globe.js";
 import { createSky } from "/sky.js";
+import { createAurora } from "/aurora.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -125,12 +126,14 @@ function showFill(changes, quiet = false, record = null) {
 // ── The sky: stars and constellations that turn with the globe, and the odd shooting star ──
 function startSky() {
   const hdr = $(".hdr");
-  const sky = createSky($("#sky"), {
+  const opts = {
     view: () => globe.view(),
     horizon: () => $(".horizon").getBoundingClientRect().top - hdr.getBoundingClientRect().top,
-  });
+  };
+  const aurora = createAurora($("#aurora"), opts);
+  const sky = createSky($("#sky"), opts);
   let inView = true;
-  const sync = () => sky.setRunning(inView && !document.hidden);
+  const sync = () => { const on = inView && !document.hidden; aurora.setRunning(on); sky.setRunning(on); };
   new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); }).observe(hdr);
   document.addEventListener("visibilitychange", sync);
   sync();

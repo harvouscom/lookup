@@ -546,3 +546,6 @@ th { background: var(--frame); }
 .sky { border-radius: 13px; }
 @media (max-width: 640px) { .horizon { border-radius: 0 0 11px 11px; } .sky { border-radius: 11px; } }
 @media (max-width: 640px) { .tag:not(.big) { display: none; } }
+.aurora { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 13px; }
+@media (max-width: 640px) { .aurora { border-radius: 11px; } }
+p.num::after { margin-left: 2px; }

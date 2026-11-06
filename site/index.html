@@ -37,6 +37,7 @@
 </nav>
 
 <header class="hdr" id="top">
+  <canvas class="aurora" id="aurora" aria-hidden="true"></canvas>
   <canvas class="sky" id="sky" aria-hidden="true"></canvas>
   <div class="hero">
     <h1>Church details, filled in.</h1>
@@ -128,7 +129,7 @@
   </nav>
 
   <section id="overview" aria-labelledby="overview-h">
-    <p class="num" aria-hidden="true"><span>01</span>overview</p>
+    <p class="num" aria-hidden="true"><span>01</span></p>
     <h2 id="overview-h">Stop retyping church details</h2>
     <p class="lead">Church tools keep asking people for the same details. Lookup fills them in from <a href="https://heresmychurch.com">Here's My Church</a>, an open directory of 587,842 churches in 19 countries.</p>
     <ul class="features">
@@ -139,7 +140,7 @@
   </section>
 
   <section id="quickstart" aria-labelledby="quickstart-h">
-    <p class="num" aria-hidden="true"><span>02</span>quickstart</p>
+    <p class="num" aria-hidden="true"><span>02</span></p>
     <h2 id="quickstart-h">Quickstart</h2>
     <p>Add the script, put <code>&lt;church-lookup&gt;</code> in your form, and mark the fields it should fill with <code>data-hmc-field</code>. There's no key to request.</p>
     <div class="frame"><div class="frame-in code" data-tabs>
@@ -180,7 +181,7 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="widget" aria-labelledby="widget-h">
-    <p class="num" aria-hidden="true"><span>03</span>widget</p>
+    <p class="num" aria-hidden="true"><span>03</span></p>
     <h2 id="widget-h">The widget</h2>
     <p><code>&lt;church-lookup&gt;</code> is an accessible combobox. It searches as people type, asks for smarter results when they pause, and fills your form when they choose.</p>
     <h3>Attributes</h3>
@@ -205,7 +206,7 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="service-times" aria-labelledby="st-h">
-    <p class="num" aria-hidden="true"><span>04</span>service times</p>
+    <p class="num" aria-hidden="true"><span>04</span></p>
     <h2 id="st-h">Service times</h2>
     <p>Wrap a service-times field in <code>&lt;church-service-times&gt;</code> to edit it as rows of day, time and label, the same way Here's My Church does. The field keeps one plain string, such as <code>Sun 9:00 AM (Main Service); Wed 7:00 PM</code>, so it submits like any input.</p>
     <div class="frame"><div class="frame-in demo">
@@ -219,7 +220,7 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="theming" aria-labelledby="theme-h">
-    <p class="num" aria-hidden="true"><span>05</span>theming</p>
+    <p class="num" aria-hidden="true"><span>05</span></p>
     <h2 id="theme-h">Theming</h2>
     <p>The widget takes colors, corners and fonts from CSS variables. On a page using <a href="https://sensibleui.com">Sensible UI</a> by <a href="https://github.com/cameronapak">Cam Pak</a>, or any shadcn/ui-style tokens, it matches with no setup.</p>
     <div class="frame"><div class="frame-in flush">
@@ -235,7 +236,7 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="api" aria-labelledby="api-h">
-    <p class="num" aria-hidden="true"><span>06</span>api</p>
+    <p class="num" aria-hidden="true"><span>06</span></p>
     <h2 id="api-h">API</h2>
     <p>Base URL <code>https://lookup.heresmychurch.com/v1</code>. Open CORS, no key, no cookies.</p>
     <h3><span class="verb">GET</span> /v1/search</h3>
@@ -269,7 +270,7 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="how-search-works" aria-labelledby="how-h">
-    <p class="num" aria-hidden="true"><span>07</span>how search works</p>
+    <p class="num" aria-hidden="true"><span>07</span></p>
     <h2 id="how-h">How search works</h2>
     <ol class="flow">
       <li><b>Words, as you type.</b> A full-text index finds names that start with what's typed: nearby first, then wider, then the whole country.</li>
@@ -290,7 +291,7 @@ npm install @heresmychurch/lookup</code></pre>
   </section>
 
   <section id="data" aria-labelledby="data-h">
-    <p class="num" aria-hidden="true"><span>08</span>data</p>
+    <p class="num" aria-hidden="true"><span>08</span></p>
     <h2 id="data-h">Data and review</h2>
     <p>Lookup reads Here's My Church's reviewed listings and re-syncs changed regions every 5 minutes. Searches aren't logged, and approximate location is only used in memory to rank nearby churches.</p>
     <p class="note">Why fewer churches than Here's My Church shows? Its map counts every listing, about 655,000. Lookup leaves out about 68,000 that have no real name yet, such as "Unnamed church", since nobody can find those by typing. Once a listing gets a name on Here's My Church, the next sync adds it.</p>

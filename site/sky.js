@@ -1,4 +1,4 @@
-// The header's night sky: seeded stars and a few constellations that turn with the globe, plus
+// The header's night sky: faint seeded stars that turn with the globe, plus
 // the odd shooting star travelling the way the globe is spinning. Stays still for reduced motion.
 
 export function createSky(canvas, { view, horizon }) {
@@ -8,22 +8,10 @@ export function createSky(canvas, { view, horizon }) {
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
   // Positions are sky longitude (0-360) and height (0 = top, 1 = the horizon line).
-  const stars = Array.from({ length: 240 }, () => ({
+  const stars = Array.from({ length: 120 }, () => ({
     lng: rnd() * 360, y: Math.pow(rnd(), 1.15), r: rnd() < 0.07 ? 1.5 : rnd() < 0.35 ? 1 : 0.65,
-    a: 0.2 + rnd() * 0.55, tw: rnd() * Math.PI * 2,
+    a: 0.12 + rnd() * 0.4, tw: rnd() * Math.PI * 2,
   }));
-  const constellations = [[18, 0.16], [92, 0.34], [168, 0.12], [236, 0.28], [304, 0.18]].map(([lng, y]) => {
-    const pts = [];
-    let L = lng, Y = y;
-    const n = 5 + Math.floor(rnd() * 2);
-    for (let i = 0; i < n; i++) {
-      pts.push({ lng: L, y: Y });
-      L += 2.5 + rnd() * 4.5;
-      Y = Math.min(0.6, Math.max(0.05, Y + (rnd() - 0.5) * 0.16));
-    }
-    return pts;
-  });
-
   let W = 0, H = 0, dpr = 1, skyH = 0, running = false, last = 0, prevLng = null, spin = -1, nextShot = 0;
   const shots = [];
 
@@ -56,24 +44,6 @@ export function createSky(canvas, { view, horizon }) {
       const tw = reduce ? 1 : 0.72 + 0.28 * Math.sin(t / 900 + s.tw);
       ctx.fillStyle = `rgba(226,220,255,${s.a * tw * fade})`;
       ctx.fillRect(Math.round(x), Math.round(y), s.r, s.r);
-    }
-    ctx.lineWidth = 1;
-    for (const pts of constellations) {
-      const p = pts.map((s) => [xOf(s.lng, v), yOf(s.y, v)]);
-      ctx.strokeStyle = "rgba(196,181,253,.16)";
-      ctx.beginPath();
-      for (let i = 1; i < p.length; i++) {
-        if (Math.abs(p[i][0] - p[i - 1][0]) > W / 2) continue;
-        ctx.moveTo(p[i - 1][0], p[i - 1][1]);
-        ctx.lineTo(p[i][0], p[i][1]);
-      }
-      ctx.stroke();
-      for (const [x, y] of p) {
-        ctx.fillStyle = "rgba(237,233,254,.85)";
-        ctx.beginPath(); ctx.arc(x, y, 1.3, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "rgba(167,139,250,.18)";
-        ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
-      }
     }
     for (const s of shots) {
       const k = (t - s.t0) / s.life;
