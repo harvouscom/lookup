@@ -156,7 +156,7 @@ export class ChurchServiceTimes extends Base {
 <button type="button" class="x" data-a="remove" aria-label="Remove ${name}">×</button></div>`;
     }).join("");
     const raw = this.unread ? `<p class="raw" part="unread">These times couldn't be read automatically, so add them below: <q></q></p>` : "";
-    const presets = !this.entries.length ? `<p class="presets" part="presets"><span>Start from a common schedule:</span>${PRESETS.map(([l], i) => `<button type="button" data-a="preset" data-p="${i}">${l}</button>`).join("")}</p>` : "";
+    const presets = !this.entries.length ? `<p class="presets" part="presets"><span>Start from a common schedule:</span>${PRESETS.map(([l], i) => `<button type="button" data-a="preset" data-p="${i}" part="preset">${l}</button>`).join("")}</p>` : "";
     this.box.innerHTML = `${raw}${h}${presets}<button type="button" data-a="add" part="add">+ Add a service time</button>`;
     // Set values directly too; some engines don't honor a `selected` added to a non-standard option.
     this.box.querySelectorAll<HTMLElement>("[data-i]").forEach((row) => {

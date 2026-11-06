@@ -118,7 +118,13 @@
   @keyframes glow { from { box-shadow: inset 0 0 0 2px var(--lime); } }
   church-lookup { --hmc-bg: #0E0E0C; --hmc-text: #fff; --hmc-popover: #1A1A17; --hmc-popover-text: #fff; --hmc-accent: #D2F25C; --hmc-active-bg: rgba(210,242,92,.14); --hmc-active-text: #fff; --hmc-radius: 9px; --hmc-input-border: rgba(255,255,255,.16); --hmc-border: rgba(255,255,255,.12); --hmc-muted: #A3A097; color-scheme: dark; }
   church-lookup::part(label) { font-size: 12px; font-weight: 500; color: #BDBAB0; }
-  church-lookup::part(input) { min-height: 44px; font-size: 14px; }
+  church-lookup::part(input) { min-height: 36px; height: 36px; font-size: 13px; }
+  /* Section heads keep their own spacing (.panel > p would otherwise zero it) */
+  .panel > .sec { margin: 26px 0 12px; }
+  /* Service times: match the form's 12-13px text instead of the widget's 15-16px defaults */
+  church-service-times::part(presets) { margin: 2px 0 10px; font-size: 12px; line-height: 1.5; color: var(--mute); }
+  church-service-times::part(preset), church-service-times::part(add) { min-height: 32px; padding: 0 12px; border-radius: 999px; font-size: 12.5px; font-weight: 500; }
+  church-service-times::part(row) { font-size: 13px; }
   @media (max-width: 1000px) { .app, .demo-banner + .app { height: auto; } .work { grid-template-columns: 1fr; grid-template-rows: none; overflow: visible; } .canvas { overflow: visible; } .rail { display: none; } .panel { border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 24px; } .canvas { padding: 16px; } .s-body { grid-template-columns: 1fr; } .crumb, .avs { display: none; } .s-nav span { display: none; } }
   @media (prefers-reduced-motion: reduce) { .fill { animation: none; } .site { transition: none; } }
 </style>
