@@ -681,3 +681,14 @@ p.num::after { margin-left: 2px; }
 .brand-by { padding-left: 10px; border-left: 1px solid var(--line-2); font-size: .8125rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
 .brand-by:hover { color: var(--brand); }
 @media (max-width: 420px) { .brand-by { display: none; } }
+/* Harvous: one quiet row under the two project cards. */
+.oss-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 10px 14px 10px 10px; border-radius: 14px; background: var(--frame); text-decoration: none; color: var(--text-2); transition: background .2s; }
+.oss-row:hover { background: color-mix(in oklab, var(--brand) 7%, var(--frame)); }
+.oss-row img { flex: none; border-radius: 8px; }
+.oss-row-t { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: .9375rem; }
+.oss-row-t b { font-weight: 600; color: var(--text); }
+.oss-row-t span { font-size: .875rem; color: var(--muted); }
+.oss-row-go { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: .8125rem; font-weight: 500; color: var(--brand); white-space: nowrap; }
+.oss-row:hover .oss-row-go svg { transform: translateX(2px); }
+.oss-row-go svg { transition: transform .2s; }
+@media (max-width: 560px) { .oss-row-go { font-size: 0; } .oss-row-go svg { width: 16px; height: 16px; } }
