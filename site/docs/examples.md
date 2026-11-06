@@ -11,7 +11,7 @@ Each one is a made-up app using the real widget and live data, in demo mode so n
 | Example | Shows |
 |---|---|
 | Kinship, web component | React controlled inputs, `church-select` and `church-clear` events, the share panel |
-| Harvest Table | `name` and `required` in a plain form, service times feeding distribution hours |
+| Harvest | `name` and `required` in a plain form, service times feeding distribution hours |
 | Steeple | Filling a live preview, `<church-service-times>`, theming to a product's own look |
 | Kinship, shadcn/ui | `shadcn add` from the registry, `ChurchLookup` in a React Hook Form `FormField`, `ChurchConsent` |
 
