@@ -54,6 +54,8 @@ function showTags(list) {
 function placeTags(screen) {
   const h = tagLayer.clientHeight, W = tagLayer.clientWidth;
   const sizes = tags.map((t) => [t.el.offsetWidth, t.el.offsetHeight]);
+  // The church card always keeps clear space below the search box.
+  const minY = hero.getBoundingClientRect().bottom - tagLayer.getBoundingClientRect().top + 16;
   tags.forEach((t, i) => {
     const p = screen(t.lat, t.lng);
     const on = p.visible && p.y > 24 && p.y < h - 8;
@@ -65,13 +67,23 @@ function placeTags(screen) {
       const side = p.x + 22 + w <= W - 8 ? "right" : p.x - 22 - w >= 8 ? "left" : "";
       if (side) {
         const x = side === "right" ? p.x + 22 : p.x - 22 - w;
-        const y = Math.max(p.y - ht / 2, 8);
+        const y = Math.max(p.y - ht / 2, 8, minY);
         t.el.dataset.side = side;
-        t.el.style.setProperty("--stem-y", `${p.y - y}px`);
+        t.el.style.setProperty("--stem-y", `${Math.min(Math.max(p.y - y, 12), ht - 12)}px`);
         t.el.style.transform = `translate(${x}px, ${y}px)`;
         return;
       }
-      t.el.dataset.side = "top";
+      const x = Math.min(Math.max(p.x, w / 2 + 8), W - w / 2 - 8);
+      t.el.style.setProperty("--stem", `${p.x - x}px`);
+      // Above the pin if there's room under the search; otherwise below it.
+      if (p.y - 18 - ht >= minY) {
+        t.el.dataset.side = "top";
+        t.el.style.transform = `translate(${x}px, ${p.y}px) translate(-50%, calc(-100% - 18px))`;
+      } else {
+        t.el.dataset.side = "bottom";
+        t.el.style.transform = `translate(${x}px, ${p.y + 18}px) translate(-50%, 0)`;
+      }
+      return;
     }
     // Keep the label inside the globe's width; its stem still points at the pin.
     const x = Math.min(Math.max(p.x, w / 2 + 8), W - w / 2 - 8);
