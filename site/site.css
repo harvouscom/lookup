@@ -644,3 +644,5 @@ p.num::after { margin-left: 2px; }
 /* The headline keeps growing and stays on one line on desktop; the copy and search keep their own widths. */
 .hero { max-width: 64rem; }
 @media (min-width: 900px) { .hero h1 { white-space: nowrap; } }
+.lede { max-width: 36rem; }
+.nw { white-space: nowrap; color: inherit !important; }
