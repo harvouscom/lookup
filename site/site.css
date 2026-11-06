@@ -646,3 +646,11 @@ p.num::after { margin-left: 2px; }
 @media (min-width: 900px) { .hero h1 { white-space: nowrap; } }
 .lede { max-width: 36rem; }
 .nw { white-space: nowrap; color: inherit !important; }
+/* App window footer: one line at any width; the credit is a small pill that shrinks to its mark. */
+.win-main { container-type: inline-size; }
+.win-foot { gap: 8px; padding-top: 12px; padding-bottom: 12px; }
+.sc-credit { gap: 6px; min-width: 0; padding: 4px 9px 4px 5px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: .75rem; color: var(--muted); white-space: nowrap; }
+.sc-credit span { overflow: hidden; text-overflow: ellipsis; }
+.sc-credit img { border-radius: 4px; }
+.sc-btn { flex: none; white-space: nowrap; min-height: 34px; padding: 0 14px; }
+@container (max-width: 440px) { .sc-credit { padding: 4px; } .sc-credit span { display: none; } }
