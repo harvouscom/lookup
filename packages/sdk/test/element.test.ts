@@ -242,3 +242,89 @@ describe("icons", () => {
     expect(root.querySelector("li .ic svg")).not.toBeNull();
   });
 });
+
+describe("form field", () => {
+  function mountForm(attrs: string, html = "") {
+    document.body.innerHTML = `<form id="f"><church-lookup label="Your church" ${attrs}></church-lookup>${html}</form>`;
+    const el = document.querySelector("church-lookup") as ChurchLookup;
+    el.lookup = createLookup({
+      fetch: (async (url: string) => {
+        const u = new URL(url);
+        if (u.pathname.startsWith("/v1/churches/")) return Response.json(record);
+        return Response.json({ query: "grac", results: [result("R-1", "Grace Church")], corrected: null, degraded: false, attribution: "" });
+      }) as typeof fetch,
+    });
+    return { el, form: document.querySelector("form")!, input: el.shadowRoot!.querySelector("input")!, root: el.shadowRoot! };
+  }
+  const pick = async (input: HTMLInputElement) => { type(input, "grac"); await flush(160); key(input, "ArrowDown"); key(input, "Enter"); await flush(10); };
+
+  it("submits the chosen church's ID under its name", async () => {
+    const { el, form, input } = mountForm(`name="church"`);
+    expect(el.value).toBe("");
+    await pick(input);
+    expect(el.value).toBe("R-1");
+    expect(el.selected?.name).toBe("Grace Church");
+    expect(new FormData(form).get("church")).toBe("R-1");
+  });
+  it("is invalid while required and empty", async () => {
+    const { el, input } = mountForm(`name="church" required`);
+    if (!el.validity) return; // No ElementInternals in this DOM: nothing to check.
+    expect(el.checkValidity()).toBe(false);
+    await pick(input);
+    expect(el.checkValidity()).toBe(true);
+  });
+  it("clears with the clear button and fires church-clear", async () => {
+    const { el, form, input, root } = mountForm(`name="church"`);
+    await pick(input);
+    const btn = root.querySelector<HTMLButtonElement>("[part=clear]")!;
+    expect(btn.hidden).toBe(false);
+    let cleared = 0;
+    el.addEventListener("church-clear", () => cleared++);
+    btn.click();
+    expect(cleared).toBe(1);
+    expect(el.value).toBe("");
+    expect(input.value).toBe("");
+    expect(btn.hidden).toBe(true);
+    expect(new FormData(form).get("church") ?? "").toBe("");
+  });
+  it("drops the choice when the name is edited", async () => {
+    const { el, input } = mountForm(`name="church"`);
+    await pick(input);
+    type(input, "Grace Churc");
+    expect(el.value).toBe("");
+  });
+  it("shows a saved church from its value without filling", async () => {
+    const { el, input } = mountForm(`name="church" value="R-1"`, `<input id="street" data-hmc-field="street">`);
+    await flush(10);
+    expect(input.value).toBe("Grace Church");
+    expect(el.value).toBe("R-1");
+    expect((document.getElementById("street") as HTMLInputElement).value).toBe("");
+  });
+  it("fills on load with fill-on-load", async () => {
+    mountForm(`value="R-1" fill-on-load`, `<input id="street" data-hmc-field="street">`);
+    await flush(10);
+    expect((document.getElementById("street") as HTMLInputElement).value).toBe("1 Main");
+  });
+});
+
+describe("languages", () => {
+  it("uses lang for its text and announcements", async () => {
+    responses.grac = [result("R-1", "Grace Church"), result("R-2", "Grace Chapel")];
+    document.body.innerHTML = `<form><church-lookup lang="es"></church-lookup></form>`;
+    const el = document.querySelector("church-lookup") as ChurchLookup;
+    el.lookup = createLookup({ fetch: (async () => Response.json({ query: "grac", results: responses.grac, corrected: null, degraded: false, attribution: "" })) as typeof fetch });
+    const root = el.shadowRoot!;
+    expect(root.querySelector("label")!.textContent).toBe("Iglesia");
+    const input = root.querySelector("input")!;
+    type(input, "grac");
+    await flush(260);
+    expect(root.querySelector("[role=status]")!.textContent).toBe("2 iglesias encontradas. Usa las flechas arriba y abajo para elegir.");
+  });
+  it("follows the page's lang and takes overrides", () => {
+    document.body.innerHTML = `<div lang="pl"><church-lookup></church-lookup></div>`;
+    const el = document.querySelector("church-lookup") as ChurchLookup;
+    expect(el.shadowRoot!.querySelector("label")!.textContent).toBe("Kościół");
+    el.strings = { label: "Twoja parafia" };
+    expect(el.shadowRoot!.querySelector("label")!.textContent).toBe("Twoja parafia");
+  });
+});

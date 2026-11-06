@@ -1,6 +1,11 @@
-// <church-lookup>: an ARIA 1.2 combobox that searches Here's My Church and autofills a form.
+// <church-lookup>: an ARIA 1.2 combobox that searches Here's My Church and autofills a form. It's a
+// form-associated element: with a `name`, the chosen church's ID submits like any input.
+/// <reference path="./jsx.d.ts" />
 import { createLookup, type ChurchRecord, type Lookup, type SearchResult } from "./client.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
+import { stringsFor, type Strings } from "./strings.ts";
+
+export type { Strings };
 
 export { setNativeValue };
 
@@ -21,7 +26,8 @@ label{display:block;margin-bottom:8px;font-weight:600;font-size:.9375rem}
 .field{position:relative}
 .field svg{position:absolute;z-index:1;left:14px;top:50%;width:20px;height:20px;margin-top:-10px;color:var(--_muted);pointer-events:none}
 input{box-sizing:border-box;width:100%;min-height:52px;padding:12px 16px 12px 44px;font:inherit;font-size:1.0625rem;color:inherit;background:var(--_bg);border:1px solid var(--_input);border-radius:var(--_r);outline:none;transition:border-color .15s,box-shadow .15s}
-input::placeholder{color:var(--_muted);opacity:.85}
+input::placeholder{color:var(--_muted);opacity:.85}:host([data-chosen]) input{padding-right:48px}
+.x{position:absolute;z-index:1;right:10px;top:50%;width:32px;height:32px;margin-top:-16px;display:grid;place-items:center;padding:0;border:0;border-radius:calc(var(--_r) - 2px);background:none;color:var(--_muted);cursor:pointer}.x:hover{background:var(--_active);color:inherit}.x:focus-visible{outline:2px solid var(--_ring);outline-offset:1px}.x[hidden]{display:none}.x svg{width:16px;height:16px}
 input:focus-visible{border-color:var(--_ring);box-shadow:0 0 0 4px color-mix(in oklab,var(--_ring) 22%,transparent)}
 .pop{position:absolute;z-index:var(--hmc-z,1000);left:0;right:0;margin-top:8px;padding:6px;background:var(--_pop);color:var(--_pop-fg);border:1px solid var(--_line);border-radius:calc(var(--_r) + 4px);box-shadow:0 20px 40px -12px rgb(24 24 27/.25),0 4px 10px -4px rgb(24 24 27/.1)}
 .pop[hidden]{display:none}
@@ -45,6 +51,7 @@ a{color:var(--_ring);font-weight:500;text-underline-offset:3px}
 const SEARCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`;
 // Here's My Church's mark: a lilac cursive "h" on a plum tile.
 const HMC = `<svg viewBox="0 0 20 20" aria-hidden="true"><defs><clipPath id="hmc-t"><rect width="20" height="20" rx="5"/></clipPath></defs><g clip-path="url(#hmc-t)"><rect width="20" height="20" fill="#3B1D6E"/><path d="M-1 16C3 14 6 9 7.4 5.2 8.4 2.4 6.3 1.7 5.8 4.6 5.3 8 5.5 13 5.7 21M5.9 15.2C7.1 11.4 9.9 9.4 11.9 10.2 13.8 11 13.3 14.6 13.8 16.8 14.2 18.6 17 18.2 21 15.4" fill="none" stroke="#D2B4FB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`;
+const CLEAR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>`;
 const CHURCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v5M10 4h4M6 21V11l6-4 6 4v10M3 21h18M10 21v-4a2 2 0 0 1 4 0v4"/></svg>`;
 
 let uid = 0;
@@ -60,9 +67,16 @@ export function fieldValue(record: ChurchRecord, field: string): string | null {
 }
 
 export class ChurchLookup extends HTMLElement {
+  static formAssociated = true;
   /** Map of record field to an element or selector. Merged over data-hmc-field elements. */
   fieldMap: Record<string, FieldTarget | string> = {};
   lookup: Lookup | null = null;
+  private internals: ElementInternals | null = null;
+  private fallback: HTMLInputElement | null = null;
+  private chosen: SearchResult | null = null;
+  private current = "";
+  private overrides: Partial<Strings> = {};
+  private clearBtn!: HTMLButtonElement;
   private input!: HTMLInputElement;
   private list!: HTMLUListElement;
   private pop!: HTMLDivElement;
@@ -74,20 +88,44 @@ export class ChurchLookup extends HTMLElement {
   private timers: ReturnType<typeof setTimeout>[] = [];
   private ctrl: AbortController | null = null;
   private seq = 0;
-  private id = `hmc-${++uid}`;
+  private key = `hmc-${++uid}`;
+
+  constructor() {
+    super();
+    try { this.internals = this.attachInternals?.() ?? null; } catch { this.internals = null; }
+  }
+
+  /** The chosen church's ID, or "". Setting an ID shows that church, as on an edit screen. */
+  get value(): string { return this.current; }
+  set value(id: string) { void this.prefill(id); }
+  /** The chosen church as a search result, or null. */
+  get selected(): SearchResult | null { return this.chosen; }
+  /** Override any text, such as { label: "Your parish" }. */
+  get strings(): Partial<Strings> { return this.overrides; }
+  set strings(v: Partial<Strings>) { this.overrides = v ?? {}; this.applyText(); }
+  get form(): HTMLFormElement | null { return this.internals?.form ?? this.closest("form"); }
+  get validity(): ValidityState | undefined { return this.internals?.validity; }
+  checkValidity(): boolean { return this.internals?.checkValidity() ?? true; }
+  reportValidity(): boolean { return this.internals?.reportValidity() ?? true; }
+
+  private get t(): Strings {
+    const lang = this.getAttribute("lang") ?? this.closest("[lang]")?.getAttribute("lang") ?? null;
+    return { ...stringsFor(lang), ...this.overrides };
+  }
 
   connectedCallback(): void {
     if (this.shadowRoot) return;
     const root = this.attachShadow({ mode: "open" });
-    const id = this.id;
-    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field"><slot name="search-icon">${SEARCH}</slot><input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">${HMC}<span><i>Data from </i><b><a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></b></span><a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div></div><div class="sr" role="status" aria-live="polite"></div>`;
+    const id = this.key;
+    root.innerHTML = `<style>${CSS}</style><label part="label" for="${id}-i"></label><div class="field"><slot name="search-icon">${SEARCH}</slot><input part="input" id="${id}-i" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-l" autocomplete="off" spellcheck="false"><button class="x" part="clear" type="button" hidden>${CLEAR}</button></div><div class="pop" part="popup" hidden><ul part="listbox" role="listbox" id="${id}-l"></ul><div class="note" part="note" hidden></div><div class="foot" part="footer">${HMC}<span><i class="df"></i><b><a href="${ADD_URL}" target="_blank" rel="noopener">Here's My Church</a></b></span><a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div></div><div class="sr" role="status" aria-live="polite"></div>`;
     this.input = root.querySelector("input")!;
     this.list = root.querySelector("ul")!;
     this.pop = root.querySelector(".pop")!;
     this.note = root.querySelector(".note")!;
     this.live = root.querySelector("[role=status]")!;
-    root.querySelector("label")!.textContent = this.getAttribute("label") ?? "Church";
-    this.input.placeholder = this.getAttribute("placeholder") ?? "Start typing your church's name";
+    this.clearBtn = root.querySelector(".x")!;
+    this.clearBtn.addEventListener("click", () => { this.clear(); this.input.focus(); });
+    this.applyText();
     this.input.addEventListener("input", () => this.onInput());
     this.input.addEventListener("compositionstart", () => (this.composing = true));
     this.input.addEventListener("compositionend", () => { this.composing = false; this.onInput(); });
@@ -98,6 +136,73 @@ export class ChurchLookup extends HTMLElement {
       const li = (e.target as Element).closest("li");
       if (li) this.choose(Number(li.dataset.i));
     });
+    // Without ElementInternals (older browsers), a hidden input carries the value instead.
+    const name = this.getAttribute("name");
+    if (!this.internals && name && !this.fallback) {
+      this.fallback = Object.assign(document.createElement("input"), { type: "hidden", name });
+      this.append(this.fallback);
+    }
+    this.setValue("");
+    const initial = this.getAttribute("value");
+    // After a microtask, so a lookup client or strings set right after creation are used.
+    if (initial) queueMicrotask(() => void this.prefill(initial));
+  }
+
+  private applyText(): void {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const t = this.t;
+    root.querySelector("label")!.textContent = this.getAttribute("label") ?? this.overrides.label ?? t.label;
+    this.input.placeholder = this.getAttribute("placeholder") ?? this.overrides.placeholder ?? t.placeholder;
+    this.clearBtn.setAttribute("aria-label", t.clear);
+    root.querySelector(".df")!.textContent = `${t.dataFrom} `;
+  }
+
+  /** Set the submitted value and keep validity, the clear button and the fallback input in step. */
+  private setValue(id: string): void {
+    this.current = id;
+    this.internals?.setFormValue(id || null);
+    if (this.fallback) this.fallback.value = id;
+    this.toggleAttribute("data-chosen", Boolean(id));
+    if (this.clearBtn) this.clearBtn.hidden = !id;
+    if (this.internals && this.input) {
+      if (this.hasAttribute("required") && !id) this.internals.setValidity({ valueMissing: true }, this.t.required, this.input);
+      else this.internals.setValidity({});
+    }
+  }
+
+  /** Forget the chosen church. Fields it filled keep their values. */
+  clear(): void {
+    const had = Boolean(this.current);
+    this.chosen = null;
+    this.input.value = "";
+    this.results = [];
+    this.close();
+    this.setValue("");
+    if (had) this.dispatchEvent(new CustomEvent("church-clear", { bubbles: true, composed: true }));
+  }
+
+  /** Show a church by ID without searching, such as one saved earlier. Fills only with fill-on-load. */
+  private async prefill(id: string): Promise<void> {
+    if (!this.shadowRoot) { if (id) this.setAttribute("value", id); return; }
+    if (!id) { this.clear(); return; }
+    try {
+      const record = await this.client().getChurch(id);
+      const name = String(record.fields.name ?? "");
+      this.input.value = name;
+      this.chosen = { id: record.id, name, label: name, locationLabel: "" } as SearchResult;
+      this.setValue(record.id);
+      if (this.hasAttribute("fill-on-load")) this.fillFrom(record);
+    } catch {
+      this.say(this.t.loadFail);
+    }
+  }
+
+  formResetCallback(): void { this.clear(); }
+  formStateRestoreCallback(state: unknown): void { if (typeof state === "string" && state) void this.prefill(state); }
+  formDisabledCallback(disabled: boolean): void {
+    if (this.input) this.input.disabled = disabled;
+    if (this.clearBtn) this.clearBtn.disabled = disabled;
   }
 
   private client(): Lookup {
@@ -113,6 +218,8 @@ export class ChurchLookup extends HTMLElement {
     if (this.composing) return;
     this.clearTimers();
     const q = this.input.value.trim();
+    // Typing after a pick starts over: the old choice no longer matches what's in the box.
+    if (this.current && q !== this.chosen?.name) { this.chosen = null; this.setValue(""); }
     if (q.length < 2) { this.ctrl?.abort(); this.results = []; this.close(); return; }
     this.timers.push(setTimeout(() => this.run(q, false), DEBOUNCE_MS));
     if (q.length >= SETTLED_MIN) this.timers.push(setTimeout(() => this.run(q, true), SETTLE_MS));
@@ -134,7 +241,7 @@ export class ChurchLookup extends HTMLElement {
       this.dispatchEvent(new CustomEvent("church-results", { detail: { query: q, results: this.results, settled }, bubbles: true, composed: true }));
     } catch (e) {
       if ((e as Error).name === "AbortError" || seq !== this.seq) return;
-      this.show([], "Search isn't available right now. You can keep typing your church's details.");
+      this.show([], this.t.error);
     }
   }
 
@@ -151,7 +258,7 @@ export class ChurchLookup extends HTMLElement {
     this.placeIcons(next.length);
     this.list.replaceChildren(...next.map((r, i) => {
       const li = document.createElement("li");
-      li.id = `${this.id}-o${i}`;
+      li.id = `${this.key}-o${i}`;
       li.setAttribute("role", "option");
       li.setAttribute("part", "option");
       li.setAttribute("aria-selected", String(i === this.active));
@@ -165,18 +272,18 @@ export class ChurchLookup extends HTMLElement {
     this.note.hidden = Boolean(next.length);
     if (!next.length) {
       this.note.innerHTML = "";
-      this.note.append(error ?? "No matching church. What you typed stays in the form. ");
+      this.note.append(error ?? this.t.none);
       if (!error) {
         const link = document.createElement("a");
         link.href = ADD_URL;
         link.target = "_blank";
         link.rel = "noopener";
-        link.textContent = "Add it on Here's My Church";
+        link.textContent = this.t.add;
         this.note.append(link);
       }
     }
     this.open();
-    this.say(error ?? (next.length ? `${next.length} ${next.length === 1 ? "church" : "churches"} found. Use up and down arrows to choose.` : "No matching church."));
+    this.say(error ?? (next.length ? this.t.found(next.length) : this.t.noneShort));
     this.mark();
   }
 
@@ -269,13 +376,19 @@ export class ChurchLookup extends HTMLElement {
     this.active = -1;
     if (!this.dispatchEvent(new CustomEvent("church-select", { detail: { result }, cancelable: true, bubbles: true, composed: true }))) return;
     this.input.value = result.name;
+    this.chosen = result;
+    this.setValue(result.id);
     let record: ChurchRecord;
     try {
       record = await this.client().getChurch(result.id);
     } catch {
-      this.say("Couldn't load that church's details. You can type them in.");
+      this.say(this.t.loadFail);
       return;
     }
+    this.fillFrom(record);
+  }
+
+  private fillFrom(record: ChurchRecord): void {
     const overwrite = this.hasAttribute("overwrite");
     const changes: FillChange[] = [];
     const empty: string[] = [];
@@ -288,7 +401,7 @@ export class ChurchLookup extends HTMLElement {
     }
     if (!this.dispatchEvent(new CustomEvent("church-fill", { detail: { record, changes }, cancelable: true, bubbles: true, composed: true }))) return;
     for (const c of changes) setNativeValue(c.element, c.value);
-    this.say(`Filled ${changes.length} ${changes.length === 1 ? "field" : "fields"}.${empty.length ? ` Not available: ${empty.join(", ")}.` : ""}`);
+    this.say(this.t.filled(changes.length, empty));
   }
 }
 

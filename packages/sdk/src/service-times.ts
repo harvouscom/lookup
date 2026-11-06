@@ -105,7 +105,7 @@ export class ChurchServiceTimes extends HTMLElement {
     new MutationObserver(() => this.bind()).observe(this, { childList: true, subtree: true, characterData: true });
     this.box.addEventListener("change", (e) => this.edit(e.target as HTMLElement));
     this.box.addEventListener("input", (e) => { if ((e.target as HTMLElement).dataset.k === "label") this.edit(e.target as HTMLElement); });
-    this.box.addEventListener("click", (e) => this.click(e.target as HTMLElement));
+    this.box.addEventListener("click", (e) => this.onBoxClick(e.target as HTMLElement));
     if (!this.field) this.render();
   }
 
@@ -178,7 +178,7 @@ export class ChurchServiceTimes extends HTMLElement {
     }
   }
 
-  private click(t: HTMLElement): void {
+  private onBoxClick(t: HTMLElement): void {
     const a = t.closest<HTMLElement>("[data-a]")?.dataset.a;
     if (!a) return;
     if (a === "add") {

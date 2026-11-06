@@ -308,7 +308,9 @@ $$(".looks button", card).forEach((b) => b.addEventListener("click", () => {
 }));
 $("#sc-save").addEventListener("click", (e) => {
   const b = e.currentTarget;
-  b.textContent = "Saved (demo)";
+  // The search above is a form field: its name="church" submits the chosen church's ID with this form.
+  const id = new FormData(card).get("church");
+  b.textContent = id ? `Saved church ${id}` : "Saved (demo)";
   setTimeout(() => { b.textContent = "Save church"; }, 1800);
 });
 

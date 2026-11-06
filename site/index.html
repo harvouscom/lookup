@@ -52,7 +52,7 @@
     <h1>Church details, filled in.</h1>
     <p class="lede">One search box for any church app. Pick from <span data-stat="churches">587,842</span> churches and the address, website and service times fill in.</p>
     <div class="try">
-      <church-lookup id="hero-search" label="Find a church" placeholder="Search for a church" form="result-form" overwrite limit="6"></church-lookup>
+      <church-lookup id="hero-search" name="church" label="Find a church" placeholder="Search for a church" form="result-form" overwrite limit="6"></church-lookup>
     </div>
   </div>
   <div class="horizon" aria-hidden="true">
@@ -197,7 +197,12 @@ npm install @heresmychurch/lookup</code></pre>
     <p><code>&lt;church-lookup&gt;</code> is an accessible combobox. It searches as people type, asks for smarter results when they pause, and fills your form when they choose.</p>
     <h3>Attributes</h3>
     <dl class="defs">
+      <div><dt><code>name</code></dt><dd>Submit the chosen church&#8217;s ID with your form under this name, like any input.</dd></div>
+      <div><dt><code>required</code></dt><dd>The form won&#8217;t submit until a church is chosen from the list.</dd></div>
+      <div><dt><code>value</code></dt><dd>A church ID to show, such as one saved earlier on an edit screen.</dd></div>
+      <div><dt><code>fill-on-load</code></dt><dd>Also fill the form from <code>value</code> when the page loads.</dd></div>
       <div><dt><code>label</code>, <code>placeholder</code></dt><dd>The visible label and the hint inside the box.</dd></div>
+      <div><dt><code>lang</code></dt><dd>English, Spanish, French, German, Portuguese or Polish. Defaults to the page&#8217;s language. Set the <code>strings</code> property to change any text.</dd></div>
       <div><dt><code>region</code>, <code>country</code></dt><dd>Limit results, such as <code>region="TX"</code> or <code>country="DE"</code>.</dd></div>
       <div><dt><code>near</code></dt><dd>Rank results near a place, such as <code>near="Dallas"</code>.</dd></div>
       <div><dt><code>geo="off"</code></dt><dd>Don't use the visitor's approximate location.</dd></div>
@@ -206,6 +211,38 @@ npm install @heresmychurch/lookup</code></pre>
       <div><dt><code>limit</code></dt><dd>How many results to show, up to 20. Defaults to 8.</dd></div>
       <div><dt><code>icons="none"</code></dt><dd>Hide the icon beside each result.</dd></div>
     </dl>
+    <h3>In your form</h3>
+    <p>It&#8217;s a real form field. Give it a <code>name</code> and the chosen church&#8217;s ID submits with your form, so you can store the ID and look the church up again later. React and Vue get types for the tag and its events.</p>
+    <div class="frame"><div class="frame-in code" data-tabs>
+      <div class="code-bar">
+        <div role="tablist" aria-label="Form example" class="tabs">
+          <button role="tab" aria-selected="true" aria-controls="ff-html" id="ff-html-t">html form</button>
+          <button role="tab" aria-selected="false" aria-controls="ff-react" id="ff-react-t" tabindex="-1">react</button>
+        </div>
+        <button class="copy" type="button">copy</button>
+      </div>
+      <pre tabindex="0" role="tabpanel" id="ff-html" aria-labelledby="ff-html-t"><code><span class="t">&lt;form</span> <span class="a">action</span>=<span class="s">&quot;/signup&quot;</span> <span class="a">method</span>=<span class="s">&quot;post&quot;</span><span class="t">&gt;</span>
+  <span class="t">&lt;church-lookup</span> <span class="a">name</span>=<span class="s">&quot;church_id&quot;</span> <span class="a">required</span><span class="t">&gt;&lt;/church-lookup&gt;</span>
+  <span class="t">&lt;input</span> <span class="a">name</span>=<span class="s">&quot;city&quot;</span> <span class="a">data-hmc-field</span>=<span class="s">&quot;city&quot;</span><span class="t">&gt;</span>
+  <span class="t">&lt;button&gt;</span>Join<span class="t">&lt;/button&gt;</span>
+<span class="t">&lt;/form&gt;</span>
+<span class="c">&lt;!-- Posts church_id=CA-ON-56994145&amp;city=Thorold --&gt;</span></code></pre>
+      <pre tabindex="0" role="tabpanel" id="ff-react" aria-labelledby="ff-react-t" hidden><code><span class="t">import</span> <span class="s">&quot;@heresmychurch/lookup/element&quot;</span>;
+<span class="t">import type</span> {} <span class="t">from</span> <span class="s">&quot;@heresmychurch/lookup/react&quot;</span>;
+
+<span class="t">function</span> ChurchField({ onChange }) {
+  <span class="t">const</span> ref = useRef(null);
+  useEffect(() =&gt; {
+    <span class="t">const</span> el = ref.current;
+    const pick = (e) =&gt; onChange(e.detail.result.id);
+    const clear = () =&gt; onChange("");
+    el.addEventListener(<span class="s">&quot;church-select&quot;</span>, pick);
+    el.addEventListener(<span class="s">&quot;church-clear&quot;</span>, clear);
+    return () =&gt; { el.removeEventListener("church-select", pick); el.removeEventListener("church-clear", clear); };
+  }, [onChange]);
+  <span class="t">return</span> <span class="t">&lt;church-lookup</span> <span class="a">ref</span>={ref} <span class="a">name</span>=<span class="s">&quot;church_id&quot;</span> <span class="a">lang</span>=<span class="s">&quot;es&quot;</span> <span class="t">/&gt;</span>;
+}</code></pre>
+    </div></div>
     <h3>Icons</h3>
     <p>Use the icons your design system already has. Put one with <code>slot="search-icon"</code> in the box, and one with <code>slot="result-icon"</code> to repeat beside every result. It works with SVG sets like Lucide or Heroicons, icon fonts like Tabler or Font Awesome, and icon components like Iconify, because the icons stay in your page and pick up its CSS.</p>
     <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html</span><button class="copy" type="button">copy</button></div>
@@ -220,6 +257,7 @@ npm install @heresmychurch/lookup</code></pre>
       <div><dt><code>church-results</code></dt><dd>Results appeared. <code>detail</code> has <code>query</code>, <code>results</code> and <code>settled</code>.</dd></div>
       <div><dt><code>church-select</code></dt><dd>A church was chosen. Cancel it to stop the fill.</dd></div>
       <div><dt><code>church-fill</code></dt><dd>Fields are about to fill. Cancel it to fill them yourself from <code>detail.record</code>.</dd></div>
+      <div><dt><code>church-clear</code></dt><dd>The choice was cleared, with the clear button or by editing the name.</dd></div>
     </dl>
     <p class="note">An ARIA 1.2 combobox: arrow keys move through results, Enter chooses and Escape closes. Results and fills are announced, targets are 44 pixels, and it respects forced colors and reduced motion.</p>
   </section>
