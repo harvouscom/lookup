@@ -25,7 +25,10 @@ fetch("/data/globe.json")
       return Math.asin(Math.min(1, Math.max(-1, 1 - ((small() ? 156 : 124) - 36) / R))) * 180 / Math.PI;
     } });
     startSky();
-    startDemo(); })
+    startDemo();
+    // The closing call to action has its own globe rising from the bottom, aimed so Europe sits in the visible band.
+    const ctaGlobe = $("#cta-globe");
+    if (ctaGlobe) createGlobe(ctaGlobe, data, { lat: -18, lng: -10, scale: 1.8, top: 180 }); })
   .catch((err) => { console.error(err); $(".horizon").hidden = true; });
 
 fetch("/v1/meta")
@@ -352,18 +355,6 @@ demoFrame?.addEventListener("load", () => {
 });
 if (demoFrame?.contentDocument?.readyState === "complete") fitFrame();
 
-// ── Thanks: if an avatar can't load, show initials instead of a broken image ──
-for (const img of $$(".thanks img")) {
-  const swap = () => {
-    const tile = document.createElement("span");
-    tile.className = "th-ic th-initials";
-    tile.textContent = "CP";
-    img.replaceWith(tile);
-  };
-  if (img.complete && !img.naturalWidth) swap();
-  else img.addEventListener("error", swap, { once: true });
-}
-
 // ── GitHub stars on the repo buttons, shown once a repo has some ──
 async function repoStars(repo) {
   const key = `lookup-stars:${repo}`;
@@ -417,6 +408,45 @@ const markScrolled = () => nav.classList.toggle("scrolled", scrollY > 8);
 addEventListener("scroll", markScrolled, { passive: true });
 markScrolled();
 
+// ── The notch: cut out of the dark band's top edge (not painted on), so whatever is beneath shows through ──
+(function notch() {
+  const band = $(".cta");
+  if (!band) return;
+  const cut = () => {
+    const W = band.clientWidth, r = W <= 640 ? 12 : 18, H = 2 * r;
+    const T = Math.min(1120, W - 32), L = (W - T) / 2, R = L + T;
+    // The band's opaque top strip: rounded where it meets the tab, scooped where the tab's corners curve in.
+    const d = `M0 0H${L - r}A${r} ${r} 0 0 1 ${L} ${r}A${r} ${r} 0 0 0 ${L + r} ${H}H${R - r}A${r} ${r} 0 0 0 ${R} ${r}A${r} ${r} 0 0 1 ${R + r} 0H${W}V${H}H0Z`;
+    const svg = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H}'><path d='${d}'/></svg>`)}")`;
+    const mask = `${svg} 0 0 / ${W}px ${H}px no-repeat, linear-gradient(#000, #000) 0 ${H}px / 100% calc(100% - ${H}px) no-repeat`;
+    band.style.webkitMask = mask;
+    band.style.mask = mask;
+  };
+  new ResizeObserver(cut).observe(band);
+  cut();
+})();
+
+// ── The light page pins once its end is in view, and the dark get-started band slides up over it ──
+(function slideOver() {
+  const page = $("#main"), band = $(".cta");
+  if (!page || !band) return;
+  const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Sticky with a negative top: the page stops moving when its bottom edge reaches the bottom of the window.
+  const pin = () => { page.style.top = `${Math.min(0, innerHeight - page.offsetHeight)}px`; };
+  let queued = false;
+  const recede = () => {
+    queued = false;
+    // How far the band has climbed over the pinned page, 0 to 1.
+    const k = Math.min(1, Math.max(0, (innerHeight - band.getBoundingClientRect().top) / innerHeight));
+    page.style.transform = still() || !k ? "" : `scale(${1 - 0.04 * k})`;
+    page.style.opacity = still() || !k ? "" : String(1 - 0.5 * k);
+  };
+  new ResizeObserver(() => { pin(); recede(); }).observe(page);
+  addEventListener("resize", pin);
+  addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(recede); } }, { passive: true });
+  pin(); recede();
+})();
+
 // ── Examples: each app opens full screen in a window frame. Deep links: /#example/<name> ──
 (function examples() {
   const dlg = $("#exm");
@@ -428,7 +458,7 @@ markScrolled();
         { key: "element", label: "Web component", src: "/demo/kinship?embed=1", open: "/demo/kinship" },
         { key: "shadcn", label: "shadcn/ui", src: "/demo/shadcn/?embed=1", open: "/demo/shadcn/" },
       ] },
-    { key: "harvest", name: "Harvest Table", kind: "Food pantry network · plain HTML form", addr: "partners.harvesttable.org/join" },
+    { key: "harvest", name: "Harvest", kind: "Food pantry network · plain HTML form", addr: "partners.harvestpantries.org/join" },
     { key: "steeple", name: "Steeple", kind: "Church website builder · live preview", addr: "build.steeple.site/setup" },
   ];
   const frame = $("#exm-frame");
