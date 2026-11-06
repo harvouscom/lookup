@@ -1,8 +1,8 @@
 // <church-lookup>: an ARIA 1.2 combobox that searches Here's My Church and autofills a form. It's a
 // form-associated element: with a `name`, the chosen church's ID submits like any input.
 /// <reference path="./jsx.d.ts" preserve="true" />
-import { createLookup, type ChurchRecord, type FieldStatus, type Lookup, type LookupError, type Meta, type SearchResult } from "./client.ts";
-import { applyFill, consentDiff, contributable, createLookupController, fieldValue, findTargets, planFill, type ControllerState, type FillChange } from "./core.ts";
+import { createLookup, type AddResult, type ChurchRecord, type FieldStatus, type Lookup, type LookupError, type Meta, type NewChurch, type SearchResult } from "./client.ts";
+import { addUrl, applyFill, changeFor, consentDiff, contributable, createLookupController, fieldValue, findTargets, isStale, mergeAddress, newChurchFrom, planFill, suggestUrl, type ControllerState, type FillChange } from "./core.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
 import { matchField } from "./fields.ts";
 import { LANGS, registry, stringsFor, type Strings } from "./strings.ts";
@@ -57,6 +57,7 @@ a{color:var(--_ring);font-weight:500;text-underline-offset:3px}
 .cs ul{max-height:none;overflow:visible;gap:4px;margin:0 0 10px}.cs li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;min-height:44px;padding:6px 4px;cursor:default;align-items:start}.cs li:hover{background:none}
 .cs input[type=checkbox]{width:20px;height:20px;min-height:0;margin:2px 0 0;padding:0;accent-color:var(--_ring)}.cs label{font-weight:600}.cs .v{grid-column:2;display:flex;flex-wrap:wrap;gap:4px 8px;color:var(--_muted);overflow-wrap:anywhere}.cs s{opacity:.75}.cs ins{text-decoration:none;color:inherit}
 .cs .b{grid-column:2;justify-self:start;padding:1px 8px;border-radius:999px;font-size:.75rem;background:color-mix(in oklab,var(--_ring) 12%,transparent);color:var(--_ring)}.cs .b.m{background:color-mix(in oklab,var(--_muted) 14%,transparent);color:inherit}
+.cs .ex{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;font-size:.8125rem}.cs .ex button{padding:0;border:0;background:none;font:inherit;color:var(--_ring);cursor:pointer;text-decoration:underline;text-underline-offset:3px}.cs .ex[hidden]{display:none}.cs .kv li{min-height:0;padding:2px 4px}.cs li button{all:unset;cursor:pointer;grid-column:1/-1}.cs li button:focus-visible{outline:2px solid var(--_ring)}.cs li:has(button):hover{background:var(--_active)}
 .cs .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.cs .bt{min-height:40px;padding:0 14px;border-radius:calc(var(--_r) - 2px);font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--_ring);background:var(--_ring);color:#fff}.cs .bt.g{background:transparent;color:inherit;border-color:var(--_input)}.cs .bt:disabled{opacity:.6;cursor:default}.cs .bt:focus-visible,.cs input:focus-visible{outline:2px solid var(--_ring);outline-offset:2px}.cs .note{padding:0;margin:8px 0 0}
 @media (prefers-reduced-motion:reduce){input{transition:none}.field::after{animation-duration:0s,2.4s!important}}
 @media (forced-colors:active){li[aria-selected=true]{background:Highlight;color:HighlightText;forced-color-adjust:none}input,.pop{border:1px solid CanvasText}input:focus-visible{outline:2px solid Highlight}}
@@ -76,7 +77,14 @@ const Base = (typeof HTMLElement === "undefined" ? class {} : HTMLElement) as ty
 export interface ChurchErrorDetail { query?: string; id?: string; status?: number; code?: string; retryAfter?: number; error: unknown }
 
 interface WatchRow { field: string; el: FieldTarget; label: string; was: string; review: "live" | "moderated"; soon: boolean }
-interface Snapshot { id: string; rows: WatchRow[]; sent: Map<string, string>; dismissed: string; confirmed: boolean; off: () => void }
+type Row = WatchRow & { value: string; parts?: Record<string, string> };
+interface Snapshot {
+  id: string; record: ChurchRecord; rows: WatchRow[]; sent: Map<string, string>; dismissed: string; confirmed: boolean;
+  /** Rows the person unchecked. Changed rows start checked. */
+  off: Set<string>; stale: boolean; reports: (keyof Strings["reports"])[]; note: string; stop: () => void;
+}
+/** The add-a-church offer: what was offered, and what's showing. */
+interface Adding { name: string; dismissed: boolean; busy: boolean }
 
 export class ChurchLookup extends Base {
   static formAssociated = true;
@@ -92,6 +100,7 @@ export class ChurchLookup extends Base {
   private panel!: HTMLDivElement;
   private meta: Promise<Meta | null> | null = null;
   private snap: Snapshot | null = null;
+  private adding: Adding | null = null;
   private input!: HTMLInputElement;
   private list!: HTMLUListElement;
   private pop!: HTMLDivElement;
@@ -173,6 +182,8 @@ export class ChurchLookup extends Base {
 
   disconnectedCallback(): void {
     document.removeEventListener("hmc-strings", this.onStrings);
+    document.removeEventListener("submit", this.onSubmit, true);
+    document.removeEventListener("change", this.onFormChange, true);
     this.ctl.destroy();
     this.close();
     // Moving the element (a portal, a reorder) reconnects it at once: keep the consent panel then.
@@ -181,6 +192,8 @@ export class ChurchLookup extends Base {
 
   connectedCallback(): void {
     document.addEventListener("hmc-strings", this.onStrings);
+    document.addEventListener("submit", this.onSubmit, true);
+    document.addEventListener("change", this.onFormChange, true);
     if (this.shadowRoot) return;
     const root = this.attachShadow({ mode: "open", delegatesFocus: true });
     const id = this.key;
@@ -362,7 +375,10 @@ export class ChurchLookup extends Base {
         a.setAttribute("part", "retry");
         a.onclick = () => this.ctl.retry();
         a.textContent = t.retry;
-      } else Object.assign(a, { href: ADD_URL, target: "_blank", rel: "noopener", textContent: t.add });
+      } else {
+        const tg = this.targets();
+        Object.assign(a, { href: addUrl({ name: st.query, city: tg.get("city")?.value, region: (tg.get("region") ?? tg.get("regionName"))?.value }), target: "_blank", rel: "noopener", textContent: t.add });
+      }
       this.note.append(a);
     }
     if (added) this.say(t.moreFound(added.length));
@@ -481,8 +497,12 @@ export class ChurchLookup extends Base {
 
   // ── Consent: share corrections back to Here's My Church, only when the person chooses to ──
 
+  private metaP(): Promise<Meta | null> {
+    return (this.meta ??= this.client().meta().catch(() => null));
+  }
+
   private unwatch(): void {
-    this.snap?.off();
+    this.snap?.stop();
     this.snap = null;
     if (this.panel) this.panel.hidden = true;
   }
@@ -490,8 +510,9 @@ export class ChurchLookup extends Base {
   /** After a fill, watch the mapped fields Lookup can contribute, against what the record said. */
   private async watch(record: ChurchRecord): Promise<void> {
     this.unwatch();
+    this.adding = null;
     if (this.getAttribute("contribute") === "off") return;
-    const meta = await (this.meta ??= this.client().meta().catch(() => null));
+    const meta = await this.metaP();
     if (!meta?.contributableFields) return;
     const country = String(record.fields.country ?? "");
     const rows: WatchRow[] = [];
@@ -501,15 +522,50 @@ export class ChurchLookup extends Base {
       const label = (el.labels?.[0]?.textContent ?? el.getAttribute("aria-label") ?? field).trim();
       rows.push({ field, el, label, was: (fieldValue(record, field) ?? "").trim(), review: rule.review, soon: rule.status === "coming_soon" });
     }
+    const reports = (["reportClosed", "reportDuplicate", "reportRelocated"] as const).filter((f) => contributable(meta, f, country));
     const render = () => this.renderPanel();
     rows.forEach((r) => r.el.addEventListener("change", render));
-    this.snap = { id: record.id, rows, sent: new Map(), dismissed: "", confirmed: false, off: () => rows.forEach((r) => r.el.removeEventListener("change", render)) };
+    this.snap = { id: record.id, record, rows, sent: new Map(), dismissed: "", confirmed: false, off: new Set(), stale: isStale(record), reports, note: "", stop: () => rows.forEach((r) => r.el.removeEventListener("change", render)) };
     this.renderPanel();
   }
 
-  private changed(): WatchRow[] {
+  /** Changed rows, with street, city and postal code as one address row. */
+  private changed(): Row[] {
     const s = this.snap!;
-    return consentDiff(s.rows.map((r) => ({ ...r, value: r.el.value })), s.sent);
+    return consentDiff(mergeAddress(s.rows.map((r) => ({ ...r, value: r.el.value }))), s.sent);
+  }
+
+  /** Report a problem, and a link to fix anything else on Here's My Church. */
+  private extras(): HTMLElement {
+    const s = this.snap!;
+    const t = this.t;
+    const ex = document.createElement("div");
+    ex.className = "ex";
+    if (s.note) ex.append(s.note);
+    else if (s.reports.length) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = t.report;
+      b.setAttribute("aria-expanded", "false");
+      b.onclick = () => {
+        b.replaceWith(...s.reports.map((f) => {
+          const c = document.createElement("button");
+          c.type = "button";
+          c.textContent = t.reports[f];
+          c.onclick = () => void this.send([{ field: f, value: "true" }], true);
+          return c;
+        }));
+        ex.querySelector("button")?.focus();
+      };
+      ex.append(b);
+    }
+    const url = suggestUrl(s.record);
+    if (url) {
+      const a = Object.assign(document.createElement("a"), { href: url, target: "_blank", rel: "noopener", textContent: t.moreFixes });
+      ex.append(a);
+    }
+    ex.hidden = !ex.childNodes.length;
+    return ex;
   }
 
   private renderPanel(result?: Map<string, { status: FieldStatus; message?: string }>, sandbox?: boolean): void {
@@ -518,29 +574,39 @@ export class ChurchLookup extends Base {
     if (!s) { p.hidden = true; return; }
     const t = this.t;
     const changed = this.changed();
-    const sig = changed.map((r) => `${r.field}=${r.el.value.trim()}`).join("|");
+    const sig = changed.map((r) => `${r.field}=${r.value.trim()}`).join("|");
     const h = `${this.key}-cs`;
     p.setAttribute("aria-labelledby", h);
+    if (!result && changed.length && s.dismissed === sig) { p.hidden = true; return; }
     if (!changed.length && !result) {
-      // Nothing changed: offer "Still correct" once per pick.
-      if (s.confirmed || s.dismissed === "confirm") { p.hidden = true; return; }
-      p.innerHTML = `<div class="q"><p id="${h}"></p><span class="row"><button type="button" class="bt">${""}</button><button type="button" class="bt g"></button></span></div>`;
-      p.querySelector("p")!.textContent = t.confirmQ;
-      const [yes, no] = p.querySelectorAll<HTMLButtonElement>("button");
-      yes!.textContent = t.stillCorrect;
-      no!.textContent = t.notNow;
-      yes!.onclick = () => void this.sendConfirm();
-      no!.onclick = () => { s.dismissed = "confirm"; p.hidden = true; };
-      p.hidden = false;
+      // Nothing to share: ask "Still correct?" of a listing nobody confirmed this year, once per pick.
+      p.innerHTML = "";
+      if (s.stale && !s.confirmed && s.dismissed !== "confirm" && !changed.length) {
+        p.innerHTML = `<div class="q"><p id="${h}"></p><span class="row"><button type="button" class="bt"></button><button type="button" class="bt g"></button></span></div>`;
+        p.querySelector("p")!.textContent = t.confirmQ;
+        const [yes, no] = p.querySelectorAll<HTMLButtonElement>("button");
+        yes!.textContent = t.stillCorrect;
+        no!.textContent = t.notNow;
+        yes!.onclick = () => void this.sendConfirm();
+        no!.onclick = () => { s.dismissed = "confirm"; this.renderPanel(); };
+      }
+      const ex = this.extras();
+      p.append(ex);
+      p.hidden = ex.hidden && !p.querySelector("p");
       return;
     }
-    if (!result && s.dismissed === sig) { p.hidden = true; return; }
     const wasHidden = p.hidden || !p.querySelector("ul");
     p.innerHTML = `<h3 id="${h}"></h3><p></p><ul></ul><div class="row"><button type="button" class="bt"></button><button type="button" class="bt g"></button></div>`;
     p.querySelector("h3")!.textContent = t.shareTitle;
     p.querySelector("p")!.textContent = t.shareBody;
     const ul = p.querySelector("ul")!;
-    const shown = result ? s.rows.filter((r) => result.has(r.field)).concat(changed.filter((r) => !result.has(r.field))) : changed;
+    const shown: Row[] = result ? mergeAddress(s.rows.map((r) => ({ ...r, value: r.el.value }))).filter((r) => result.has(r.field) && !changed.some((c) => c.field === r.field)).concat(changed) : changed;
+    const [share, later] = p.querySelectorAll<HTMLButtonElement>(".row button");
+    const count = () => {
+      const n = p.querySelectorAll("ul input:checked:not(:disabled)").length;
+      share!.textContent = n ? t.shareN(n) : t.share;
+      share!.disabled = !n;
+    };
     shown.forEach((r, i) => {
       const li = document.createElement("li");
       const id = `${h}-${i}`;
@@ -548,53 +614,80 @@ export class ChurchLookup extends Base {
       li.innerHTML = `<input type="checkbox" id="${id}"><label for="${id}"></label><span class="v"><s></s><span aria-hidden="true">→</span><ins></ins></span><span class="b"></span>`;
       const box = li.querySelector("input")!;
       box.dataset.field = r.field;
-      box.disabled = r.soon || (Boolean(res) && res!.status !== "try_again");
-      li.querySelector("label")!.textContent = r.label;
+      box.disabled = r.soon || (Boolean(res) && res!.status !== "try_again" && !changed.includes(r));
+      box.checked = !box.disabled && !s.off.has(r.field);
+      box.onchange = () => { s.off[box.checked ? "delete" : "add"](r.field); count(); };
+      li.querySelector("label")!.textContent = r.parts ? t.address : r.label;
       li.querySelector("s")!.textContent = r.was || "—";
-      li.querySelector("ins")!.textContent = res ? (s.sent.get(r.field) ?? r.el.value.trim()) : r.el.value.trim();
+      li.querySelector("ins")!.textContent = res && !changed.includes(r) ? (s.sent.get(r.field) ?? r.value.trim()) : r.value.trim();
       const b = li.querySelector<HTMLElement>(".b")!;
       b.textContent = res ? (res.message && res.status === "rejected" ? `${t.st.rejected}: ${res.message}` : t.st[res.status]) : r.soon ? t.soon : r.review === "moderated" ? t.reviewed : t.goesLive;
       b.classList.toggle("m", r.soon || r.review === "moderated" || (Boolean(res) && res!.status !== "live"));
       ul.append(li);
     });
-    const [share, later] = p.querySelectorAll<HTMLButtonElement>(".row button");
-    share!.textContent = t.share;
+    count();
     later!.textContent = t.notNow;
     share!.onclick = () => void this.sendShare();
-    later!.onclick = () => { s.dismissed = sig; p.hidden = true; };
+    later!.onclick = () => { s.dismissed = sig; this.renderPanel(); };
     // After a share with nothing left to send, one button closes the panel.
-    if (result && !p.querySelector("input[type=checkbox]:not(:disabled)")) { share!.hidden = true; later!.textContent = t.done; }
+    if (result && !p.querySelector("ul input:not(:disabled)")) { share!.hidden = true; later!.textContent = t.done; }
     if (sandbox) {
       const n = document.createElement("p");
       n.className = "note";
       n.textContent = t.sandbox;
       p.append(n);
     }
+    p.append(this.extras());
     p.hidden = false;
     if (wasHidden && !result) this.say(t.changedNote(changed.length));
   }
 
-  private async sendShare(): Promise<void> {
+  /** Send changes for the chosen church. A report (true) shows its outcome in place of the report link. */
+  private async send(changes: { field: string; value: unknown }[], report = false): Promise<void> {
     const s = this.snap!;
-    const p = this.panel;
-    const picked = [...p.querySelectorAll<HTMLInputElement>("input[type=checkbox]:checked:not(:disabled)")]
-      .map((b) => s.rows.find((r) => r.field === b.dataset.field)!).filter(Boolean);
-    if (!picked.length) return;
-    const changes = picked.map((r) => ({ field: r.field, value: r.el.value.trim() }));
     if (!this.dispatchEvent(new CustomEvent("church-contribute", { detail: { churchId: s.id, changes }, cancelable: true, bubbles: true, composed: true }))) return;
-    const btn = p.querySelector<HTMLButtonElement>(".row .bt")!;
-    btn.disabled = true;
-    btn.textContent = this.t.sending;
+    const btn = this.panel.querySelector<HTMLButtonElement>(".row .bt");
+    if (btn && !report) { btn.disabled = true; btn.textContent = this.t.sending; }
     let out: { sandbox?: boolean; results: { field: string; status: FieldStatus; message?: string }[] };
     try { out = await this.client().contribute(s.id, changes); }
     catch { out = { results: changes.map((c) => ({ field: c.field, status: "try_again" as const })) }; }
     if (this.snap !== s) return;
+    const t = this.t;
+    if (report) {
+      const st = out.results[0]?.status ?? "try_again";
+      s.note = st === "try_again" || st === "rejected" ? t.st[st] : `${t.reported}${out.sandbox ? ` ${t.sandbox}` : ""}`;
+      this.renderPanel();
+      this.say(s.note);
+      return;
+    }
     const result = new Map(out.results.map((r) => [r.field, r]));
-    for (const c of changes) if (result.get(c.field)?.status !== "try_again") s.sent.set(c.field, c.value);
+    const rows = this.changed();
+    for (const c of changes) if (result.get(c.field)?.status !== "try_again") s.sent.set(c.field, rows.find((r) => r.field === c.field)?.value.trim() ?? String(c.value));
     this.renderPanel(result, out.sandbox);
     const done = out.results.filter((r) => r.status === "live" || r.status === "in_review").length;
-    this.say(`${this.t.shared(done)} ${out.results.map((r) => `${r.field}: ${this.t.st[r.status]}`).join(". ")}.`);
+    this.say(`${t.shared(done)} ${out.results.map((r) => `${r.field}: ${t.st[r.status]}`).join(". ")}.`);
   }
+
+  private sendShare(): Promise<void> {
+    const boxes = [...this.panel.querySelectorAll<HTMLInputElement>("ul input:checked:not(:disabled)")].map((b) => b.dataset.field);
+    const picked = this.changed().filter((r) => boxes.includes(r.field));
+    return picked.length ? this.send(picked.map(changeFor)) : Promise.resolve();
+  }
+
+  /** A checked data-hmc-share box in the submitted form sends the checked changes, without holding up the submit. */
+  private onSubmit = (e: Event): void => {
+    const form = e.target as HTMLFormElement;
+    const s = this.snap;
+    if (!s || !(form === this.form || form.contains?.(this)) || !form.querySelector<HTMLInputElement>("[data-hmc-share]")?.checked) return;
+    const rows = this.changed().filter((r) => !r.soon && !s.off.has(r.field));
+    if (!rows.length) return;
+    const changes = rows.map(changeFor);
+    if (!this.dispatchEvent(new CustomEvent("church-contribute", { detail: { churchId: s.id, changes, onSubmit: true }, cancelable: true, bubbles: true, composed: true }))) return;
+    for (const r of rows) s.sent.set(r.field, r.value.trim());
+    this.client().contribute(s.id, changes, { keepalive: true }).catch(() => { /* nothing to show: the page is moving on */ });
+    // A form that stays on the page (a single-page app) shouldn't offer the same fixes again.
+    this.renderPanel();
+  };
 
   private async sendConfirm(): Promise<void> {
     const s = this.snap!;
@@ -605,8 +698,122 @@ export class ChurchLookup extends Base {
     s.confirmed = ok;
     const msg = ok ? this.t.thanks : this.t.st.try_again;
     this.panel.querySelector("p")!.textContent = msg;
-    this.panel.querySelectorAll("button").forEach((b) => { b.hidden = ok; });
+    this.panel.querySelectorAll(".row button").forEach((b) => { (b as HTMLElement).hidden = ok; });
     this.say(msg);
+  }
+
+  // ── Add a church that isn't listed ──
+
+  /** A mapped field changed while no church is chosen: offer to add the one typed in. */
+  private onFormChange = (e: Event): void => {
+    if (this.current || this.snap || !this.input?.value.trim() || ![...this.targets().values()].includes(e.target as FieldTarget)) return;
+    void this.offerAdd();
+  };
+
+  private newChurch(): NewChurch | null {
+    return newChurchFrom(this.input.value, this.targets());
+  }
+
+  private async offerAdd(): Promise<void> {
+    if (this.getAttribute("contribute") === "off" || this.adding?.busy) return;
+    const meta = await this.metaP();
+    const church = this.newChurch();
+    const p = this.panel;
+    if (!meta?.addEnabled || !church || this.current || this.snap) { if (!this.snap) p.hidden = true; return; }
+    if (this.adding?.name === church.name && this.adding.dismissed) return;
+    this.adding = { name: church.name, dismissed: false, busy: false };
+    const t = this.t;
+    const h = `${this.key}-cs`;
+    p.setAttribute("aria-labelledby", h);
+    p.innerHTML = `<h3 id="${h}"></h3><p></p><ul></ul><div class="row"><button type="button" class="bt"></button><button type="button" class="bt g"></button></div>`;
+    p.querySelector("h3")!.textContent = t.addQ(church.name);
+    p.querySelector("p")!.textContent = t.addBody;
+    p.querySelector("ul")!.className = "kv";
+    const labels = new Map([...this.targets()].map(([f, el]) => [f === "regionName" ? "region" : f === "countryName" ? "country" : f, (el.labels?.[0]?.textContent ?? f).trim()]));
+    for (const [k, v] of Object.entries(church)) {
+      const li = document.createElement("li");
+      li.innerHTML = `<b></b><span></span>`;
+      li.firstChild!.textContent = k === "name" ? t.label : labels.get(k) ?? k;
+      li.lastChild!.textContent = String(v);
+      p.querySelector("ul")!.append(li);
+    }
+    const [yes, no] = p.querySelectorAll<HTMLButtonElement>(".row button");
+    yes!.textContent = t.addBtn;
+    no!.textContent = t.notNow;
+    yes!.onclick = () => void this.sendAdd(false);
+    no!.onclick = () => { this.adding!.dismissed = true; p.hidden = true; };
+    p.hidden = false;
+  }
+
+  private async sendAdd(confirmAdd: boolean): Promise<void> {
+    const church = this.newChurch();
+    const a = this.adding;
+    if (!church || !a) return;
+    if (!this.dispatchEvent(new CustomEvent("church-add", { detail: { church, confirmAdd }, cancelable: true, bubbles: true, composed: true }))) return;
+    const t = this.t;
+    const p = this.panel;
+    const btn = p.querySelector<HTMLButtonElement>(".row .bt")!;
+    btn.disabled = true;
+    btn.textContent = t.adding;
+    a.busy = true;
+    let out: AddResult;
+    try { out = await this.client().addChurch(church, { confirmAdd }); }
+    catch (e) { out = { status: "try_again", message: (e as Error).message }; }
+    a.busy = false;
+    if (this.adding !== a) return;
+    const head = p.querySelector("h3")!, body = p.querySelector("p")!, ul = p.querySelector("ul")!;
+    btn.disabled = false;
+    btn.textContent = t.addBtn;
+    if (out.status === "similar" && out.similar?.length) {
+      head.textContent = t.similarQ;
+      body.textContent = "";
+      ul.className = "";
+      ul.replaceChildren(...out.similar.map((r) => {
+        const li = document.createElement("li");
+        const b = document.createElement("button");
+        b.type = "button";
+        b.innerHTML = `<span class="t"><span class="n"></span><span class="sub"></span></span>`;
+        b.querySelector(".n")!.textContent = r.name;
+        b.querySelector(".sub")!.textContent = r.locationLabel;
+        b.onclick = () => void this.pickSimilar(r);
+        li.append(b);
+        return li;
+      }));
+      btn.textContent = t.noneOfThese;
+      btn.onclick = () => void this.sendAdd(true);
+      this.say(t.similarQ);
+    } else if (out.status === "live") {
+      ul.remove();
+      head.textContent = t.added(church.name);
+      body.textContent = out.sandbox ? t.sandbox : "";
+      p.querySelector(".row")!.remove();
+      this.adding = { ...a, dismissed: true };
+      if (out.id) {
+        this.ctl.select({ id: out.id, name: church.name, label: church.name, locationLabel: "" } as SearchResult);
+        this.setValue(out.id);
+      }
+      this.dispatchEvent(new CustomEvent("church-added", { detail: { id: out.id ?? null, church, sandbox: Boolean(out.sandbox) }, bubbles: true, composed: true }));
+      this.say(head.textContent);
+    } else {
+      body.textContent = out.status === "rejected" && out.message ? `${t.st.rejected}: ${out.message}` : t.st.try_again;
+      this.say(body.textContent);
+    }
+  }
+
+  /** "Is it one of these?": choosing one selects it, as picking it from the search would. */
+  private async pickSimilar(r: SearchResult): Promise<void> {
+    this.adding = null;
+    this.panel.hidden = true;
+    this.input.value = r.name;
+    try {
+      const record = await this.client().getChurch(r.id);
+      this.ctl.select({ ...r, id: record.id });
+      this.setValue(record.id);
+      this.fillFrom(record);
+    } catch (e) {
+      this.say(this.t.loadFail);
+      this.fail(e, { id: r.id });
+    }
   }
 }
 

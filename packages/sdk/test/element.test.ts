@@ -504,22 +504,27 @@ describe("consent", () => {
     website: { countries: "all", review: "moderated" },
     denomination: { countries: "all", review: "live" },
     phone: { countries: ["US", "CA"], review: "live" },
+    address: { countries: "all", review: "moderated" },
+    reportClosed: { countries: "all", review: "moderated" },
+    reportDuplicate: { countries: "all", review: "moderated" },
+    reportRelocated: { countries: "all", review: "moderated" },
   } };
-  let posts: { path: string; body: any }[] = [];
-  function mountConsent(attrs = "", reply: any = { churchId: "R-1", results: [{ field: "website", status: "in_review" }] }) {
+  let posts: { path: string; body: any; keepalive?: boolean }[] = [];
+  let recordExtra: Record<string, unknown> = {};
+  function mountConsent(attrs = "", reply: any = { churchId: "R-1", results: [{ field: "website", status: "in_review" }] }, extraHtml = "") {
     posts = [];
     document.body.innerHTML = `<form><church-lookup client="acme" ${attrs}></church-lookup>
       <label for="w">Website</label><input id="w" data-hmc-field="website">
       <label for="d">Denomination</label><input id="d" data-hmc-field="denomination">
-      <label for="n">Church name</label><input id="n" data-hmc-field="name"></form>`;
+      <label for="n">Church name</label><input id="n" data-hmc-field="name">${extraHtml}</form>`;
     const el = document.querySelector("church-lookup") as ChurchLookup;
     el.lookup = createLookup({
       client: "acme",
       fetch: (async (url: string, init?: RequestInit) => {
         const u = new URL(url);
-        if (init?.method === "POST") { posts.push({ path: u.pathname, body: JSON.parse(String(init.body)) }); return Response.json(u.pathname.endsWith("/confirm") ? { churchId: "R-1", status: "confirmed" } : reply); }
+        if (init?.method === "POST") { posts.push({ path: u.pathname, body: JSON.parse(String(init.body)), ...(init.keepalive ? { keepalive: true } : {}) }); return Response.json(u.pathname.endsWith("/confirm") ? { churchId: "R-1", status: "confirmed" } : reply); }
         if (u.pathname === "/v1/meta") return Response.json(meta);
-        if (u.pathname.startsWith("/v1/churches/")) return Response.json({ ...record, fields: { ...record.fields, country: "US", denomination: null } });
+        if (u.pathname.startsWith("/v1/churches/")) return Response.json({ ...record, ...recordExtra, fields: { ...record.fields, country: "US", denomination: null } });
         return Response.json({ query: "grac", results: [result("R-1", "Grace Church")], corrected: null, degraded: false, attribution: "" });
       }) as typeof fetch,
     });
@@ -527,6 +532,7 @@ describe("consent", () => {
   }
   const pick = async (input: HTMLInputElement) => { type(input, "grac"); await flush(160); key(input, "ArrowDown"); key(input, "Enter"); await flush(20); };
   const edit = (id: string, v: string) => { const f = document.getElementById(id) as HTMLInputElement; f.value = v; f.dispatchEvent(new Event("change")); };
+  beforeEach(() => { recordExtra = {}; });
 
   it("offers Still correct after a fill, and confirms on click", async () => {
     const { input, panel } = mountConsent();
@@ -538,19 +544,87 @@ describe("consent", () => {
     expect(posts).toEqual([{ path: "/v1/churches/R-1/confirm", body: { client: "acme" } }]);
     expect(panel.textContent).toContain("Thanks for confirming.");
   });
-  it("lists edits unchecked and sends nothing without a click", async () => {
+  it("lists edits checked and sends nothing until Share", async () => {
     const { input, panel } = mountConsent();
     await pick(input);
     edit("w", "https://new.example");
-    const boxes = panel.querySelectorAll<HTMLInputElement>("input[type=checkbox]");
-    expect(boxes).toHaveLength(1);
-    expect(boxes[0]!.checked).toBe(false);
+    edit("d", "Baptist");
+    const boxes = panel.querySelectorAll<HTMLInputElement>("ul input[type=checkbox]");
+    expect([...boxes].map((b) => b.checked)).toEqual([true, true]);
     expect(panel.textContent).toContain("https://grace.example");
     expect(panel.textContent).toContain("https://new.example");
     expect(panel.textContent).toContain("A moderator reviews it");
+    const share = panel.querySelector<HTMLButtonElement>(".row .bt")!;
+    expect(share.textContent).toBe("Share 2 fixes");
+    expect(posts).toHaveLength(0);
+    boxes[0]!.checked = false;
+    boxes[0]!.dispatchEvent(new Event("change"));
+    expect(share.textContent).toBe("Share 1 fix");
+    // Another edit re-renders the panel; the unchecked row stays unchecked.
+    edit("d", "Methodist");
+    expect([...panel.querySelectorAll<HTMLInputElement>("ul input")].map((b) => b.checked)).toEqual([false, true]);
     panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
     await flush(10);
+    expect(posts[0]!.body.changes).toEqual([{ field: "denomination", value: "Methodist" }]);
+  });
+  it("asks Still correct only of a listing nobody confirmed this year", async () => {
+    recordExtra = { freshness: { lastVerified: Date.now() - 30 * 864e5 } };
+    const fresh = mountConsent();
+    await pick(fresh.input);
+    expect(fresh.panel.textContent).not.toContain("Still correct?");
+    recordExtra = { freshness: { lastVerified: Date.now() - 400 * 864e5 } };
+    const old = mountConsent();
+    await pick(old.input);
+    expect(old.panel.textContent).toContain("Still correct?");
+  });
+  it("shows street, city and postal code as one Address row and sends them together", async () => {
+    const { input, panel } = mountConsent("", { churchId: "R-1", results: [{ field: "address", status: "in_review" }] },
+      `<label for="s">Street</label><input id="s" data-hmc-field="street"><label for="c">City</label><input id="c" data-hmc-field="city"><label for="z">ZIP</label><input id="z" data-hmc-field="postalCode">`);
+    await pick(input);
+    edit("s", "9 Elm St");
+    edit("c", "Irving");
+    const labels = [...panel.querySelectorAll("ul label")].map((l) => l.textContent);
+    expect(labels).toEqual(["Address"]);
+    expect(panel.querySelector("ul s")!.textContent).toBe("1 Main, Dallas, 75201");
+    expect(panel.querySelector("ul ins")!.textContent).toBe("9 Elm St, Irving, 75201");
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    expect(posts[0]!.body.changes).toEqual([{ field: "address", value: { street: "9 Elm St", city: "Irving", postalCode: "75201" } }]);
+    expect(panel.textContent).toContain("Sent for review");
+  });
+  it("sends checked changes with keepalive when the form submits with data-hmc-share checked", async () => {
+    const { input } = mountConsent("", undefined, `<input type="checkbox" data-hmc-share checked>`);
+    await pick(input);
+    edit("w", "https://new.example");
+    const form = document.querySelector("form")!;
+    const submit = new Event("submit", { bubbles: true, cancelable: true });
+    form.dispatchEvent(submit);
+    expect(submit.defaultPrevented).toBe(false);
+    await flush(10);
+    expect(posts).toEqual([{ path: "/v1/churches/R-1/contributions", body: { client: "acme", changes: [{ field: "website", value: "https://new.example" }] }, keepalive: true }]);
+    expect(document.querySelector("church-lookup")!.shadowRoot!.querySelector("[part=consent] ul")).toBeNull();
+  });
+  it("sends nothing on submit when data-hmc-share is unchecked", async () => {
+    const { input } = mountConsent("", undefined, `<input type="checkbox" data-hmc-share>`);
+    await pick(input);
+    edit("w", "https://new.example");
+    document.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await flush(10);
     expect(posts).toHaveLength(0);
+  });
+  it("reports a problem and links to more fixes", async () => {
+    recordExtra = { freshness: { lastVerified: Date.now() }, links: { heresMyChurch: "https://heresmychurch.com/US/TX/abc" } };
+    const { input, panel } = mountConsent("", { churchId: "R-1", results: [{ field: "reportClosed", status: "in_review" }] });
+    await pick(input);
+    expect(panel.hidden).toBe(false);
+    expect(panel.querySelector<HTMLAnchorElement>(".ex a")!.href).toBe("https://heresmychurch.com/US/TX/abc?suggest=1");
+    panel.querySelector<HTMLButtonElement>(".ex button")!.click();
+    const choices = [...panel.querySelectorAll<HTMLButtonElement>(".ex button")];
+    expect(choices.map((b) => b.textContent)).toEqual(["Closed", "Duplicate", "Moved"]);
+    choices[0]!.click();
+    await flush(10);
+    expect(posts[0]!.body.changes).toEqual([{ field: "reportClosed", value: "true" }]);
+    expect(panel.textContent).toContain("A moderator will check it.");
   });
   it("shares checked rows, fires church-contribute, and shows each result", async () => {
     const { el, input, panel } = mountConsent("", { churchId: "R-1", sandbox: true, results: [{ field: "website", status: "in_review" }, { field: "denomination", status: "live" }] });
@@ -600,5 +674,105 @@ describe("consent", () => {
     expect(panel.hidden).toBe(true);
     edit("d", "Baptist");
     expect(panel.hidden).toBe(false);
+  });
+});
+
+describe("add a church", () => {
+  const meta = { fields: [], completenessWeights: {}, attribution: "", addEnabled: true, contributableFields: {} };
+  let posts: { path: string; body: any }[] = [];
+  let replies: any[] = [];
+  function mountAdd() {
+    posts = [];
+    document.body.innerHTML = `<form><church-lookup client="acme"></church-lookup>
+      <label for="c">City</label><input id="c" data-hmc-field="city">
+      <label for="r">State</label><select id="r" data-hmc-field="region"><option value=""></option><option value="TX">Texas</option></select>
+      <label for="p">Phone</label><input id="p" data-hmc-field="phone"></form>`;
+    const el = document.querySelector("church-lookup") as ChurchLookup;
+    el.lookup = createLookup({
+      client: "acme",
+      fetch: (async (url: string, init?: RequestInit) => {
+        const u = new URL(url);
+        if (init?.method === "POST") { posts.push({ path: u.pathname, body: JSON.parse(String(init.body)) }); return Response.json(replies.shift()); }
+        if (u.pathname === "/v1/meta") return Response.json(meta);
+        if (u.pathname.startsWith("/v1/churches/")) return Response.json({ ...record, id: u.pathname.split("/").pop() });
+        return Response.json({ query: u.searchParams.get("q"), results: [], corrected: null, degraded: false, attribution: "" });
+      }) as typeof fetch,
+    });
+    return { el, input: el.shadowRoot!.querySelector("input")!, panel: el.shadowRoot!.querySelector<HTMLElement>("[part=consent]")! };
+  }
+  const set = (id: string, v: string) => { const f = document.getElementById(id) as HTMLInputElement; f.value = v; f.dispatchEvent(new Event("change")); };
+  async function fill(input: HTMLInputElement) {
+    type(input, "New Hope Fellowship");
+    await flush(800);
+    set("c", "Dallas");
+    set("r", "TX");
+    set("p", "214-555-0100");
+    await flush(10);
+  }
+
+  it("deep-links the no-match link to Here's My Church's add form", async () => {
+    const { input, el } = mountAdd();
+    set("c", "Dallas");
+    type(input, "New Hope");
+    await flush(200);
+    expect(el.shadowRoot!.querySelector<HTMLAnchorElement>(".note a")!.href).toBe("https://heresmychurch.com/add?name=New+Hope&city=Dallas");
+  });
+  it("offers to add the typed church with the form's values, then adds it after similar ones", async () => {
+    const { el, input, panel } = mountAdd();
+    const added: any[] = [];
+    el.addEventListener("church-added", (e) => added.push((e as CustomEvent).detail));
+    await fill(input);
+    expect(panel.hidden).toBe(false);
+    expect(panel.querySelector("h3")!.textContent).toBe("Add New Hope Fellowship to Here's My Church?");
+    expect(panel.textContent).toContain("Dallas");
+    replies = [{ status: "similar", similar: [result("R-9", "New Hope Church")] }, { status: "live", id: "NEW-1" }];
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    expect(posts[0]).toEqual({ path: "/v1/churches", body: { client: "acme", church: { name: "New Hope Fellowship", city: "Dallas", region: "TX", phone: "214-555-0100" } } });
+    expect(panel.querySelector("h3")!.textContent).toBe("Is it one of these?");
+    expect(panel.textContent).toContain("New Hope Church");
+    const none = panel.querySelector<HTMLButtonElement>(".row .bt")!;
+    expect(none.textContent).toBe("None of these, add it");
+    none.click();
+    await flush(10);
+    expect(posts[1]!.body.confirmAdd).toBe(true);
+    expect(el.value).toBe("NEW-1");
+    expect(panel.textContent).toContain("Added New Hope Fellowship. Thank you!");
+    expect(added).toEqual([{ id: "NEW-1", church: posts[1]!.body.church, sandbox: false }]);
+  });
+  it("selects a similar church when it's picked", async () => {
+    const { el, input, panel } = mountAdd();
+    await fill(input);
+    replies = [{ status: "similar", similar: [result("R-9", "New Hope Church")] }];
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    panel.querySelector<HTMLButtonElement>("ul button")!.click();
+    await flush(10);
+    expect(el.value).toBe("R-9");
+    expect(input.value).toBe("New Hope Church");
+    expect(posts).toHaveLength(1);
+  });
+  it("lets the host cancel church-add, and shows a refusal", async () => {
+    const { el, input, panel } = mountAdd();
+    await fill(input);
+    const stop = (e: Event) => e.preventDefault();
+    el.addEventListener("church-add", stop);
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    expect(posts).toHaveLength(0);
+    el.removeEventListener("church-add", stop);
+    replies = [{ status: "rejected", message: "Name looks like spam" }];
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    expect(panel.textContent).toContain("Not accepted: Name looks like spam");
+    expect(el.value).toBe("");
+  });
+  it("says nothing until name, city and region are known", async () => {
+    const { input, panel } = mountAdd();
+    type(input, "New Hope");
+    await flush(200);
+    set("c", "Dallas");
+    await flush(10);
+    expect(panel.hidden).toBe(true);
   });
 });

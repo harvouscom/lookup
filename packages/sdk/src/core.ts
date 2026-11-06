@@ -1,7 +1,7 @@
 // @heresmychurch/lookup/core: the headless engine behind <church-lookup>, for building your own UI
 // (the shadcn registry components use it). No rendering and no side effects on import: nothing is
 // registered, and timers only run while a search is pending.
-import { createLookup, type ChurchRecord, type Lookup, type LookupError, type Meta, type SearchResult } from "./client.ts";
+import { createLookup, type ChurchRecord, type Lookup, type LookupError, type Meta, type NewChurch, type SearchResult } from "./client.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
 
 export * from "./client.ts";
@@ -343,14 +343,70 @@ export type ContributableRule = NonNullable<Meta["contributableFields"]>[string]
 
 /** The contribution rule for a form field in a church's country, or null if it can't be shared. */
 export function contributable(meta: Meta | null | undefined, field: string, country: string): ContributableRule | null {
-  const rule = meta?.contributableFields?.[field === "street" ? "address" : field];
+  const rule = meta?.contributableFields?.[ADDRESS_FIELDS.includes(field) ? "address" : field];
   if (!rule || (rule.countries !== "all" && !rule.countries.includes(country))) return null;
   return rule;
 }
+
+/** The form fields that make up an address. They're shown and sent as one "address" change. */
+export const ADDRESS_FIELDS = ["street", "city", "postalCode"];
 
 export interface ConsentRow { field: string; was: string; value: string }
 
 /** Rows whose value changed from the record and hasn't already been sent as that value. */
 export function consentDiff<T extends ConsentRow>(rows: T[], sent: Map<string, string> = new Map()): T[] {
   return rows.filter((r) => { const v = r.value.trim(); return v && v !== r.was && sent.get(r.field) !== v; });
+}
+
+/** Street, city and postal code rows become one "address" row in the first one's place, with `parts` to send. */
+export function mergeAddress<T extends ConsentRow>(rows: T[]): (T & { parts?: Record<string, string> })[] {
+  const parts = rows.filter((r) => ADDRESS_FIELDS.includes(r.field));
+  if (!parts.length) return rows;
+  const join = (k: "was" | "value") => parts.map((r) => r[k].trim()).filter(Boolean).join(", ");
+  const address = { ...parts[0]!, field: "address", was: join("was"), value: join("value"), parts: Object.fromEntries(parts.map((r) => [r.field, r.value.trim()])) };
+  return rows.flatMap((r) => (r === parts[0] ? [address] : parts.includes(r) ? [] : [r]));
+}
+
+/** The change to send for a consent row: an address goes as its parts. */
+export const changeFor = (r: ConsentRow & { parts?: Record<string, string> }) => ({ field: r.field, value: r.parts ?? r.value.trim() });
+
+// ── Here's My Church ──
+
+export const HMC_SITE = "https://heresmychurch.com";
+/** "Still correct?" is only worth asking when nobody has confirmed the listing for this long. */
+export const STALE_MS = 365 * 864e5;
+
+/** The listing was never confirmed, or not in the last 12 months. */
+export function isStale(record: ChurchRecord, now = Date.now()): boolean {
+  const v = record.freshness?.lastVerified;
+  return v == null || now - v > STALE_MS;
+}
+
+/** The church's page with the suggest-a-fix form open, or null when the record has no page. */
+export const suggestUrl = (record: ChurchRecord): string | null => (record.links?.heresMyChurch ? `${record.links.heresMyChurch}?suggest=1` : null);
+
+/** Here's My Church's add-a-church form, prefilled with what's known. */
+export function addUrl(p: { name?: string; city?: string; region?: string } = {}): string {
+  const q = new URLSearchParams();
+  for (const k of ["name", "city", "region"] as const) { const v = p[k]?.trim(); if (v) q.set(k, v); }
+  const qs = q.toString();
+  return `${HMC_SITE}/add${qs ? `?${qs}` : ""}`;
+}
+
+const ADD_KEYS = ["street", "city", "region", "postalCode", "country", "phone", "email", "website", "denomination", "serviceTimes", "languages", "ministries", "pastorName"];
+
+/**
+ * A church to add, from the name typed in the search box and the form fields a fill would use. A
+ * select gives its value, which the API reads as a code or a name. Null until name, city and region are known.
+ */
+export function newChurchFrom(name: string, targets: Targets): NewChurch | null {
+  const v: Record<string, string> = {};
+  for (const [field, el] of targets) {
+    const key = field === "regionName" ? "region" : field === "countryName" ? "country" : field;
+    const val = el.value.trim();
+    if (val && (ADD_KEYS.includes(key) || key === "name") && !v[key]) v[key] = val;
+  }
+  const { name: mapped, ...rest } = v;
+  const church = { name: name.trim() || mapped || "", ...rest } as NewChurch;
+  return church.name.length >= 3 && church.city && church.region ? church : null;
 }

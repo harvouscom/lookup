@@ -70,7 +70,7 @@ It also asks for smarter results when people pause. Change the options below to 
 | `debounce` | Milliseconds to wait after typing before searching. Defaults to 150. |
 | `semantic="off"` | Skip the slower search after a pause, which can find churches by meaning. |
 | `disabled` | Turn the field off, like any input. A disabled `fieldset` does the same. |
-| `contribute="off"` | Don't offer to share corrections back to Here's My Church. |
+| `contribute="off"` | Don't offer to share corrections, report problems or add missing churches. |
 | `client` | Your app's name, sent with requests. Use `lookup-demo` while testing. |
 
 ## In your form
@@ -123,6 +123,22 @@ A `<select>` fills when one of its options matches by value or text, as a code o
 document.querySelector("church-lookup").fieldMap = { website: "#site-url", phone: phoneInput };
 ```
 
+## Sharing fixes
+
+After a fill, changing a field Lookup filled shows the changes below the church field, checked, with **Share N fixes**. Street, city and postal code show as one Address row. "Still correct?" appears only for listings nobody confirmed in the last year. See [Data and review](/docs/data#sharing-fixes-back) for what's accepted where.
+
+### Share on submit
+
+To let people share as part of submitting your form, add a checkbox with `data-hmc-share`. If it's checked when the form submits, the checked changes are sent in the background (with `keepalive`, so leaving the page doesn't cut them off). The submit is never delayed or blocked.
+
+```html
+<label><input type="checkbox" data-hmc-share checked> Share my fixes with Here's My Church</label>
+```
+
+### Missing churches
+
+When nothing matches, the "Add it" link opens Here's My Church's add form with the typed name. If someone fills in your form without picking a church, the widget offers to add it, listing the values it would send from your mapped fields (it needs a name, city and region). Similar listings come first as "Is it one of these?"; picking one selects it. Once added, the widget's value is the new church's ID.
+
 ## Icons
 
 Use the icons your design system already has. Put one with `slot="search-icon"` in the box, and one with `slot="result-icon"` to repeat beside every result. It works with SVG sets like Lucide or Heroicons, icon fonts like Tabler or Font Awesome, and icon components like Iconify, because the icons stay in your page and pick up its CSS.
@@ -143,8 +159,10 @@ Use the icons your design system already has. Put one with `slot="search-icon"` 
 | `church-fill` | Fields are about to fill. Cancel it to fill them yourself from `detail.record`. |
 | `church-clear` | The choice was cleared, with the clear button or by editing the name. |
 | `church-error` | A search or a church's details failed to load. `detail` has `query` or `id`, plus `status`, `code`, `retryAfter` and the `error`. |
-| `church-contribute` | Someone chose Share. `detail` has `churchId` and `changes`. Cancel it to send them yourself, or not at all. |
+| `church-contribute` | Someone chose Share, reported a problem, or submitted with `data-hmc-share` checked (`detail.onSubmit`). `detail` has `churchId` and `changes`; an address change's `value` is `{ street, city, postalCode }`. Cancel it to send them yourself, or not at all. |
 | `church-confirm` | Someone chose Still correct. Cancel it to skip the confirmation. |
+| `church-add` | Someone chose to add a church that isn't listed. `detail` has `church` and `confirmAdd`. Cancel it to stop the add. |
+| `church-added` | A church was added. `detail` has its new `id` (null with `lookup-demo`), the `church` and `sandbox`. The widget's value is already the new ID. |
 
 ## Accessibility
 

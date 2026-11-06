@@ -210,8 +210,12 @@ describe("meta and routing", () => {
   it("serves meta", async () => {
     const { body } = await get("/v1/meta");
     expect(body.completenessWeights.serviceTimes).toBe(25);
-    expect(body.contributableFields.email).toBeUndefined();
-    expect(body.contributableFields.pastorName).toBeUndefined();
+    expect(body.contributableFields.email).toEqual({ countries: "all", review: "moderated" });
+    expect(body.contributableFields.pastorName.review).toBe("moderated");
+    expect(body.contributableFields.phone.countries).toBe("all");
+    expect(body.contributableFields.address).toEqual({ countries: "all", review: "moderated" });
+    expect(body.contributableFields.reportClosed.review).toBe("moderated");
+    expect(body.addEnabled).toBe(false);
     expect(body.contributableFields.name.review).toBe("moderated");
     expect(body.contributableFields.serviceTimes.review).toBe("live");
     expect(body.counts.churches).toBe(rows.length + searchRows.length);

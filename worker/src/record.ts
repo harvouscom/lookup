@@ -5,7 +5,7 @@ import { COUNTRIES, REGIONS } from "./regions.generated.ts";
 import { parseServiceTimes } from "./service-times.ts";
 
 export interface ChurchRow {
-  id: string; name: string; street: string | null; city: string | null; near: string | null; postal_code: string | null;
+  id: string; short_id?: string | null; name: string; street: string | null; city: string | null; near: string | null; postal_code: string | null;
   region: string; country: string; lat: number; lng: number; phone: string | null; email: string | null; website: string | null;
   denomination: string | null; service_times: string | null; languages: string | null; ministries: string | null;
   pastor_name: string | null; last_verified: number | null; completeness: number;
@@ -15,6 +15,8 @@ const list = (v: string | null): string[] => {
   if (!v) return [];
   try { const a = JSON.parse(v); return Array.isArray(a) ? a : []; } catch { return []; }
 };
+
+export const HMC_SITE = "https://heresmychurch.com";
 
 export function toRecord(r: ChurchRow) {
   const serviceTimes = parseServiceTimes(r.service_times);
@@ -50,6 +52,8 @@ export function toRecord(r: ChurchRow) {
     missing,
     completeness: r.completeness,
     freshness: { lastVerified: r.last_verified },
+    // The church's page, where people can fix anything Lookup doesn't take. Add ?suggest=1 to open the form.
+    links: { heresMyChurch: r.short_id ? `${HMC_SITE}/${r.country}/${r.region}/${encodeURIComponent(r.short_id)}` : null },
     // Values that aren't facts about the listing. A host must never fill `city` from nearestPlace.
     hints: { nearestPlace: r.city ? null : r.near },
   };
@@ -57,9 +61,10 @@ export function toRecord(r: ChurchRow) {
 
 /**
  * What a person can update through Lookup, and how it's reviewed. "live" goes live on one vote;
- * "moderated" waits for a Here's My Church moderator. Email and pastor name are left out on
- * purpose: they would go live on one vote, and a host form can hold someone's personal details.
- * `name` needs the matching change in the Here's My Church API before contributions accept it.
+ * "moderated" waits for a Here's My Church moderator. Email and pastor name are always moderated,
+ * since a host form can hold someone's personal details. `address` is street, city and postal code
+ * sent together. The report* fields flag a listing as closed, a duplicate or moved, and never go
+ * live without a moderator. `name` needs NAME_CONTRIBUTIONS before contributions accept it.
  */
 export const CONTRIBUTABLE_FIELDS = {
   name: { countries: "all", review: "moderated" },
@@ -67,9 +72,14 @@ export const CONTRIBUTABLE_FIELDS = {
   denomination: { countries: "all", review: "live" },
   languages: { countries: "all", review: "live" },
   ministries: { countries: "all", review: "live" },
+  phone: { countries: "all", review: "live" },
   website: { countries: "all", review: "moderated" },
-  address: { countries: ["US"], review: "moderated" },
-  phone: { countries: ["US", "CA"], review: "live" },
+  address: { countries: "all", review: "moderated" },
+  email: { countries: "all", review: "moderated" },
+  pastorName: { countries: "all", review: "moderated" },
+  reportClosed: { countries: "all", review: "moderated" },
+  reportDuplicate: { countries: "all", review: "moderated" },
+  reportRelocated: { countries: "all", review: "moderated" },
 } as const;
 
 export const RECORD_FIELDS = ["name", "street", "city", "region", "regionName", "postalCode", "country", "countryName", "latitude", "longitude", "phone", "email", "website", "denomination", "serviceTimes", "languages", "ministries", "pastorName"];

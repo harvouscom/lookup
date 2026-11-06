@@ -60,7 +60,11 @@ export interface ChurchRecord {
   fields: Record<string, unknown> & { name: string; serviceTimes: { raw: string | null } };
   missing: string[];
   completeness: number;
+  /** When someone last confirmed the listing (ms since 1970), or null if never. */
+  freshness?: { lastVerified: number | null };
   hints: { nearestPlace: string | null };
+  /** The church's page on Here's My Church, where people can fix anything else. Add ?suggest=1 to open the form. */
+  links?: { heresMyChurch: string | null };
   attribution: string;
 }
 
@@ -71,11 +75,21 @@ export interface ContributionResult {
   sandbox?: boolean;
   results: { field: string; status: FieldStatus; message?: string }[];
 }
+/** A church to add: record field names. Name, city and region (a code or name) are required. */
+export interface NewChurch {
+  name: string; city: string; region: string; street?: string; postalCode?: string; country?: string;
+  phone?: string; email?: string; website?: string; denomination?: string; serviceTimes?: string;
+  languages?: string | string[]; ministries?: string | string[]; pastorName?: string; latitude?: number; longitude?: number;
+}
+/** live: added (with its new `id`). similar: it may already be listed; `similar` holds candidates, send again with confirmAdd to add anyway. */
+export interface AddResult { status: "live" | "similar" | "rejected" | "try_again"; id?: string | null; similar?: SearchResult[]; message?: string; sandbox?: boolean }
 export interface ConfirmResult { churchId: string; sandbox?: boolean; status: "confirmed" | FieldStatus; message?: string; lastVerified?: number }
 export interface Meta {
   fields: string[];
   contributableFields: Record<string, { countries: "all" | string[]; review: "live" | "moderated"; status?: "coming_soon" }>;
   completenessWeights: Record<string, number>;
+  /** Whether addChurch() takes new churches right now. */
+  addEnabled?: boolean;
   attribution: string;
 }
 
@@ -112,8 +126,9 @@ export function createLookup(opts: LookupOptions = {}) {
     return body;
   }
 
-  const post = <T>(path: string, body: unknown) =>
-    get<T>(path, undefined, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const post = <T>(path: string, body: unknown, keepalive?: boolean) =>
+    get<T>(path, undefined, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), ...(keepalive ? { keepalive } : {}) });
+  const client = opts.client ?? "unknown";
 
   return {
     search(q: string, o: SearchOptions = {}): Promise<SearchResponse> {
@@ -134,13 +149,17 @@ export function createLookup(opts: LookupOptions = {}) {
     meta(): Promise<Meta> {
       return get("/meta");
     },
-    /** Send corrections. Each field comes back live, in review, or with a reason. */
-    contribute(id: string, changes: { field: string; value: unknown }[]): Promise<ContributionResult> {
-      return post(`/churches/${encodeURIComponent(id)}/contributions`, { client: opts.client ?? "unknown", changes });
+    /** Send corrections. Each field comes back live, in review, or with a reason. keepalive lets it finish as the page unloads. */
+    contribute(id: string, changes: { field: string; value: unknown }[], o: { keepalive?: boolean } = {}): Promise<ContributionResult> {
+      return post(`/churches/${encodeURIComponent(id)}/contributions`, { client, changes }, o.keepalive);
     },
     /** "Still correct": bumps the church's last-verified date. */
     confirm(id: string): Promise<ConfirmResult> {
-      return post(`/churches/${encodeURIComponent(id)}/confirm`, { client: opts.client ?? "unknown" });
+      return post(`/churches/${encodeURIComponent(id)}/confirm`, { client });
+    },
+    /** Add a church to Here's My Church. Similar listings come back first; confirmAdd adds it anyway. */
+    addChurch(church: NewChurch, o: { confirmAdd?: boolean } = {}): Promise<AddResult> {
+      return post("/churches", { client, church, ...(o.confirmAdd ? { confirmAdd: true } : {}) });
     },
   };
 }

@@ -42,6 +42,24 @@ export interface Strings {
   done: string;
   thanks: string;
   changedNote: (n: number) => string;
+  /** The one consent row for street, city and postal code. */
+  address: string;
+  /** The share button, with how many checked changes it sends. */
+  shareN: (n: number) => string;
+  /** "Report a problem" and its choices. */
+  report: string;
+  reports: { reportClosed: string; reportDuplicate: string; reportRelocated: string };
+  reported: string;
+  /** Link to the church's page on Here's My Church, for fixes Lookup doesn't take. */
+  moreFixes: string;
+  /** Offered when the form is filled without picking a church. */
+  addQ: (name: string) => string;
+  addBody: string;
+  addBtn: string;
+  adding: string;
+  similarQ: string;
+  noneOfThese: string;
+  added: (name: string) => string;
 }
 
 
@@ -71,13 +89,13 @@ export const EN: Strings = {
     clear: "Clear church",
     required: "Choose your church from the list.",
     shareTitle: "Share your fixes with Here's My Church?",
-    shareBody: "Checked changes help every church app. Nothing is sent until you choose Share.",
+    shareBody: "Uncheck anything you'd rather not share. Nothing is sent until you choose Share.",
     share: "Share",
     notNow: "Not now",
     goesLive: "Goes live",
     reviewed: "A moderator reviews it",
     soon: "Coming soon",
-    st: { live: "Live now", in_review: "Sent for review", not_applied: "Already up to date", rejected: "Not accepted", try_again: "Couldn't send. Try again shortly.", coming_soon: "Coming soon" },
+    st: { live: "Live now", in_review: "Sent for review", not_applied: "Not changed: Here's My Church kept the listed value", rejected: "Not accepted", try_again: "Couldn't send. Try again shortly.", coming_soon: "Coming soon" },
     shared: (n) => `Shared ${n} ${n === 1 ? "change" : "changes"}.`,
     sending: "Sending…",
     sandbox: "Demo only: nothing was sent.",
@@ -86,6 +104,19 @@ export const EN: Strings = {
     done: "Done",
     thanks: "Thanks for confirming.",
     changedNote: (n) => `You changed ${n} ${n === 1 ? "detail" : "details"}. You can share ${n === 1 ? "it" : "them"} with Here's My Church below the church field.`,
+    address: "Address",
+    shareN: (n) => `Share ${n} ${n === 1 ? "fix" : "fixes"}`,
+    report: "Report a problem",
+    reports: { reportClosed: "Closed", reportDuplicate: "Duplicate", reportRelocated: "Moved" },
+    reported: "Thanks. A moderator will check it.",
+    moreFixes: "More fixes on Here's My Church",
+    addQ: (name) => `Add ${name} to Here's My Church?`,
+    addBody: "It goes live right away, so the next person can find it. Check the details first.",
+    addBtn: "Add church",
+    adding: "Adding…",
+    similarQ: "Is it one of these?",
+    noneOfThese: "None of these, add it",
+    added: (name) => `Added ${name}. Thank you!`,
   };
 
 /** The languages with a strings file next to the element. */

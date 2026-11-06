@@ -65,7 +65,11 @@ export interface ChurchRecord {
   fields: Record<string, unknown> & { name: string; serviceTimes: { raw: string | null } };
   missing: string[];
   completeness: number;
+  /** When someone last confirmed the listing (ms since 1970), or null if never. */
+  freshness?: { lastVerified: number | null };
   hints: { nearestPlace: string | null };
+  /** The church's page on Here's My Church, where people can fix anything else. Add ?suggest=1 to open the form. */
+  links?: { heresMyChurch: string | null };
   attribution: string;
 }
 
@@ -76,11 +80,21 @@ export interface ContributionResult {
   sandbox?: boolean;
   results: { field: string; status: FieldStatus; message?: string }[];
 }
+/** A church to add: record field names. Name, city and region (a code or name) are required. */
+export interface NewChurch {
+  name: string; city: string; region: string; street?: string; postalCode?: string; country?: string;
+  phone?: string; email?: string; website?: string; denomination?: string; serviceTimes?: string;
+  languages?: string | string[]; ministries?: string | string[]; pastorName?: string; latitude?: number; longitude?: number;
+}
+/** live: added (with its new `id`). similar: it may already be listed; `similar` holds candidates, send again with confirmAdd to add anyway. */
+export interface AddResult { status: "live" | "similar" | "rejected" | "try_again"; id?: string | null; similar?: SearchResult[]; message?: string; sandbox?: boolean }
 export interface ConfirmResult { churchId: string; sandbox?: boolean; status: "confirmed" | FieldStatus; message?: string; lastVerified?: number }
 export interface Meta {
   fields: string[];
   contributableFields: Record<string, { countries: "all" | string[]; review: "live" | "moderated"; status?: "coming_soon" }>;
   completenessWeights: Record<string, number>;
+  /** Whether addChurch() takes new churches right now. */
+  addEnabled?: boolean;
   attribution: string;
 }
 
@@ -117,8 +131,9 @@ export function createLookup(opts: LookupOptions = {}) {
     return body;
   }
 
-  const post = <T>(path: string, body: unknown) =>
-    get<T>(path, undefined, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const post = <T>(path: string, body: unknown, keepalive?: boolean) =>
+    get<T>(path, undefined, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), ...(keepalive ? { keepalive } : {}) });
+  const client = opts.client ?? "unknown";
 
   return {
     search(q: string, o: SearchOptions = {}): Promise<SearchResponse> {
@@ -139,13 +154,17 @@ export function createLookup(opts: LookupOptions = {}) {
     meta(): Promise<Meta> {
       return get("/meta");
     },
-    /** Send corrections. Each field comes back live, in review, or with a reason. */
-    contribute(id: string, changes: { field: string; value: unknown }[]): Promise<ContributionResult> {
-      return post(`/churches/${encodeURIComponent(id)}/contributions`, { client: opts.client ?? "unknown", changes });
+    /** Send corrections. Each field comes back live, in review, or with a reason. keepalive lets it finish as the page unloads. */
+    contribute(id: string, changes: { field: string; value: unknown }[], o: { keepalive?: boolean } = {}): Promise<ContributionResult> {
+      return post(`/churches/${encodeURIComponent(id)}/contributions`, { client, changes }, o.keepalive);
     },
     /** "Still correct": bumps the church's last-verified date. */
     confirm(id: string): Promise<ConfirmResult> {
-      return post(`/churches/${encodeURIComponent(id)}/confirm`, { client: opts.client ?? "unknown" });
+      return post(`/churches/${encodeURIComponent(id)}/confirm`, { client });
+    },
+    /** Add a church to Here's My Church. Similar listings come back first; confirmAdd adds it anyway. */
+    addChurch(church: NewChurch, o: { confirmAdd?: boolean } = {}): Promise<AddResult> {
+      return post("/churches", { client, church, ...(o.confirmAdd ? { confirmAdd: true } : {}) });
     },
   };
 }
@@ -208,6 +227,24 @@ export interface Strings {
   done: string;
   thanks: string;
   changedNote: (n: number) => string;
+  /** The one consent row for street, city and postal code. */
+  address: string;
+  /** The share button, with how many checked changes it sends. */
+  shareN: (n: number) => string;
+  /** "Report a problem" and its choices. */
+  report: string;
+  reports: { reportClosed: string; reportDuplicate: string; reportRelocated: string };
+  reported: string;
+  /** Link to the church's page on Here's My Church, for fixes Lookup doesn't take. */
+  moreFixes: string;
+  /** Offered when the form is filled without picking a church. */
+  addQ: (name: string) => string;
+  addBody: string;
+  addBtn: string;
+  adding: string;
+  similarQ: string;
+  noneOfThese: string;
+  added: (name: string) => string;
 }
 
 
@@ -237,13 +274,13 @@ export const EN: Strings = {
     clear: "Clear church",
     required: "Choose your church from the list.",
     shareTitle: "Share your fixes with Here's My Church?",
-    shareBody: "Checked changes help every church app. Nothing is sent until you choose Share.",
+    shareBody: "Uncheck anything you'd rather not share. Nothing is sent until you choose Share.",
     share: "Share",
     notNow: "Not now",
     goesLive: "Goes live",
     reviewed: "A moderator reviews it",
     soon: "Coming soon",
-    st: { live: "Live now", in_review: "Sent for review", not_applied: "Already up to date", rejected: "Not accepted", try_again: "Couldn't send. Try again shortly.", coming_soon: "Coming soon" },
+    st: { live: "Live now", in_review: "Sent for review", not_applied: "Not changed: Here's My Church kept the listed value", rejected: "Not accepted", try_again: "Couldn't send. Try again shortly.", coming_soon: "Coming soon" },
     shared: (n) => `Shared ${n} ${n === 1 ? "change" : "changes"}.`,
     sending: "Sending…",
     sandbox: "Demo only: nothing was sent.",
@@ -252,6 +289,19 @@ export const EN: Strings = {
     done: "Done",
     thanks: "Thanks for confirming.",
     changedNote: (n) => `You changed ${n} ${n === 1 ? "detail" : "details"}. You can share ${n === 1 ? "it" : "them"} with Here's My Church below the church field.`,
+    address: "Address",
+    shareN: (n) => `Share ${n} ${n === 1 ? "fix" : "fixes"}`,
+    report: "Report a problem",
+    reports: { reportClosed: "Closed", reportDuplicate: "Duplicate", reportRelocated: "Moved" },
+    reported: "Thanks. A moderator will check it.",
+    moreFixes: "More fixes on Here's My Church",
+    addQ: (name) => `Add ${name} to Here's My Church?`,
+    addBody: "It goes live right away, so the next person can find it. Check the details first.",
+    addBtn: "Add church",
+    adding: "Adding…",
+    similarQ: "Is it one of these?",
+    noneOfThese: "None of these, add it",
+    added: (name) => `Added ${name}. Thank you!`,
   };
 
 /** The languages with a strings file next to the element. */
@@ -643,14 +693,70 @@ export type ContributableRule = NonNullable<Meta["contributableFields"]>[string]
 
 /** The contribution rule for a form field in a church's country, or null if it can't be shared. */
 export function contributable(meta: Meta | null | undefined, field: string, country: string): ContributableRule | null {
-  const rule = meta?.contributableFields?.[field === "street" ? "address" : field];
+  const rule = meta?.contributableFields?.[ADDRESS_FIELDS.includes(field) ? "address" : field];
   if (!rule || (rule.countries !== "all" && !rule.countries.includes(country))) return null;
   return rule;
 }
+
+/** The form fields that make up an address. They're shown and sent as one "address" change. */
+export const ADDRESS_FIELDS = ["street", "city", "postalCode"];
 
 export interface ConsentRow { field: string; was: string; value: string }
 
 /** Rows whose value changed from the record and hasn't already been sent as that value. */
 export function consentDiff<T extends ConsentRow>(rows: T[], sent: Map<string, string> = new Map()): T[] {
   return rows.filter((r) => { const v = r.value.trim(); return v && v !== r.was && sent.get(r.field) !== v; });
+}
+
+/** Street, city and postal code rows become one "address" row in the first one's place, with `parts` to send. */
+export function mergeAddress<T extends ConsentRow>(rows: T[]): (T & { parts?: Record<string, string> })[] {
+  const parts = rows.filter((r) => ADDRESS_FIELDS.includes(r.field));
+  if (!parts.length) return rows;
+  const join = (k: "was" | "value") => parts.map((r) => r[k].trim()).filter(Boolean).join(", ");
+  const address = { ...parts[0]!, field: "address", was: join("was"), value: join("value"), parts: Object.fromEntries(parts.map((r) => [r.field, r.value.trim()])) };
+  return rows.flatMap((r) => (r === parts[0] ? [address] : parts.includes(r) ? [] : [r]));
+}
+
+/** The change to send for a consent row: an address goes as its parts. */
+export const changeFor = (r: ConsentRow & { parts?: Record<string, string> }) => ({ field: r.field, value: r.parts ?? r.value.trim() });
+
+// ── Here's My Church ──
+
+export const HMC_SITE = "https://heresmychurch.com";
+/** "Still correct?" is only worth asking when nobody has confirmed the listing for this long. */
+export const STALE_MS = 365 * 864e5;
+
+/** The listing was never confirmed, or not in the last 12 months. */
+export function isStale(record: ChurchRecord, now = Date.now()): boolean {
+  const v = record.freshness?.lastVerified;
+  return v == null || now - v > STALE_MS;
+}
+
+/** The church's page with the suggest-a-fix form open, or null when the record has no page. */
+export const suggestUrl = (record: ChurchRecord): string | null => (record.links?.heresMyChurch ? `${record.links.heresMyChurch}?suggest=1` : null);
+
+/** Here's My Church's add-a-church form, prefilled with what's known. */
+export function addUrl(p: { name?: string; city?: string; region?: string } = {}): string {
+  const q = new URLSearchParams();
+  for (const k of ["name", "city", "region"] as const) { const v = p[k]?.trim(); if (v) q.set(k, v); }
+  const qs = q.toString();
+  return `${HMC_SITE}/add${qs ? `?${qs}` : ""}`;
+}
+
+const ADD_KEYS = ["street", "city", "region", "postalCode", "country", "phone", "email", "website", "denomination", "serviceTimes", "languages", "ministries", "pastorName"];
+
+/**
+ * A church to add, from the name typed in the search box and the form fields a fill would use. A
+ * select gives its value, which the API reads as a code or a name. Null until name, city and region are known.
+ */
+export function newChurchFrom(name: string, targets: Targets): NewChurch | null {
+  const v: Record<string, string> = {};
+  for (const [field, el] of targets) {
+    const key = field === "regionName" ? "region" : field === "countryName" ? "country" : field;
+    const val = el.value.trim();
+    if (val && (ADD_KEYS.includes(key) || key === "name") && !v[key]) v[key] = val;
+  }
+  const { name: mapped, ...rest } = v;
+  const church = { name: name.trim() || mapped || "", ...rest } as NewChurch;
+  return church.name.length >= 3 && church.city && church.region ? church : null;
 }

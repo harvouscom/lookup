@@ -1,7 +1,7 @@
 // Types for <church-lookup> in any setup: the DOM tag and its events, and JSX for React <= 18,
 // Preact and Solid through the global JSX namespace. React 19 and Vue: also import the matching
 // "@heresmychurch/lookup/react" or "@heresmychurch/lookup/vue" types.
-import type { ChurchRecord, SearchResult } from "./client.ts";
+import type { ChurchRecord, NewChurch, SearchResult } from "./client.ts";
 import type { ChurchErrorDetail, ChurchLookup, FillChange } from "./element.ts";
 
 export interface ChurchLookupEventMap {
@@ -11,8 +11,13 @@ export interface ChurchLookupEventMap {
   "church-fill": CustomEvent<{ record: ChurchRecord; changes: FillChange[] }>;
   "church-clear": CustomEvent<null>;
   "church-error": CustomEvent<ChurchErrorDetail>;
-  "church-contribute": CustomEvent<{ churchId: string; changes: { field: string; value: string }[] }>;
+  /** Cancelable. `value` is a string, or { street, city, postalCode } for "address". onSubmit: sent by a checked data-hmc-share box. */
+  "church-contribute": CustomEvent<{ churchId: string; changes: { field: string; value: unknown }[]; onSubmit?: boolean }>;
   "church-confirm": CustomEvent<{ churchId: string }>;
+  /** Cancelable: about to add a church that wasn't found. */
+  "church-add": CustomEvent<{ church: NewChurch; confirmAdd: boolean }>;
+  /** A church was added. `id` is null for the lookup-demo client, which sends nothing. */
+  "church-added": CustomEvent<{ id: string | null; church: NewChurch; sandbox: boolean }>;
 }
 
 /** Attributes you can set on <church-lookup>. */

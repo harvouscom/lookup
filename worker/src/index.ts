@@ -1,7 +1,7 @@
 // hmc-lookup Worker. Search, the autofill record, metadata, and the cron sync.
 // Queries are never logged: invocation logs are off, and request location stays in memory.
 import { ask } from "./ask.ts";
-import { confirm, contribute, contributableFields } from "./contribute.ts";
+import { addChurch, confirm, contribute, contributableFields } from "./contribute.ts";
 import { COMPLETENESS_WEIGHTS, RECORD_FIELDS, toRecord, type ChurchRow } from "./record.ts";
 import { COUNTRIES, REGIONS } from "./regions.generated.ts";
 import { search } from "./search.ts";
@@ -29,6 +29,7 @@ export interface Env {
   CONTRIBUTIONS_ENABLED?: string;
   NAME_CONTRIBUTIONS?: string;
   CONTRIBUTIONS_DAILY_CAP?: string;
+  ADD_ENABLED?: string;
   ASK_ENABLED?: string;
 }
 
@@ -36,7 +37,8 @@ export const ATTRIBUTION = "Church data from OpenStreetMap contributors (ODbL) a
 const MAX_QUERY = 120;
 export const MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 8;
-const CACHE_SECONDS = { search: 300, church: 300, meta: 3600 };
+// A record is short-lived, and purged here when a change goes live through Lookup.
+const CACHE_SECONDS = { search: 300, church: 60, meta: 3600 };
 
 // Expose the headers the SDK reads, which browsers otherwise hide from other origins.
 const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type", "access-control-expose-headers": "retry-after, x-lookup-cache, x-lookup-degraded", "access-control-max-age": "86400" };
@@ -63,11 +65,15 @@ function number(url: URL, name: string, min: number, max: number): number | null
 
 export const isOverload = (e: unknown): boolean => /overloaded|too many|database is locked|busy/i.test(String((e as Error)?.message ?? e));
 
+const edgeCache = () => (caches as unknown as { default: Cache }).default;
+// Keyed by deployed version, so a ranking change can't serve results from the previous one.
+const cacheRequest = (request: Request, env: Env, key: string) =>
+  new Request(`https://${new URL(request.url).hostname}/__cache/${env.CF_VERSION_METADATA?.id ?? "dev"}${key}`);
+const churchKey = (id: string) => `/v1/churches/${encodeURIComponent(id)}`;
+
 async function cached(request: Request, env: Env, ctx: ExecutionContext, key: string, seconds: number, produce: () => Promise<Response>): Promise<Response> {
-  const cache = (caches as unknown as { default: Cache }).default;
-  // Keyed by deployed version, so a ranking change can't serve results from the previous one.
-  const version = env.CF_VERSION_METADATA?.id ?? "dev";
-  const req = new Request(`https://${new URL(request.url).hostname}/__cache/${version}${key}`);
+  const cache = edgeCache();
+  const req = cacheRequest(request, env, key);
   const hit = await cache.match(req);
   if (hit) {
     const out = new Response(hit.body, hit);
@@ -142,7 +148,7 @@ async function handleSearch(request: Request, env: Env, ctx: ExecutionContext, u
 
 async function handleChurch(request: Request, env: Env, ctx: ExecutionContext, id: string): Promise<Response> {
   if (id.length > 80) return fail(404, "not found");
-  return cached(request, env, ctx, `/v1/churches/${encodeURIComponent(id)}`, CACHE_SECONDS.church, async () => {
+  return cached(request, env, ctx, churchKey(id), CACHE_SECONDS.church, async () => {
     const session = env.DB.withSession("first-unconstrained");
     const row = await session.prepare("SELECT * FROM church WHERE id = ?").bind(id).first<ChurchRow>();
     if (row) return json({ ...toRecord(row), attribution: ATTRIBUTION });
@@ -159,6 +165,8 @@ async function handleMeta(request: Request, env: Env, ctx: ExecutionContext): Pr
     return json({
       fields: RECORD_FIELDS,
       contributableFields: contributableFields(env),
+      // Whether POST /v1/churches takes new churches right now.
+      addEnabled: env.ADD_ENABLED === "true" && env.CONTRIBUTIONS_ENABLED === "true",
       completenessWeights: COMPLETENESS_WEIGHTS,
       counts: build?.counts ?? null,
       fieldFill: build?.fill ?? null,
@@ -168,15 +176,17 @@ async function handleMeta(request: Request, env: Env, ctx: ExecutionContext): Pr
   });
 }
 
-/** Contributions and confirmations. Never cached; each field reports its own status. */
-async function handleWrite(request: Request, env: Env, id: string, kind: "contributions" | "confirm"): Promise<Response> {
+/** Contributions, confirmations and adds. Never cached; a change that went live purges the church's record. */
+async function handleWrite(request: Request, env: Env, ctx: ExecutionContext, id: string, kind: "contributions" | "confirm" | "add"): Promise<Response> {
   const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
   const text = await request.text();
   if (text.length > 16_000) return fail(413, "request too large");
   let input: unknown;
   try { input = text ? JSON.parse(text) : {}; } catch { return fail(400, "body must be JSON"); }
   try {
-    const out = kind === "contributions" ? await contribute(env, id, ip, input) : await confirm(env, id, ip, input);
+    const out = kind === "contributions" ? await contribute(env, id, ip, input) : kind === "confirm" ? await confirm(env, id, ip, input) : await addChurch(env, ip, input);
+    // This data center's copy; others expire within CACHE_SECONDS.church.
+    for (const pid of out.purge) ctx.waitUntil(edgeCache().delete(cacheRequest(request, env, churchKey(pid))).then(() => undefined, () => undefined));
     const retry: Record<string, string> = out.status === 503 || out.status === 429 ? { "retry-after": "60" } : {};
     return json({ ...(out.body as object), attribution: ATTRIBUTION }, out.status, { "cache-control": "no-store", ...retry });
   } catch (e) {
@@ -244,7 +254,11 @@ export default {
     const writeMatch = url.pathname.replace(/\/+$/, "").match(/^\/v1\/churches\/([^/]+)\/(contributions|confirm)$/);
     if (writeMatch) {
       if (request.method !== "POST") return fail(405, "method not allowed", { allow: "POST, OPTIONS" });
-      return handleWrite(request, env, decodeURIComponent(writeMatch[1]!), writeMatch[2] as "contributions" | "confirm");
+      return handleWrite(request, env, ctx, decodeURIComponent(writeMatch[1]!), writeMatch[2] as "contributions" | "confirm");
+    }
+    if (url.pathname.replace(/\/+$/, "") === "/v1/churches") {
+      if (request.method !== "POST") return fail(405, "method not allowed", { allow: "POST, OPTIONS" });
+      return handleWrite(request, env, ctx, "", "add");
     }
     if (request.method !== "GET" && request.method !== "HEAD") return fail(405, "method not allowed", { allow: "GET, OPTIONS" });
 

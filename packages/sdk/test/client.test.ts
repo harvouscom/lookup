@@ -47,4 +47,16 @@ describe("client", () => {
     await createLookup({ fetch: f.fetch }).search("grace", { lat: 32.78, lng: -96.8 });
     expect(new URL(f.calls[0]!).searchParams.get("lat")).toBe("32.78");
   });
+  it("adds a church, and sends contributions with keepalive when asked", async () => {
+    const sent: { url: string; init: RequestInit }[] = [];
+    const fetch = (async (url: string, init: RequestInit) => { sent.push({ url, init }); return Response.json({ status: "live", id: "NEW-1", results: [] }); }) as unknown as typeof globalThis.fetch;
+    const lookup = createLookup({ fetch, client: "acme" });
+    expect(await lookup.addChurch({ name: "New Hope", city: "Dallas", region: "TX" }, { confirmAdd: true })).toMatchObject({ status: "live", id: "NEW-1" });
+    expect(sent[0]!.url).toBe("https://lookup.heresmychurch.com/v1/churches");
+    expect(JSON.parse(String(sent[0]!.init.body))).toEqual({ client: "acme", church: { name: "New Hope", city: "Dallas", region: "TX" }, confirmAdd: true });
+    await lookup.contribute("R-1", [{ field: "phone", value: "1" }], { keepalive: true });
+    expect(sent[1]!.init.keepalive).toBe(true);
+    await lookup.contribute("R-1", [{ field: "phone", value: "1" }]);
+    expect(sent[2]!.init.keepalive).toBeUndefined();
+  });
 });

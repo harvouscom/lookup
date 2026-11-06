@@ -2,22 +2,28 @@
 
 // ChurchLookup: a church search box for shadcn/ui apps. Pick a church and the form's fields fill
 // from Here's My Church. Works with plain forms (a hidden input submits the church ID), controlled
-// state, and React Hook Form (spread a FormField's `field` onto it).
+// state, and React Hook Form (spread a FormField's `field` onto it). When the form is filled in
+// without picking a church, it offers to add that church to Here's My Church.
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
 import { Church, LoaderCircle, Search, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import { useChurchLookup, type UseChurchLookupOptions } from "@/hooks/use-church-lookup"
 import {
+  addUrl,
   applyFill,
   findTargets,
   matchField,
+  newChurchFrom,
   planFill,
   stringsFor,
+  type AddResult,
   type ChurchRecord,
+  type NewChurch,
   type FillPlan,
   type LookupError,
   type SearchResult,
@@ -48,6 +54,15 @@ export interface ChurchLookupProps extends Omit<UseChurchLookupOptions, "onError
   fill?: boolean | "auto" | "tagged"
   /** Fill from `value` when it's first shown, as when a saved church should refresh the form. */
   fillOnLoad?: boolean
+  /**
+   * The form was filled in without picking a church: about to add the typed one to Here's My Church.
+   * Return false to stop it. Set `addChurch={false}` to never offer adding.
+   */
+  onAdd?: (church: NewChurch, confirmAdd: boolean) => boolean | void
+  /** A church was added. `id` is null for the lookup-demo client, which sends nothing. */
+  onAdded?: (id: string | null, church: NewChurch, sandbox: boolean) => void
+  /** Offer to add a church that isn't listed. Defaults to true. */
+  addChurch?: boolean
   /** The id of the form to fill. Defaults to the enclosing form, then the whole page. */
   form?: string
   /** Replace fields that already have values. */
@@ -85,7 +100,7 @@ const useIsoLayoutEffect = typeof window === "undefined" ? React.useEffect : Rea
 
 export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps>(function ChurchLookup(
   {
-    name, value, onChange, onBlur, onClear, onFill, onError, fill = true, fillOnLoad, form, overwrite, required, lang, strings,
+    name, value, onChange, onBlur, onClear, onFill, onError, onAdd, onAdded, addChurch = true, fill = true, fillOnLoad, form, overwrite, required, lang, strings,
     label, placeholder, density = "compact", icon, searchIcon, showDistance = true, id, disabled, className,
     "aria-invalid": invalid, "aria-describedby": describedBy, onResults, onSelect, ...search
   },
@@ -150,6 +165,64 @@ export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps
     if (onFill?.(record, plan) === false || !plan) return
     applyFill(plan.changes)
     setAnnounce(t.filled(plan.changes.length, plan.empty))
+  }
+
+  // ── Add a church that isn't listed ──
+  type Adding = { church: NewChurch; dismissed: boolean; busy: boolean; result: AddResult | null }
+  const [adding, setAdding] = React.useState<Adding | null>(null)
+  const addEnabled = React.useRef<Promise<boolean> | null>(null)
+  const latest = React.useRef({ text, chosenId, adding })
+  latest.current = { text, chosenId, adding }
+  React.useEffect(() => {
+    if (!addChurch) return
+    const onChange = async (e: Event) => {
+      const { text: typed, chosenId: chosen, adding: a } = latest.current
+      if (chosen || !typed.trim() || a?.busy || ![...targets().values()].includes(e.target as HTMLInputElement)) return
+      addEnabled.current ??= lookup.lookup.meta().then((m) => Boolean(m.addEnabled), () => false)
+      const church = newChurchFrom(typed, targets())
+      if (!(await addEnabled.current) || !church) return setAdding(null)
+      setAdding((prev) => (prev?.church.name === church.name && prev.dismissed ? prev : { church, dismissed: false, busy: false, result: null }))
+    }
+    document.addEventListener("change", onChange, true)
+    return () => document.removeEventListener("change", onChange, true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addChurch, form, fill])
+
+  async function sendAdd(confirmAdd: boolean) {
+    if (!adding) return
+    const church = newChurchFrom(text, targets()) ?? adding.church
+    if (onAdd?.(church, confirmAdd) === false) return
+    setAdding({ ...adding, church, busy: true })
+    let out: AddResult
+    try {
+      out = await lookup.lookup.addChurch(church, { confirmAdd })
+    } catch (e) {
+      out = { status: "try_again", message: (e as Error).message }
+    }
+    setAdding({ church, dismissed: out.status === "live", busy: false, result: out })
+    if (out.status === "live") {
+      setAnnounce(t.added(church.name))
+      if (out.id) {
+        lookup.select({ id: out.id, name: church.name, label: church.name, locationLabel: "" } as SearchResult)
+        onChange?.(out.id)
+      }
+      onAdded?.(out.id ?? null, church, Boolean(out.sandbox))
+    } else setAnnounce(out.status === "similar" ? t.similarQ : out.message ? `${t.st.rejected}: ${out.message}` : t.st.try_again)
+  }
+
+  /** "Is it one of these?": choosing one selects it, as picking it from the search would. */
+  async function pickSimilar(r: SearchResult) {
+    setAdding(null)
+    setText(r.name)
+    try {
+      const record = await lookup.lookup.getChurch(r.id)
+      lookup.select({ ...r, id: record.id })
+      onChange?.(record.id)
+      fillFrom(record)
+    } catch (e) {
+      setAnnounce(t.loadFail)
+      onError?.(e, { id: r.id })
+    }
   }
 
   // A value set from outside (a saved church, or a form reset) shows that church.
@@ -222,6 +295,7 @@ export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps
       return
     }
     if (!record) return
+    setAdding(null)
     onChange?.(record.id)
     fillFrom(record)
   }
@@ -309,7 +383,15 @@ export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps
               ) : showEmpty ? (
                 <p className="text-muted-foreground px-3 py-4 text-sm">
                   {t.none}
-                  <a className="text-foreground underline underline-offset-4" href="https://heresmychurch.com" target="_blank" rel="noopener">
+                  <a
+                    className="text-foreground underline underline-offset-4"
+                    href={(() => {
+                      const tg = typeof document === "undefined" ? new Map() : targets()
+                      return addUrl({ name: lookup.query, city: tg.get("city")?.value, region: (tg.get("region") ?? tg.get("regionName"))?.value })
+                    })()}
+                    target="_blank"
+                    rel="noopener"
+                  >
                     {t.add}
                   </a>
                 </p>
@@ -366,6 +448,56 @@ export const ChurchLookup = React.forwardRef<HTMLInputElement, ChurchLookupProps
           </PopoverContent>
         </Popover>
       </Command>
+      {adding && (!chosenId || adding.result?.status === "live") && !(adding.dismissed && !adding.result) && (
+        <div className="bg-muted/40 mt-3 rounded-lg border p-4 text-sm" role="region" aria-label={t.addQ(adding.church.name)} data-slot="church-lookup-add">
+          {adding.result?.status === "live" ? (
+            <p className="font-medium" role="status">
+              {t.added(adding.church.name)}
+              {adding.result.sandbox && <span className="text-muted-foreground block text-xs font-normal">{t.sandbox}</span>}
+            </p>
+          ) : adding.result?.status === "similar" && adding.result.similar?.length ? (
+            <>
+              <h3 className="font-medium">{t.similarQ}</h3>
+              <ul className="mt-3 grid gap-2">
+                {adding.result.similar.map((r) => (
+                  <li key={r.id}>
+                    <button type="button" onClick={() => void pickSimilar(r)} className="bg-background hover:bg-accent w-full rounded-md border px-3 py-2 text-left">
+                      <span className="block font-medium">{r.name}</span>
+                      <span className="text-muted-foreground block text-xs">{r.locationLabel}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-3 flex flex-wrap justify-end gap-2">
+                <Button type="button" size="sm" onClick={() => void sendAdd(true)} disabled={adding.busy}>{adding.busy ? t.adding : t.noneOfThese}</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setAdding({ ...adding, dismissed: true, result: null })}>{t.notNow}</Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h3 className="font-medium">{t.addQ(adding.church.name)}</h3>
+              <p className="text-muted-foreground mt-1">{t.addBody}</p>
+              <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+                {Object.entries(adding.church).map(([k, v]) => (
+                  <React.Fragment key={k}>
+                    <dt className="font-medium">{k === "name" ? t.label : (targets().get(k)?.labels?.[0]?.textContent ?? k).trim()}</dt>
+                    <dd className="text-muted-foreground min-w-0 break-words">{String(v)}</dd>
+                  </React.Fragment>
+                ))}
+              </dl>
+              {adding.result && (
+                <p className="text-destructive mt-2" role="status">
+                  {adding.result.status === "rejected" && adding.result.message ? `${t.st.rejected}: ${adding.result.message}` : t.st.try_again}
+                </p>
+              )}
+              <div className="mt-3 flex flex-wrap justify-end gap-2">
+                <Button type="button" size="sm" onClick={() => void sendAdd(false)} disabled={adding.busy}>{adding.busy ? t.adding : t.addBtn}</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setAdding({ ...adding, dismissed: true, result: null })}>{t.notNow}</Button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
       {name ? <input type="hidden" name={name} value={chosenId} /> : null}
       <span className="sr-only" role="status" aria-live="polite">
         {announce}

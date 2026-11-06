@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { addUrl, changeFor, isStale, mergeAddress, newChurchFrom, suggestUrl, STALE_MS } from "../src/core.ts";
 import { consentDiff, contributable, createLookup, createLookupController, fieldValue, fillTargets, findTargets, planFill, type ControllerState } from "../src/core.ts";
 
 const result = (id: string, name: string) => ({ id, name, label: name, locationLabel: "Dallas, Texas", street: null, city: "Dallas", nearestPlace: null, region: "TX", regionName: "Texas", country: "US", countryName: "United States", latitude: 1, longitude: 2, denomination: null, completeness: 50, distanceKm: null, band: 1, source: "lexical" as const });
@@ -347,6 +348,8 @@ describe("consent", () => {
     expect(contributable(meta, "phone", "US")?.review).toBe("live");
     expect(contributable(meta, "phone", "DE")).toBeNull();
     expect(contributable(meta, "street", "US")?.review).toBe("moderated");
+    expect(contributable(meta, "city", "US")?.review).toBe("moderated");
+    expect(contributable(meta, "postalCode", "US")?.review).toBe("moderated");
     expect(contributable(meta, "email", "US")).toBeNull();
     expect(contributable(null, "phone", "US")).toBeNull();
   });
@@ -354,5 +357,38 @@ describe("consent", () => {
     const rows = [{ field: "phone", was: "1", value: "2" }, { field: "city", was: "Dallas", value: " Dallas " }, { field: "website", was: "", value: "" }, { field: "name", was: "A", value: "B" }];
     expect(consentDiff(rows).map((r) => r.field)).toEqual(["phone", "name"]);
     expect(consentDiff(rows, new Map([["name", "B"]])).map((r) => r.field)).toEqual(["phone"]);
+  });
+  it("merges street, city and postal code into one address row in the first one's place", () => {
+    const rows = [{ field: "phone", was: "1", value: "2" }, { field: "city", was: "Dallas", value: "Irving" }, { field: "street", was: "1 Main", value: "1 Main" }];
+    const merged = mergeAddress(rows);
+    expect(merged.map((r) => r.field)).toEqual(["phone", "address"]);
+    expect(merged[1]).toMatchObject({ was: "Dallas, 1 Main", value: "Irving, 1 Main", parts: { city: "Irving", street: "1 Main" } });
+    expect(changeFor(merged[1]!)).toEqual({ field: "address", value: { city: "Irving", street: "1 Main" } });
+    expect(changeFor(merged[0]!)).toEqual({ field: "phone", value: "2" });
+    expect(mergeAddress([{ field: "phone", was: "", value: "" }])).toHaveLength(1);
+  });
+});
+
+describe("Here's My Church", () => {
+  const rec = (lastVerified: number | null | undefined, link: string | null = null) => ({ id: "R-1", fields: {}, freshness: lastVerified === undefined ? undefined : { lastVerified }, links: { heresMyChurch: link } }) as never;
+  it("is stale when never confirmed or not this year", () => {
+    const now = Date.UTC(2026, 10, 6);
+    expect(isStale(rec(null), now)).toBe(true);
+    expect(isStale(rec(undefined), now)).toBe(true);
+    expect(isStale(rec(now - STALE_MS - 1), now)).toBe(true);
+    expect(isStale(rec(now - 30 * 864e5), now)).toBe(false);
+  });
+  it("builds the suggest and add links", () => {
+    expect(suggestUrl(rec(null, "https://heresmychurch.com/US/TX/abc"))).toBe("https://heresmychurch.com/US/TX/abc?suggest=1");
+    expect(suggestUrl(rec(null))).toBeNull();
+    expect(addUrl({ name: " Grace & Truth ", city: "Dallas", region: "" })).toBe("https://heresmychurch.com/add?name=Grace+%26+Truth&city=Dallas");
+    expect(addUrl()).toBe("https://heresmychurch.com/add");
+  });
+  it("builds a church to add from the typed name and mapped fields", () => {
+    const input = (v: string) => Object.assign(document.createElement("input"), { value: v });
+    const targets = new Map([["city", input("Dallas")], ["regionName", input("Texas")], ["phone", input(" 214 ")], ["latitude", input("1")], ["website", input("")]]);
+    expect(newChurchFrom("New Hope", targets)).toEqual({ name: "New Hope", city: "Dallas", region: "Texas", phone: "214" });
+    expect(newChurchFrom("NH", targets)).toBeNull();
+    expect(newChurchFrom("New Hope", new Map([["city", input("Dallas")]]))).toBeNull();
   });
 });
