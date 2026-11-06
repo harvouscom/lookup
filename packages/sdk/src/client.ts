@@ -38,14 +38,25 @@ export interface SearchResult {
 export interface SearchResponse {
   query: string;
   results: SearchResult[];
+  /** More churches ranked past `limit`. Ask again with a higher limit to get them. */
+  hasMore?: boolean;
+  /** The place understood from the query or `near`, such as Dallas, TX. */
+  place: { name: string; region: string; country: string } | null;
+  /** The spelling searched instead of what was typed, or null. */
   corrected: string | null;
+  /** A fallback answer: part of the search didn't run. */
   degraded: boolean;
+  /** Whether semantic search ran. */
+  semantic?: "used" | "skipped" | "off" | "failed";
   attribution: string;
 }
 
 export interface ChurchRecord {
   id: string;
+  /** Only with { follow: false }: this listing merged into another. Load that ID instead. */
   movedTo?: string;
+  /** The ID you asked for, when it merged into this church. Store this record's `id` instead. */
+  movedFrom?: string;
   fields: Record<string, unknown> & { name: string; serviceTimes: { raw: string | null } };
   missing: string[];
   completeness: number;
@@ -70,11 +81,16 @@ export interface Meta {
 
 export class LookupError extends Error {
   status: number;
+  /** Seconds to wait before trying again, on a 429 or 503. */
   retryAfter?: number;
-  constructor(status: number, message: string, retryAfter?: number) {
+  /** A stable reason: invalid, not_found, rate_limited, overloaded, unavailable, … */
+  code?: string;
+  constructor(status: number, message: string, retryAfter?: number, code?: string) {
     super(message);
+    this.name = "LookupError";
     this.status = status;
     this.retryAfter = retryAfter;
+    this.code = code;
   }
 }
 
@@ -92,7 +108,7 @@ export function createLookup(opts: LookupOptions = {}) {
   async function get<T>(path: string, signal?: AbortSignal, init?: RequestInit): Promise<T> {
     const res = await f(base + path, { signal, ...init });
     const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined);
+    if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined, body.code);
     return body;
   }
 
@@ -108,8 +124,11 @@ export function createLookup(opts: LookupOptions = {}) {
       if (opts.client) p.set("client", opts.client);
       return get(`/search?${p}`, o.signal);
     },
-    getChurch(id: string, o: { signal?: AbortSignal } = {}): Promise<ChurchRecord> {
-      return get(`/churches/${encodeURIComponent(id)}`, o.signal);
+    /** The autofill record. An ID whose listing merged into another loads that church, with `movedFrom`. */
+    async getChurch(id: string, o: { signal?: AbortSignal; follow?: boolean } = {}): Promise<ChurchRecord> {
+      const one = (i: string) => get<ChurchRecord>(`/churches/${encodeURIComponent(i)}`, o.signal);
+      const rec = await one(id);
+      return rec.movedTo && o.follow !== false ? { ...(await one(rec.movedTo)), movedFrom: id } : rec;
     },
     /** Field names, which fields can be contributed and how each is reviewed. */
     meta(): Promise<Meta> {

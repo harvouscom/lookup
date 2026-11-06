@@ -33,11 +33,12 @@ export interface Env {
 
 export const ATTRIBUTION = "Church data from OpenStreetMap contributors (ODbL) and Here's My Church contributors.";
 const MAX_QUERY = 120;
-const MAX_LIMIT = 20;
+export const MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 8;
 const CACHE_SECONDS = { search: 300, church: 300, meta: 3600 };
 
-const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type", "access-control-max-age": "86400" };
+// Expose the headers the SDK reads, which browsers otherwise hide from other origins.
+const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type", "access-control-expose-headers": "retry-after, x-lookup-cache, x-lookup-degraded", "access-control-max-age": "86400" };
 
 function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
@@ -45,8 +46,10 @@ function json(body: unknown, status = 200, headers: Record<string, string> = {})
     headers: { "content-type": "application/json; charset=utf-8", ...CORS, ...headers },
   });
 }
+/** A stable, machine-readable reason for each error status. The `error` text may change. */
+export const ERROR_CODES: Record<number, string> = { 400: "invalid", 404: "not_found", 405: "method_not_allowed", 413: "too_large", 429: "rate_limited", 500: "unavailable", 503: "overloaded" };
 const fail = (status: number, error: string, headers: Record<string, string> = {}) =>
-  json({ error, attribution: ATTRIBUTION }, status, { "cache-control": "no-store", ...headers });
+  json({ error, code: ERROR_CODES[status] ?? "error", attribution: ATTRIBUTION }, status, { "cache-control": "no-store", ...headers });
 
 const round = (v: number) => Math.round(v * 10) / 10;
 
@@ -84,7 +87,8 @@ async function handleSearch(request: Request, env: Env, ctx: ExecutionContext, u
   const q = (url.searchParams.get("q") ?? "").trim().replace(/\s+/g, " ");
   if (q.length > MAX_QUERY) return fail(400, "q is too long");
   const lat = number(url, "lat", -90, 90), lng = number(url, "lng", -180, 180), limitRaw = number(url, "limit", 1, MAX_LIMIT);
-  if (lat === "invalid" || lng === "invalid" || limitRaw === "invalid") return fail(400, "lat, lng or limit is out of range");
+  if (lat === "invalid" || lng === "invalid") return fail(400, "lat must be -90 to 90 and lng -180 to 180");
+  if (limitRaw === "invalid") return fail(400, `limit must be 1 to ${MAX_LIMIT}`);
   if ((lat === null) !== (lng === null)) return fail(400, "lat and lng must be sent together");
   const limit = limitRaw ?? DEFAULT_LIMIT;
   const country = url.searchParams.get("country")?.toUpperCase() || null;
@@ -94,7 +98,7 @@ async function handleSearch(request: Request, env: Env, ctx: ExecutionContext, u
   const near = url.searchParams.get("near")?.slice(0, MAX_QUERY) || null;
 
   const base = { attribution: ATTRIBUTION };
-  if (q.length < 2 && !near) return json({ query: q, results: [], place: null, corrected: null, degraded: false, ...base });
+  if (q.length < 2 && !near) return json({ query: q, results: [], place: null, corrected: null, degraded: false, semantic: "skipped", hasMore: false, ...base });
 
   const cf = (request as unknown as { cf?: IncomingRequestCfProperties }).cf;
   const useGeo = url.searchParams.get("geo") !== "off";
@@ -128,7 +132,7 @@ async function handleSearch(request: Request, env: Env, ctx: ExecutionContext, u
       lat: lat === null ? null : round(lat),
       lng: lng === null ? null : round(lng as number),
     });
-    return json({ query: q, results: r.results, place: r.place, corrected: r.corrected, degraded: r.degraded, semantic: r.semantic, ...base }, 200, {
+    return json({ query: q, results: r.results, hasMore: r.hasMore, place: r.place, corrected: r.corrected, degraded: r.degraded, semantic: r.semantic, ...base }, 200, {
       "server-timing": `d1;dur=${r.timing.d1Ms};desc="${r.timing.statements} statements", ai;dur=${r.timing.aiMs}, total;dur=${Date.now() - started}`,
       ...(r.degraded ? { "x-lookup-degraded": "1" } : {}),
     });

@@ -31,9 +31,11 @@ Try it against the live API:
 | `q` | What the person typed. Place words like "in Dallas" or ", TX" are understood. |
 | `near`, `lat`, `lng` | Rank near a place or point. |
 | `country`, `region` | Only return churches there. |
-| `limit` | 1 to 20. Defaults to 8. |
+| `limit` | 1 to 50. Defaults to 8. |
 | `settled=1` | The person paused, so semantic search may run. |
 | `geo=off` | Don't use the request's approximate location. |
+
+The response has `results`, plus `hasMore` when more churches ranked past `limit`. To show more, ask again with a higher `limit` and add the results you haven't shown yet. A higher limit can search wider, so don't assume the first ones come back in the same order. It also has `place` (the place understood from the query, or `null`), `corrected` (the spelling searched instead, or `null`), `degraded` and `semantic`.
 
 ## GET /v1/churches/:id
 
@@ -78,6 +80,20 @@ Test with `client: "lookup-demo"`. Changes are checked the same way but never se
 
 Ask a question about these docs. Send `{ question }` (up to 500 characters) and the answer streams back as server-sent events. It powers the Ask AI button and is limited to 10 questions a minute.
 
+## Errors
+
+Errors are JSON with a readable `error` and a stable `code` to check in your code:
+
+| Status | `code` |
+|---|---|
+| 400 | `invalid` |
+| 404 | `not_found` |
+| 405 | `method_not_allowed` |
+| 413 | `too_large` |
+| 429 | `rate_limited` |
+| 500 | `unavailable` |
+| 503 | `overloaded` |
+
 ## Limits
 
-120 searches and 30 semantic searches a minute per visitor, 5 contributions and 10 docs questions a minute. Over the limit returns `429`, a busy database returns `503`, and both send `Retry-After`.
+120 requests and 30 semantic searches a minute per visitor, 5 contributions and 10 docs questions a minute. Over the limit returns `429`, a busy database returns `503`, and both send `Retry-After`, which browsers on any origin can read.

@@ -49,7 +49,24 @@ Try it below. The right side has no Lookup CSS at all, only the page's tokens. P
 | `--hmc-active-bg`, `--hmc-active-text` | `--accent`, `--accent-foreground` | The highlighted result |
 | `--hmc-muted` | `--muted-foreground` | Secondary text |
 | `--hmc-radius` | `--radius` | Corners |
+| `--hmc-z` | | The results list's `z-index`. Defaults to 1000. |
 
-The widget also takes your page's font. For anything else, style its parts with `::part(label)`, `::part(input)` and `::part(popup)`.
+The widget also takes your page's font. Rows are compact by default; `density="comfortable"` makes them taller with larger icons.
+
+## Parts
+
+For anything else, style its parts with `::part()`, such as `church-lookup::part(option-name) { font-weight: 500 }`.
+
+| Part | What it is |
+|---|---|
+| `label`, `input`, `clear` | The label, the search box and its clear button |
+| `popup`, `listbox` | The results panel and the list inside it |
+| `option` | Each result row |
+| `option-name`, `option-detail`, `option-distance` | A result's name, its address line and its distance |
+| `more` | The **Show more** row |
+| `corrected` | The "Showing results for" line above corrected results |
+| `note`, `retry` | The no-results or error message, and its **Try again** button |
+| `footer` | The data credit under the results |
+| `consent` | The panel that offers to share fixes back |
 
 Want to see it fill a real form? [Open the full theming example](/examples/autofill).
