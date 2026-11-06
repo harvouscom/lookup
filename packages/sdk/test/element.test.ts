@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChurchLookup, fieldValue, setNativeValue } from "../src/element.ts";
 import { createLookup } from "../src/client.ts";
+import { registerStrings } from "../src/strings.ts";
 import "../src/strings-es.ts";
 import "../src/strings-pl.ts";
 
@@ -12,8 +13,10 @@ const record = {
 
 let searches: { q: string; settled: boolean }[] = [];
 let responses: Record<string, ReturnType<typeof result>[]> = {};
-function mount(html = "") {
-  document.body.innerHTML = `<form id="f"><church-lookup label="Your church"></church-lookup>${html}</form>`;
+/** Status the next search fails with, or 0. */
+let failNext = 0;
+function mount(html = "", attrs = "") {
+  document.body.innerHTML = `<form id="f"><church-lookup label="Your church" ${attrs}></church-lookup>${html}</form>`;
   const el = document.querySelector("church-lookup") as ChurchLookup;
   el.lookup = createLookup({
     fetch: (async (url: string) => {
@@ -21,8 +24,12 @@ function mount(html = "") {
       if (u.pathname.startsWith("/v1/churches/")) return Response.json(record);
       const q = u.searchParams.get("q")!;
       searches.push({ q, settled: u.searchParams.get("settled") === "1" });
+      if (failNext) { const status = failNext; failNext = 0; return Response.json({ error: "down", code: "unavailable" }, { status }); }
       const key = u.searchParams.get("settled") === "1" ? `${q}|settled` : q;
-      return Response.json({ query: q, results: responses[key] ?? responses[q] ?? [], corrected: null, degraded: false, attribution: "" });
+      // Like the API: the top `limit` rows, and whether more ranked past them.
+      const all = responses[key] ?? responses[q] ?? [];
+      const limit = Number(u.searchParams.get("limit")) || 8;
+      return Response.json({ query: q, results: all.slice(0, limit), hasMore: all.length > limit, corrected: q === "gracee" ? "grace" : null, degraded: false, attribution: "" });
     }) as typeof fetch,
   });
   const root = el.shadowRoot!;
@@ -33,7 +40,9 @@ const type = (input: HTMLInputElement, v: string) => { input.value = v; input.di
 const key = (input: HTMLInputElement, k: string, extra: KeyboardEventInit = {}) => input.dispatchEvent(new KeyboardEvent("keydown", { key: k, cancelable: true, ...extra }));
 const flush = async (ms = 200) => { await vi.advanceTimersByTimeAsync(ms); };
 
-beforeEach(() => { vi.useFakeTimers(); searches = []; responses = {}; });
+beforeEach(() => { vi.useFakeTimers(); searches = []; responses = {}; failNext = 0; });
+const many = (n: number) => Array.from({ length: n }, (_, i) => result(`R-${i}`, `Grace ${i}`));
+const status = (root: ShadowRoot) => root.querySelector("[role=status]")!.textContent;
 afterEach(() => { vi.useRealTimers(); });
 
 describe("combobox semantics", () => {
@@ -123,6 +132,85 @@ describe("combobox semantics", () => {
   });
 });
 
+describe("more results", () => {
+  it("shows a Show more row that appends the next page in place and announces it", async () => {
+    responses.grace = many(20);
+    const { root, input } = mount();
+    type(input, "grace"); await flush();
+    const rows = () => [...root.querySelectorAll("[role=option]")];
+    expect(rows()).toHaveLength(9);
+    const more = rows().at(-1)!;
+    expect(more.getAttribute("part")).toBe("more");
+    expect(more.textContent).toBe("Show more results");
+    const before = rows().slice(0, 8).map((r) => r.textContent);
+    (more as HTMLElement).click();
+    await flush(100);
+    expect(rows()).toHaveLength(17);
+    expect(rows().slice(0, 8).map((r) => r.textContent)).toEqual(before);
+    expect(status(root)).toBe("8 more churches.");
+    expect(input.value).toBe("grace");
+  });
+  it("reaches Show more with the arrows; down on it loads more and moves to the first new row", async () => {
+    responses.grace = many(12);
+    const { root, input } = mount();
+    type(input, "grace"); await flush();
+    key(input, "ArrowUp");
+    const more = root.querySelector("[part=more]")!;
+    expect(input.getAttribute("aria-activedescendant")).toBe(more.id);
+    key(input, "ArrowDown");
+    await flush(100);
+    const rows = root.querySelectorAll("[role=option]");
+    expect(rows).toHaveLength(12);
+    expect(root.querySelector("[part=more]")).toBeNull();
+    expect(input.getAttribute("aria-activedescendant")).toBe(rows[8]!.id);
+    key(input, "Enter");
+    await flush(10);
+    expect(input.value).toBe("Grace 8");
+  });
+  it("hides Show more at max-results", async () => {
+    responses.grace = many(20);
+    const { root, input } = mount("", `max-results="8"`);
+    type(input, "grace"); await flush();
+    expect(root.querySelectorAll("[role=option]")).toHaveLength(8);
+    expect(root.querySelector("[part=more]")).toBeNull();
+  });
+  it("says what it searched when it corrected the spelling", async () => {
+    responses.gracee = [result("R-1", "Grace Church")];
+    const { root, input } = mount("", `semantic="off"`);
+    type(input, "gracee"); await flush(300);
+    const fix = root.querySelector<HTMLElement>("[part=corrected]")!;
+    expect(fix.hidden).toBe(false);
+    expect(fix.textContent).toBe("Showing results for “grace”");
+    expect(status(root)).toContain("Showing results for “grace”");
+  });
+  it("offers Try again after an error, and fires church-error", async () => {
+    responses.grac = [result("R-1", "Grace Church")];
+    const { el, root, input } = mount();
+    const errors: any[] = [];
+    el.addEventListener("church-error", (e) => errors.push((e as CustomEvent).detail));
+    failNext = 500;
+    type(input, "grac"); await flush();
+    expect(errors).toEqual([expect.objectContaining({ query: "grac", status: 500, code: "unavailable" })]);
+    const retry = root.querySelector<HTMLButtonElement>("[part=retry]")!;
+    expect(retry.textContent).toBe("Try again");
+    retry.click(); await flush();
+    expect(root.querySelectorAll("[role=option]")).toHaveLength(1);
+    failNext = 500;
+    type(input, "gra"); await flush();
+    key(input, "Enter"); await flush();
+    expect(root.querySelectorAll("[role=option]")).toHaveLength(0);
+  });
+  it("marks itself loading while a search is in flight", async () => {
+    let release!: () => void;
+    const { el, input } = mount();
+    el.lookup = createLookup({ fetch: (() => new Promise<Response>((r) => { release = () => r(Response.json({ results: [] })); })) as typeof fetch });
+    type(input, "grac"); await flush(160);
+    expect(el.hasAttribute("data-loading")).toBe(true);
+    release(); await flush(0);
+    expect(el.hasAttribute("data-loading")).toBe(false);
+  });
+});
+
 describe("fill", () => {
   const form = `<input data-hmc-field="street"><input data-hmc-field="city" value="Plano"><input data-hmc-field="phone"><textarea data-hmc-field="serviceTimes"></textarea><input data-hmc-field="languages"><select data-hmc-field="region"><option value="">-</option><option value="TX">Texas</option></select>`;
   const pick = async (input: HTMLInputElement) => {
@@ -173,6 +261,28 @@ describe("fill", () => {
     await pick(b.input);
     expect(changes.length).toBe(4);
     expect(document.querySelector<HTMLInputElement>("[data-hmc-field=street]")!.value).toBe("");
+  });
+  it("fills church-named fields with no tags, and plain ones with fill=auto", async () => {
+    const plain = `<input name="church_street"><input id="churchWebsite"><input name="city"><input name="church_address_2">`;
+    const a = mount(plain);
+    await pick(a.input);
+    const v = (sel: string) => document.querySelector<HTMLInputElement>(sel)!.value;
+    expect([v("[name=church_street]"), v("#churchWebsite"), v("[name=city]"), v("[name=church_address_2]")]).toEqual(["1 Main", "https://grace.example", "", ""]);
+    const b = mount(plain, `fill="auto"`);
+    await pick(b.input);
+    expect(v("[name=city]")).toBe("Dallas");
+    const c = mount(plain, `fill="tagged"`);
+    await pick(c.input);
+    expect(v("[name=church_street]")).toBe("");
+  });
+  it("fills nothing with fill=off but still hands over the record", async () => {
+    const { el, root, input } = mount(`<input name="church_city"><input data-hmc-field="street">`, `fill="off"`);
+    let got: any = null;
+    el.addEventListener("church-fill", (e) => (got = (e as CustomEvent).detail));
+    await pick(input);
+    expect(got).toMatchObject({ record: { id: "R-1" }, changes: [] });
+    expect(document.querySelector<HTMLInputElement>("[data-hmc-field=street]")!.value).toBe("");
+    expect(status(root)).not.toContain("Filled");
   });
   it("supports fieldMap with selectors outside the form", async () => {
     document.body.insertAdjacentHTML("beforeend", "");
@@ -289,11 +399,33 @@ describe("form field", () => {
     expect(btn.hidden).toBe(true);
     expect(new FormData(form).get("church") ?? "").toBe("");
   });
-  it("drops the choice when the name is edited", async () => {
+  it("drops the choice when the name is edited, and fires church-clear once", async () => {
     const { el, input } = mountForm(`name="church"`);
     await pick(input);
+    let cleared = 0;
+    el.addEventListener("church-clear", () => cleared++);
     type(input, "Grace Churc");
+    type(input, "Grace Chur");
     expect(el.value).toBe("");
+    expect(cleared).toBe(1);
+  });
+  it("keeps value empty when the church can't load, and fires church-error", async () => {
+    const { el, input } = mountForm(`name="church"`);
+    el.lookup = createLookup({ fetch: (async (url: string) => (url.includes("/churches/") ? Response.json({ error: "down" }, { status: 500 }) : Response.json({ results: [result("R-1", "Grace Church")] }))) as typeof fetch });
+    const errors: any[] = [];
+    el.addEventListener("church-error", (e) => errors.push((e as CustomEvent).detail));
+    await pick(input);
+    expect(el.value).toBe("");
+    expect(errors).toEqual([expect.objectContaining({ id: "R-1", status: 500 })]);
+  });
+  it("follows a saved church that moved, and reports the new ID", async () => {
+    document.body.innerHTML = `<form><church-lookup name="church"></church-lookup></form>`;
+    const el = document.querySelector("church-lookup") as ChurchLookup;
+    el.lookup = createLookup({ fetch: (async (url: string) => Response.json(url.endsWith("/OLD") ? { id: "OLD", movedTo: "R-1" } : record)) as typeof fetch });
+    el.setAttribute("value", "OLD");
+    await flush(10);
+    expect(el.value).toBe("R-1");
+    expect(el.shadowRoot!.querySelector("input")!.value).toBe("Grace Church");
   });
   it("shows a saved church from its value without filling", async () => {
     const { el, input } = mountForm(`name="church" value="R-1"`, `<input id="street" data-hmc-field="street">`);
@@ -306,6 +438,41 @@ describe("form field", () => {
     mountForm(`value="R-1" fill-on-load`, `<input id="street" data-hmc-field="street">`);
     await flush(10);
     expect((document.getElementById("street") as HTMLInputElement).value).toBe("1 Main");
+  });
+});
+
+describe("lifecycle", () => {
+  it("focuses the search box", () => {
+    const { el, input } = mount();
+    const spy = vi.spyOn(input, "focus");
+    el.focus();
+    expect(spy).toHaveBeenCalled();
+  });
+  it("applies attribute changes after it's on the page", () => {
+    const { el, root, input } = mount();
+    el.setAttribute("label", "Parish");
+    el.setAttribute("placeholder", "Type here");
+    expect(root.querySelector("label")!.textContent).toBe("Parish");
+    expect(input.placeholder).toBe("Type here");
+    el.removeAttribute("label");
+    el.setAttribute("lang", "es");
+    expect(root.querySelector("label")!.textContent).toBe("Iglesia");
+    if (!el.validity) return;
+    expect(el.checkValidity()).toBe(true);
+    el.setAttribute("required", "");
+    expect(el.checkValidity()).toBe(false);
+  });
+  it("stops searching when removed, and follows new strings after it's moved", async () => {
+    const { el, input } = mount();
+    type(input, "grace comm");
+    el.remove();
+    await flush(800);
+    expect(searches).toEqual([]);
+    el.removeAttribute("label");
+    el.setAttribute("lang", "fr");
+    document.body.append(el);
+    registerStrings("fr", { label: "Église" });
+    expect(el.shadowRoot!.querySelector("label")!.textContent).toBe("Église");
   });
 });
 

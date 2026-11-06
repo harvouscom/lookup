@@ -6,7 +6,8 @@ import { createRequire } from "node:module";
 import { gzipSync } from "node:zlib";
 
 rmSync("dist", { recursive: true, force: true });
-const common = { bundle: true, minify: true, format: "esm", target: "es2020", legalComments: "none" };
+// Assignment semantics for class fields: uninitialized fields emit nothing instead of a defineProperty each.
+const common = { bundle: true, minify: true, format: "esm", target: "es2020", legalComments: "none", tsconfigRaw: { compilerOptions: { useDefineForClassFields: false } } };
 await build({ ...common, entryPoints: ["src/index.ts"], outfile: "dist/index.js" });
 await build({ ...common, entryPoints: ["src/core.ts"], outfile: "dist/core.js" });
 await build({ ...common, entryPoints: ["src/fields.ts"], outfile: "dist/fields.js" });

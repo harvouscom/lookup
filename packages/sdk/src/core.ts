@@ -119,8 +119,7 @@ export function createLookupController(opts: ControllerOptions = {}) {
     ctrl?.abort();
     const mine = (ctrl = new AbortController());
     const p = params();
-    const at = p.lat != null && p.lng != null ? { lat: p.lat, lng: p.lng } : {};
-    return { n: ++seq, res: client().search(q, { settled, signal: mine.signal, region: p.region, country: p.country, near: p.near, ...at, limit, geo: p.geo !== false }) };
+    return { n: ++seq, res: client().search(q, { settled, signal: mine.signal, region: p.region, country: p.country, near: p.near, lat: p.lat, lng: p.lng, limit, geo: p.geo !== false }) };
   }
 
   async function run(q: string, settled: boolean, retried = false): Promise<void> {
