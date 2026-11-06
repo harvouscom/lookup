@@ -19,7 +19,7 @@ fetch("/data/globe.json")
     // globe still visible above the form stack.
     get pinOffset() {
       const W = $("#globe").clientWidth, R = Math.min(W * 0.66, 1300);
-      return Math.asin(Math.min(1, Math.max(-1, 1 - ((small() ? 136 : 124) - 36) / R))) * 180 / Math.PI;
+      return Math.asin(Math.min(1, Math.max(-1, 1 - ((small() ? 156 : 124) - 36) / R))) * 180 / Math.PI;
     } }); startDemo(); })
   .catch(() => { $(".horizon").hidden = true; });
 
@@ -40,8 +40,8 @@ function showTags(list) {
   tags = list.map((t) => {
     const el = document.createElement("div");
     el.className = t.big ? "tag big" : "tag";
-    el.textContent = t.text;
-    if (t.big) { const sub = document.createElement("small"); sub.textContent = t.sub ?? ""; el.append(sub); }
+    if (t.big) el.append(...churchCard(t));
+    else el.textContent = t.text;
     tagLayer.append(el);
     return { ...t, el };
   });
@@ -49,13 +49,28 @@ function showTags(list) {
 }
 function placeTags(screen) {
   const h = tagLayer.clientHeight, W = tagLayer.clientWidth;
-  const widths = tags.map((t) => t.el.offsetWidth);
+  const sizes = tags.map((t) => [t.el.offsetWidth, t.el.offsetHeight]);
   tags.forEach((t, i) => {
     const p = screen(t.lat, t.lng);
     const on = p.visible && p.y > 24 && p.y < h - 8;
-    // Keep the label inside the globe's width; its stem still points at the pin.
-    const x = Math.min(Math.max(p.x, widths[i] / 2 + 8), W - widths[i] / 2 - 8);
+    const [w, ht] = sizes[i];
     t.el.style.opacity = on ? "1" : "0";
+    // The church card sits beside its pin (right, or left near the edge) so it never covers the
+    // search above. Where neither side fits, as on phones, it sits above the pin.
+    if (t.big) {
+      const side = p.x + 22 + w <= W - 8 ? "right" : p.x - 22 - w >= 8 ? "left" : "";
+      if (side) {
+        const x = side === "right" ? p.x + 22 : p.x - 22 - w;
+        const y = Math.max(p.y - ht / 2, 8);
+        t.el.dataset.side = side;
+        t.el.style.setProperty("--stem-y", `${p.y - y}px`);
+        t.el.style.transform = `translate(${x}px, ${y}px)`;
+        return;
+      }
+      t.el.dataset.side = "top";
+    }
+    // Keep the label inside the globe's width; its stem still points at the pin.
+    const x = Math.min(Math.max(p.x, w / 2 + 8), W - w / 2 - 8);
     t.el.style.transform = `translate(${x}px, ${p.y}px) translate(-50%, calc(-100% - ${t.big ? 18 : 12}px))`;
     t.el.style.setProperty("--stem", `${p.x - x}px`);
   });
@@ -69,7 +84,7 @@ hero.addEventListener("church-results", (e) => {
   logEvent("church-results", `${results.length} for "${query}"`, true);
 });
 hero.addEventListener("church-select", (e) => beginPick(e.detail.result));
-hero.addEventListener("church-fill", (e) => showFill(e.detail.changes));
+hero.addEventListener("church-fill", (e) => showFill(e.detail.changes, false, e.detail.record));
 
 function beginPick(r, quiet = false) {
   globe?.setPins([]);
@@ -82,7 +97,8 @@ function beginPick(r, quiet = false) {
   showTags([{ lat: r.latitude, lng: r.longitude, text: r.name, sub: r.locationLabel, big: true }]);
   hud.textContent = "";
 }
-function showFill(changes, quiet = false) {
+function showFill(changes, quiet = false, record = null) {
+  if (record) enrichCard(record);
   const filled = new Set(changes.map((c) => c.field));
   const total = $$("input", card).length;
   requestAnimationFrame(() => {
@@ -98,8 +114,6 @@ function showFill(changes, quiet = false) {
     });
     status.classList.add("done");
     status.textContent = `Autofilled ${changes.length} of ${total} fields from Here's My Church`;
-    const big = $(".tag.big small", tagLayer);
-    if (big) big.textContent = `${changes.length} fields filled`;
     if (!quiet) logEvent("church-fill", `${changes.length} fields`);
     if (!quiet) logEvent("input/change", `fired on ${changes.length} fields`);
   });
@@ -107,7 +121,7 @@ function showFill(changes, quiet = false) {
 
 // ── Idle demo: while nobody is searching, real churches light up on the globe and flow through
 // the tagged fields into the app. Any use of the search box ends it for good. ──
-const DEMO_QUERIES = ["grace community", "first baptist", "st mary", "trinity", "calvary chapel", "kosciol", "saint paul", "eglise"];
+const DEMO_QUERIES = ["grace community", "first baptist", "st mary", "trinity", "calvary chapel", "kosciol", "saint paul", "eglise", "methodist", "lutheran", "presbyterian", "catholic"];
 let demoOn = !matchMedia("(prefers-reduced-motion: reduce)").matches;
 let demoTimer = 0, demoSeen = false, demoPool = [], demoAt = 0;
 function stopDemo() { demoOn = false; clearTimeout(demoTimer); }
@@ -136,26 +150,91 @@ async function startDemo() {
 async function demoTick() {
   if (!demoOn) return;
   if (!demoSeen || document.hidden) { demoTimer = setTimeout(demoTick, 1000); return; }
-  const r = demoPool[demoAt++ % demoPool.length];
-  beginPick(r, true);
-  let rec = null;
-  try {
-    [rec] = await Promise.all([
-      fetch(`/v1/churches/${encodeURIComponent(r.id)}`).then((x) => x.json()),
-      new Promise((ok) => setTimeout(ok, 1300)),
-    ]);
-  } catch { /* skip this one */ }
+  const hit = await nextReviewed();
   if (!demoOn) return;
-  if (rec?.fields) {
+  if (!hit) { demoTimer = setTimeout(demoTick, 3000); return; }
+  const { r, rec } = hit;
+  beginPick(r, true);
+  await new Promise((ok) => setTimeout(ok, 1300));
+  if (!demoOn) return;
+  {
     const changes = [];
     for (const i of $$("input[data-hmc-field]", card)) {
       const v = fieldText(rec, i.dataset.hmcField);
       i.value = v ?? "";
       if (v != null) changes.push({ field: i.dataset.hmcField, element: i, value: v });
     }
-    showFill(changes, true);
+    showFill(changes, true, rec);
   }
   demoTimer = setTimeout(demoTick, 5200);
+}
+// The demo only shows reviewed churches: verified by a person on Here's My Church, or meeting its
+// verified-listing bar (a street address, a website and service times).
+function isReviewed(rec) {
+  const f = rec?.fields;
+  if (!f) return false;
+  return Boolean(rec.freshness?.lastVerified) || Boolean(f.street && f.city && f.website && f.serviceTimes?.raw);
+}
+async function nextReviewed() {
+  for (let tries = 0; tries < 10 && demoOn; tries++) {
+    const r = demoPool[demoAt++ % demoPool.length];
+    if (r.skip) continue;
+    try {
+      const rec = await fetch(`/v1/churches/${encodeURIComponent(r.id)}`).then((x) => x.json());
+      if (isReviewed(rec)) return { r, rec };
+    } catch { /* try the next one */ }
+    r.skip = true;
+  }
+  return null;
+}
+
+// ── The church card on the globe ──
+const CHURCH_ICON = '<svg viewBox="0 0 16 16" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5v3M6.5 3h3M3.5 14V8L8 5l4.5 3v6M6.5 14v-3a1.5 1.5 0 0 1 3 0v3M2 14h12"/></svg>';
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+function churchCard(t) {
+  const top = document.createElement("div");
+  top.className = "cc-top";
+  const ic = document.createElement("span");
+  ic.className = "cc-ic";
+  ic.innerHTML = CHURCH_ICON;
+  const txt = document.createElement("div");
+  txt.className = "cc-t";
+  const b = document.createElement("b");
+  b.textContent = t.text;
+  const sub = document.createElement("small");
+  sub.textContent = t.sub ?? "";
+  txt.append(b, sub);
+  top.append(ic, txt);
+  const meta = document.createElement("div");
+  meta.className = "cc-meta";
+  return [top, meta];
+}
+function chip(text, cls = "") {
+  const c = document.createElement("span");
+  c.className = `cc-chip ${cls}`.trim();
+  c.textContent = text;
+  return c;
+}
+function enrichCard(rec) {
+  const meta = $(".tag.big .cc-meta", tagLayer);
+  if (!meta) return;
+  const f = rec.fields ?? {};
+  const chips = [];
+  if (rec.freshness?.lastVerified) chips.push(chip("✓ verified", "ok"));
+  else if (isReviewed(rec)) chips.push(chip("✓ reviewed", "ok"));
+  if (f.denomination && !/^unknown$/i.test(f.denomination)) chips.push(chip(f.denomination));
+  const slots = f.serviceTimes?.slots ?? [];
+  if (slots.length) {
+    const s = slots[0];
+    const [h, m] = String(s.startTime).split(":").map(Number);
+    const time = `${h % 12 || 12}${m ? `:${String(m).padStart(2, "0")}` : ""} ${h < 12 ? "AM" : "PM"}`;
+    chips.push(chip(`${DAYS[s.dayOfWeek] ?? ""} ${time}${slots.length > 1 ? ` +${slots.length - 1}` : ""}`.trim()));
+  }
+  if (f.website) {
+    try { chips.push(chip(new URL(f.website).hostname.replace(/^www\./, ""), "site")); } catch { /* not a URL */ }
+  }
+  meta.replaceChildren(...chips);
+  if (globe) placeTags(globe.screen);
 }
 
 // ── The form stack: tagged fields behind, your app on top ──

@@ -493,3 +493,33 @@ th { background: var(--frame); }
 .stack-wrap { margin-top: calc(-1 * clamp(380px, 40vw, 576px) + 176px); }
 @media (max-width: 760px) { .stack-wrap { margin-top: -150px; } }
 .tag::after { left: calc(50% + var(--stem, 0px)); }
+
+/* ── The church card on the globe ── */
+.tag.big { padding: 10px 12px 10px 10px; border-radius: 14px; white-space: normal; width: max-content; max-width: 290px;
+  background: linear-gradient(180deg, rgba(32,24,60,.94), rgba(14,10,28,.94)); border: 1px solid rgba(196,181,253,.28);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 18px 40px -12px rgba(0,0,0,.75), 0 0 44px -12px rgba(139,92,246,.6); }
+.cc-top { display: flex; align-items: center; gap: 10px; }
+.cc-ic { flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: #fff;
+  background: linear-gradient(135deg, #A78BFA, #6D28D9); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 6px 14px -6px rgba(124,58,237,.9); }
+.cc-t { min-width: 0; }
+.cc-t b { display: block; font-size: .875rem; font-weight: 600; line-height: 1.25; color: #fff; }
+.tag.big .cc-t small { display: block; margin-top: 2px; font-family: var(--font); font-size: .75rem; color: rgba(237,233,254,.6); }
+.cc-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 9px; }
+.cc-meta:empty { display: none; }
+.cc-chip { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 6px; white-space: nowrap; font-family: var(--mono); font-size: .625rem; color: #DDD6FE; background: rgba(167,139,250,.14); border: 1px solid rgba(167,139,250,.2); }
+.cc-chip.ok { color: #86EFAC; background: rgba(74,222,128,.12); border-color: rgba(74,222,128,.24); }
+@media (prefers-reduced-motion: no-preference) {
+  .cc-chip { animation: chipIn .35s cubic-bezier(.2,.8,.2,1) both; }
+  .cc-chip:nth-child(2) { animation-delay: 60ms; } .cc-chip:nth-child(3) { animation-delay: 120ms; } .cc-chip:nth-child(4) { animation-delay: 180ms; }
+  @keyframes chipIn { from { opacity: 0; transform: translateY(3px); } }
+}
+@media (max-width: 640px) { .tag.big { max-width: 250px; } }
+.tag.big[data-side=right]::after, .tag.big[data-side=left]::after { top: var(--stem-y, 50%); width: 20px; height: 1px; }
+.tag.big[data-side=right]::after { left: auto; right: 100%; background: linear-gradient(90deg, transparent, rgba(196,181,253,.75)); }
+.tag.big[data-side=left]::after { left: 100%; background: linear-gradient(90deg, rgba(196,181,253,.75), transparent); }
+@media (max-width: 760px) {
+  .stack-wrap { margin-top: -110px; }
+  .tag.big .cc-t small, .cc-chip.site { display: none; }
+  .tag.big { padding: 8px 10px 8px 8px; }
+  .cc-meta { margin-top: 7px; }
+}
