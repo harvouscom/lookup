@@ -61,6 +61,22 @@ describe("search", () => {
     expect(body.results.every((r: any) => r.region === "IN")).toBe(true);
     expect(body.results).toHaveLength(1);
   });
+  it("applies non-US country and region filters", async () => {
+    // A location far from the filter (a US caller filtering to Germany) must not hide the filtered rows.
+    for (const at of ["", "&lat=32.78&lng=-96.8"]) {
+      for (const extra of ["&country=DE", "&region=DEBY", "&country=de&region=deby"]) {
+        const { body } = await s("kirche", extra + at);
+        expect(names(body), extra + at).toEqual(["Evangelische Kirche München"]);
+      }
+      expect(names((await s("kosciol", "&country=PL" + at)).body), at).toEqual(["Kościół pw. Świętego Jana"]);
+      expect((await s("church", "&country=DE" + at)).body.results, at).toEqual([]);
+    }
+    // The same with the caller's location coming from Cloudflare rather than lat/lng.
+    const res = await SELF.fetch("https://lookup.test/v1/search?q=kirche&country=DE", { cf: { latitude: "32.78", longitude: "-96.8", country: "US" } } as RequestInit);
+    expect(names(await res.json())).toEqual(["Evangelische Kirche München"]);
+    const inRegion = await SELF.fetch("https://lookup.test/v1/search?q=kirche&region=DEBY", { cf: { latitude: "32.78", longitude: "-96.8", country: "US" } } as RequestInit);
+    expect(names(await inRegion.json())).toEqual(["Evangelische Kirche München"]);
+  });
   it("uses coordinates for proximity", async () => {
     const { body } = await s("first baptist", "&lat=41.08&lng=-85.14");
     expect(body.results[0].region).toBe("IN");

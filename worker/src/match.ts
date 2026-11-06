@@ -43,7 +43,10 @@ export interface Scope {
   filter: string | null;
 }
 
-/** Nearby cells, wider cells, then region and country. Global when there is nothing to scope by. */
+/**
+ * Nearby cells, wider cells, then region and country. Then the filter alone, or global when there is nothing to scope by.
+ * A filter is the widest rung: the soft scope comes from the caller's location and may lie outside it entirely.
+ */
 export function rungs(text: string | null, scope: Scope): string[] {
   const out: string[] = [];
   const add = (geo: string | null) => {
@@ -56,6 +59,6 @@ export function rungs(text: string | null, scope: Scope): string[] {
   }
   if (scope.region) add(geoAny(["r" + scope.region.toLowerCase()]));
   if (scope.country) add(geoAny(["cc" + scope.country.toLowerCase()]));
-  if (!out.length) add(null);
+  if (!out.length || scope.filter) add(null);
   return out;
 }
