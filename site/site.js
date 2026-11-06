@@ -14,7 +14,13 @@ let globe = null;
 fetch("/data/globe.json")
   .then((r) => r.json())
   // A pick is aimed south of the church, so its pin rises into the visible top of the globe.
-  .then((data) => { globe = createGlobe($("#globe"), data, { lat: 10, lng: -45, pinOffset: small() ? 40 : 46, onFrame: placeTags }); })
+  .then((data) => { globe = createGlobe($("#globe"), data, { lat: 10, lng: -45, onFrame: placeTags,
+    // Degrees to tilt a picked church up from the view's center so its pin lands ~100px under
+    // the crest: the band of globe still visible above the form stack.
+    get pinOffset() {
+      const W = $("#globe").clientWidth, R = Math.min(W * 0.8, 1500);
+      return Math.asin(Math.min(1, Math.max(-1, 1 - ((small() ? 88 : 100) - 36) / R))) * 180 / Math.PI;
+    } }); })
   .catch(() => { $(".horizon").hidden = true; });
 
 fetch("/v1/meta")
@@ -68,7 +74,7 @@ hero.addEventListener("church-select", (e) => {
   status.classList.toggle("done", false);
   status.textContent = `Looking up ${r.name}…`;
   showTags([{ lat: r.latitude, lng: r.longitude, text: r.name, sub: r.locationLabel, big: true }]);
-  hud.textContent = `flying to ${r.city || r.nearestPlace || r.regionName}…`;
+  hud.textContent = "";
 });
 hero.addEventListener("church-fill", (e) => {
   const { changes } = e.detail;
@@ -89,7 +95,6 @@ hero.addEventListener("church-fill", (e) => {
     status.textContent = `Autofilled ${changes.length} of ${total} fields from Here's My Church`;
     const big = $(".tag.big small", tagLayer);
     if (big) big.textContent = `${changes.length} fields filled`;
-    hud.textContent = `filled ${changes.length} fields`;
     logEvent("church-fill", `${changes.length} fields`);
     logEvent("input/change", `fired on ${changes.length} fields`);
   });

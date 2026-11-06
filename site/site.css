@@ -482,3 +482,9 @@ th { background: var(--frame); }
 .lede { text-wrap: balance; }
 .hero { padding-top: 112px; }
 @media (max-width: 640px) { .hero { padding-top: 72px; } }
+/* ── The form stack rises over the globe, right under the search, so it shows above the fold ── */
+.horizon { height: clamp(380px, 40vw, 576px); }
+.stack-wrap { margin-top: calc(-1 * clamp(380px, 40vw, 576px) + 112px); }
+@media (max-width: 760px) { .horizon { height: 340px; } .stack-wrap { margin-top: -200px; } }
+.stack-wrap { max-width: calc(1040px + 2 * clamp(24px, 6vw, 72px)); padding: 0 clamp(24px, 6vw, 72px); }
+@media (max-width: 760px) { .stack-wrap { padding: 0 16px; } }
