@@ -568,3 +568,87 @@ form.addEventListener("submit", async (e) => {
 const markScrolled = () => nav.classList.toggle("scrolled", scrollY > 8);
 addEventListener("scroll", markScrolled, { passive: true });
 markScrolled();
+
+// Widget options: every change rebuilds a fresh <church-lookup>, since the element reads attributes when it connects.
+(function widgetOptions() {
+  const host = $("#wo-host");
+  if (!host) return;
+  const HINTS = {
+    required: "The form won\u2019t submit until a church is chosen. Clear the box to see why.",
+    value: "Starts with Grace Community Church chosen, as on an edit screen. Its ID submits with the form.",
+    icons: "Results without the icon beside each one.",
+    geo: "Results aren\u2019t ranked by the visitor\u2019s approximate location.",
+  };
+  const state = { label: "", placeholder: "", lang: "", near: "", limit: 8, required: false, value: false, icons: false, geo: false };
+  const log = $("#wo-log");
+  const hint0 = $("#wo-hint").innerHTML;
+  let el = null;
+  function attrs() {
+    const a = [["name", "church_id"]];
+    if (state.label) a.push(["label", state.label]);
+    if (state.placeholder) a.push(["placeholder", state.placeholder]);
+    if (state.lang) a.push(["lang", state.lang]);
+    if (state.near) a.push(["near", state.near]);
+    if (state.limit !== 8) a.push(["limit", String(state.limit)]);
+    if (state.value) a.push(["value", "CA-ON-56994145"]);
+    if (state.icons) a.push(["icons", "none"]);
+    if (state.geo) a.push(["geo", "off"]);
+    if (state.required) a.push(["required", ""]);
+    return a;
+  }
+  function note(kind, text) {
+    log.querySelector(".wo-empty")?.remove();
+    const li = document.createElement("li");
+    li.innerHTML = `<code></code><span></span>`;
+    li.firstChild.textContent = kind;
+    li.lastChild.textContent = text;
+    log.prepend(li);
+    while (log.children.length > 4) log.lastChild.remove();
+  }
+  function build() {
+    const query = el && !el.value ? el.shadowRoot?.querySelector("input")?.value ?? "" : "";
+    const next = document.createElement("church-lookup");
+    for (const [k, v] of attrs()) next.setAttribute(k, v);
+    next.setAttribute("contribute", "off");
+    next.addEventListener("church-results", (e) => note("church-results", `${e.detail.results.length} for \u201c${e.detail.query}\u201d${e.detail.settled ? " \u00b7 settled" : ""}`));
+    next.addEventListener("church-select", (e) => note("church-select", `${e.detail.result.name} \u00b7 value ${e.detail.result.id}`));
+    next.addEventListener("church-clear", () => note("church-clear", "value is now empty"));
+    next.addEventListener("church-fill", (e) => e.preventDefault());
+    host.replaceChildren(next);
+    el = next;
+    if (query) {
+      const input = el.shadowRoot?.querySelector("input");
+      if (input) { input.value = query; input.dispatchEvent(new Event("input")); }
+    }
+    code();
+  }
+  function code() {
+    const esc = (v) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    const parts = attrs().map(([k, v]) => (v === "" ? `  <span class="a">${k}</span>` : `  <span class="a">${k}</span>=<span class="s">"${esc(v)}"</span>`));
+    $("#wo-code").innerHTML = `<span class="t">&lt;church-lookup</span>\n${parts.join("\n")}<span class="t">&gt;&lt;/church-lookup&gt;</span>`;
+  }
+  let typing;
+  $$("#wo-opts input[data-opt]").forEach((i) => i.addEventListener("input", () => {
+    state[i.dataset.opt] = i.type === "range" ? Number(i.value) : i.value.trim();
+    if (i.type === "range") $("#wo-limit").textContent = i.value;
+    clearTimeout(typing);
+    typing = setTimeout(build, i.type === "range" ? 120 : 300);
+  }));
+  const pick = (attr, key) => $$(`#wo-opts [data-${attr}]`).forEach((b) => b.addEventListener("click", () => {
+    state[key] = b.dataset[attr];
+    for (const o of $$(`#wo-opts [data-${attr}]`)) o.setAttribute("aria-pressed", String(o === b));
+    build();
+  }));
+  pick("lang", "lang");
+  pick("near", "near");
+  $$("#wo-opts [data-flag]").forEach((b) => b.addEventListener("click", () => {
+    const k = b.dataset.flag;
+    state[k] = !state[k];
+    b.setAttribute("aria-pressed", String(state[k]));
+    const on = state[k] ? k : ["value", "required", "icons", "geo"].find((f) => state[f]);
+    if (on) $("#wo-hint").textContent = HINTS[on];
+    else $("#wo-hint").innerHTML = hint0;
+    build();
+  }));
+  build();
+})();

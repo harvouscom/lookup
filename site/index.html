@@ -196,6 +196,42 @@ npm install @heresmychurch/lookup</code></pre>
     <p class="num" aria-hidden="true"><span>03</span></p>
     <h2 id="widget-h">The widget</h2>
     <p><code>&lt;church-lookup&gt;</code> is an accessible combobox. It searches as people type, asks for smarter results when they pause, and fills your form when they choose.</p>
+    <div class="frame"><div class="frame-in flush wo">
+      <div class="wo-stage">
+        <span class="ba-tag">preview</span>
+        <div class="wo-form" id="wo-host"></div>
+      </div>
+      <div class="wo-opts" id="wo-opts">
+        <div class="wo-sec">
+          <span class="ba-l">text</span>
+          <label class="wo-f"><code>label</code><input type="text" data-opt="label" placeholder="Church" autocomplete="off"></label>
+          <label class="wo-f"><code>placeholder</code><input type="text" data-opt="placeholder" placeholder="Start typing your church&#8217;s name" autocomplete="off"></label>
+          <div class="wo-f" role="group" aria-label="lang"><code>lang</code><div class="wo-chips">
+            <button type="button" class="ba-chip" data-lang="" aria-pressed="true">en</button><button type="button" class="ba-chip" data-lang="es" aria-pressed="false">es</button><button type="button" class="ba-chip" data-lang="fr" aria-pressed="false">fr</button><button type="button" class="ba-chip" data-lang="de" aria-pressed="false">de</button><button type="button" class="ba-chip" data-lang="pt" aria-pressed="false">pt</button><button type="button" class="ba-chip" data-lang="pl" aria-pressed="false">pl</button>
+          </div></div>
+        </div>
+        <div class="wo-sec">
+          <span class="ba-l">results</span>
+          <div class="wo-f" role="group" aria-label="near"><code>near</code><div class="wo-chips">
+            <button type="button" class="ba-chip" data-near="" aria-pressed="true">visitor</button><button type="button" class="ba-chip" data-near="Dallas" aria-pressed="false">Dallas</button><button type="button" class="ba-chip" data-near="Toronto" aria-pressed="false">Toronto</button><button type="button" class="ba-chip" data-near="London" aria-pressed="false">London</button>
+          </div></div>
+          <label class="wo-f"><code>limit</code><span class="wo-range"><input type="range" data-opt="limit" min="1" max="20" value="8"><output id="wo-limit">8</output></span></label>
+        </div>
+        <div class="wo-sec">
+          <span class="ba-l">behavior</span>
+          <div class="wo-chips">
+            <button type="button" class="ba-chip" data-flag="required" aria-pressed="false">required</button>
+            <button type="button" class="ba-chip" data-flag="value" aria-pressed="false">value</button>
+            <button type="button" class="ba-chip" data-flag="icons" aria-pressed="false">icons="none"</button>
+            <button type="button" class="ba-chip" data-flag="geo" aria-pressed="false">geo="off"</button>
+          </div>
+          <p class="wo-hint" id="wo-hint">Turn on <code>value</code> to start with a church already chosen, as on an edit screen.</p>
+        </div>
+      </div>
+      <div class="wo-log" aria-hidden="true"><span class="ba-l">events</span><ol id="wo-log"><li class="wo-empty">Search and choose a church to see its events.</li></ol></div>
+    </div></div>
+    <div class="frame"><div class="frame-in code"><div class="code-bar"><span class="label">html</span><button class="copy" type="button">copy</button></div>
+<pre tabindex="0"><code id="wo-code"></code></pre></div></div>
     <h3>Attributes</h3>
     <dl class="defs">
       <div><dt><code>name</code></dt><dd>Submit the chosen church&#8217;s ID with your form under this name, like any input.</dd></div>
