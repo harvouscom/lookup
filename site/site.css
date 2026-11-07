@@ -909,7 +909,7 @@ p.num::after { margin-left: 2px; }
 .doc-links a:hover svg { color: var(--brand); transform: translateX(2px); }
 
 @media (max-width: 900px) {
-  .bento, .home .exs { grid-template-columns: 1fr; max-width: 30rem; margin-inline: auto; }
+  .home .exs { grid-template-columns: 1fr; max-width: 30rem; margin-inline: auto; }
   .home .ex-card { flex-direction: column; }
   .h-split { grid-template-columns: minmax(0, 1fr); }
   .doc-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1124,3 +1124,41 @@ p.num::after { margin-left: 2px; }
   @keyframes exm-fade { from { opacity: 0; } }
 }
 @media (max-width: 720px) { .exm { width: calc(100vw - 16px); height: calc(100dvh - 16px); border-radius: 14px; } }
+
+/* Hero as a planet: the nav sits on the dark header, and a second horizon arcs across its top at the globe's own
+   radius (site.js draws it): a thin lit rim of atmosphere with a soft glow. --nav-h is the nav's height; the header
+   tucks up under it and pads its content back down. */
+:root { --nav-h: 64px; }
+@media (max-width: 640px) { :root { --nav-h: 58px; } }
+/* The header runs full-bleed: dark edge to edge from the very top, no light frame around it. */
+.hdr { margin: calc(-1 * var(--nav-h)) 0 0; padding-top: var(--nav-h); border: 0; border-radius: 0; }
+.hdr .aurora, .hdr .sky, .hdr .horizon { border-radius: 0; }
+.hdr-sky { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+.hdr-glow { fill: none; stroke: rgba(139,92,246,.55); stroke-width: 10; filter: blur(9px); }
+.hdr-rim { fill: none; stroke: rgba(216,205,255,.7); stroke-width: 1.25; }
+
+/* At the top the nav is see-through and light on the night, flat above the horizon; scrolled, it is the light
+   floating bar as before. */
+.nav .brand, .nav .brand-by, .nav .theme, .nav .nav-gh, .nav .nav-gh svg { transition: color .3s, background-color .15s; }
+/* The bar itself never paints: at the top it's see-through, and scrolled only the floating card (::before) shows. */
+.nav.solid { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.nav:not(.scrolled)::before { background-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.nav.solid:not(.scrolled) .brand { color: #fff; }
+.nav:not(.scrolled) .brand-by { color: rgba(239,237,253,.62); border-left-color: rgba(255,255,255,.18); }
+.nav:not(.scrolled) .brand-by:hover { color: #fff; }
+.nav.solid:not(.scrolled) .theme, .nav:not(.scrolled) .nav-gh, .nav:not(.scrolled) .nav-gh svg { color: rgba(239,237,253,.75); }
+.nav.solid:not(.scrolled) .theme:hover, .nav:not(.scrolled) .nav-gh:hover, .nav:not(.scrolled) .nav-gh:hover svg { color: #fff; background-color: rgba(255,255,255,.08); }
+.nav:not(.scrolled) .nav-gh:hover svg { background-color: transparent; }
+
+/* The bento keeps three columns until there's truly no room; it stacks below 760px, where the tiles' mock UIs start to truncate. */
+@media (max-width: 760px) { .bento { grid-template-columns: 1fr; max-width: 30rem; margin-inline: auto; } }
+/* Mid widths: the tiles are narrow, so their mock UIs tighten up instead of truncating. */
+@media (min-width: 761px) and (max-width: 1000px) {
+  .b-search, .b-fields, .b-fix { width: 94%; padding: 6px; font-size: .6875rem; }
+  .b-fields span { grid-template-columns: 4.6em minmax(0, 1fr) auto; gap: 6px; padding: 0 6px; }
+  .b-row small { display: none; }
+}
+
+/* Wrapping: centered intros balance their lines so the last one is never a stray few words; body copy avoids orphans. */
+p, li { text-wrap: pretty; }
+.h-head > p:last-child, .cta-in p, .lede { text-wrap: balance; }

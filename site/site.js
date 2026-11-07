@@ -408,6 +408,32 @@ const markScrolled = () => nav.classList.toggle("scrolled", scrollY > 8);
 addEventListener("scroll", markScrolled, { passive: true });
 markScrolled();
 
+// ── A second horizon across the top of the hero, at the globe's own radius ──
+// The circle matches globe.js (R = 0.66 × the canvas width, at most 1300), its crest just under the nav.
+(function horizonArc() {
+  const hdr = $("#top"), globeEl = $("#globe");
+  if (!hdr) return;
+  const NS = "http://www.w3.org/2000/svg";
+  const sky = document.createElementNS(NS, "svg");
+  sky.setAttribute("class", "hdr-sky");
+  sky.setAttribute("aria-hidden", "true");
+  sky.innerHTML = '<path class="hdr-glow"/><path class="hdr-rim"/>';
+  hdr.querySelector(".hero").before(sky);
+  const f = (n) => n.toFixed(1);
+  const draw = () => {
+    const W = hdr.clientWidth, H = hdr.clientHeight;
+    const R = Math.min((globeEl?.clientWidth || W) * 0.66, 1300);
+    const crest = nav.offsetHeight - (hdr.offsetTop + hdr.clientTop) + 6;
+    const cx = W / 2, cy = crest + R;
+    const y = (x) => cy - Math.sqrt(Math.max(R * R - (x - cx) ** 2, 0));
+    const arc = `M0 ${f(y(0))}A${f(R)} ${f(R)} 0 0 1 ${W} ${f(y(W))}`;
+    for (const p of sky.children) p.setAttribute("d", arc);
+    sky.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  };
+  draw();
+  new ResizeObserver(draw).observe(hdr);
+})();
+
 // ── The notch: cut out of the dark band's top edge (not painted on), so whatever is beneath shows through ──
 (function notch() {
   const band = $(".cta");
