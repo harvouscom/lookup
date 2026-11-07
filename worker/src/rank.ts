@@ -31,6 +31,8 @@ export interface Candidate {
   prefixed?: boolean;
   /** Words to rank this row by, when it was found by a corrected query. */
   rankTokens?: string[];
+  /** Found near a city read from the end of the query, by the words before it. Best any-order. */
+  nearPlace?: boolean;
   /** Found by the any-token fallback. */
   partial?: boolean;
   /** 1-based rank from semantic search, if it found this listing. */
@@ -51,6 +53,8 @@ export interface RankOptions {
   centerKind?: CenterKind;
   /** Keys of the named place, for the in-city bonus. */
   placeKeys?: string[];
+  /** The named place's region, so a Dallas in Georgia doesn't get Dallas, Texas's bonus. */
+  placeRegion?: string | null;
   /** True for a result outside a place the person named. It drops to the lowest band. */
   isOutside?: (item: Candidate) => boolean;
   /** A lowercase trailing code read softly. Rows in that region get a small bonus. */
@@ -136,7 +140,7 @@ export function rank<T extends Candidate>(items: T[], tokens: string[], opts: Ra
     // Settled on a soft code in its region: band by the other words, since the code was a code.
     const bandTokens = inSoft && settled && q.length > 1 ? q.slice(0, -1) : q;
     let b = band(bandTokens, nameTokens, locTokens, { prefixAll: item.prefixed });
-    if (item.corrected || item.prefixed) b = Math.max(b, BAND.anyOrder);
+    if (item.corrected || item.prefixed || item.nearPlace) b = Math.max(b, BAND.anyOrder);
     if (item.partial || item.semanticOnly || isOutside?.(item)) b = BAND.partial;
     const distanceKm = center ? km(center.lat, center.lng, item.lat, item.lng) : null;
     const text = textParts(bandTokens, nameTokens, locTokens, Boolean(item.prefixed));
@@ -145,7 +149,8 @@ export function rank<T extends Candidate>(items: T[], tokens: string[], opts: Ra
     if (merged) {
       const prox = distanceKm === null ? 0 : 1 / (1 + (distanceKm / reach) ** 2);
       const place = fold(item.city ?? item.near ?? "");
-      const inCity = cityKeys.size && cityKeys.has(tokenize(place).join(" ")) ? 1 : 0;
+      const sameRegion = !opts.placeRegion || !item.region || item.region === opts.placeRegion;
+      const inCity = cityKeys.size && sameRegion && cityKeys.has(tokenize(place).join(" ")) ? 1 : 0;
       score = 0.4 * text.any + 0.03 * text.coverage + BAND_BONUS[b]! + 0.3 * prox + 0.1 * inCity + 0.04 * (item.completeness / 100) + softBonus;
     } else {
       const proximity = distanceKm === null ? 0 : 1 / (1 + distanceKm / 25);

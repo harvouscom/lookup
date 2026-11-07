@@ -107,3 +107,4 @@
 {"id":"implicit-fbc-dallas","q":"first baptist dallas","class":"implicit-place","want":{"nameAll":["first","baptist"],"near":{"lat":32.78,"lng":-96.8,"km":30}},"probe":true}
 {"id":"implicit-guard-new-hope","q":"new hope baptist","class":"implicit-place","want":{"nameAll":["new","hope","baptist"]},"probe":true}
 {"id":"implicit-guard-st-paul","q":"st paul lutheran","class":"implicit-place","want":{"nameAny":["st","saint"],"nameAll":["paul","lutheran"]},"probe":true}
+{"id":"postal-kirche-80331","q":"kirche 80331","class":"postal","want":{"nameAny":["kirche"],"near":{"lat":48.14,"lng":11.57,"km":5}},"probe":true}

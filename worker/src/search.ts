@@ -1,6 +1,6 @@
 // The lexical search pipeline: parse, resolve place, query rungs, then correct typos or relax
 // only when results are short.
-import { allTokens, anyToken, combine, geoAny, rungs, RUNG_SQL, type Scope } from "./match.ts";
+import { allTokens, anyToken, combine, GENERIC, geoAny, rungs, RUNG_SQL, type Scope } from "./match.ts";
 import { parseQuery, placeKeys, requiredTokens, STOPWORDS, SYNONYMS, type ParsedQuery } from "./parse.ts";
 import { tokenize } from "./project.ts";
 import { BAND, km, rank, type Candidate, type CenterKind } from "./rank.ts";
@@ -22,6 +22,13 @@ const MAX_CORRECTED = 3;
 const CANDIDATE_MIN_N = 3;
 /** A one-word candidate that is this much more common in names than as a place is a name word ("zion"). */
 const CANDIDATE_DF_RATIO = 20;
+/** An unmarked trailing city ("first baptist dallas") must be this big to steer ranking. */
+const IMPLICIT_MIN_N = 5;
+/** ...and this much bigger than the next place of that name, unless the visitor is near one of them. */
+const IMPLICIT_AMBIGUITY = 3;
+const IMPLICIT_NEAR_KM = 150;
+/** Within this of an implicit city, the first rungs already covered it. */
+const IMPLICIT_COVERED_KM = 50;
 /** Results further than this from a place the person named rank below everything inside it. */
 const PLACE_KM = 75;
 /** Semantic search runs only on settled queries at least this long. */
@@ -76,7 +83,7 @@ async function batch<T>(run: Run, stmts: { sql: string; params: unknown[] }[]): 
 
 const searchStmt = (match: string) => ({ sql: RUNG_SQL, params: [match] });
 
-type Flags = Pick<Candidate, "corrected" | "prefixed" | "rankTokens" | "partial" | "semanticOnly" | "semanticRank">;
+type Flags = Pick<Candidate, "corrected" | "prefixed" | "nearPlace" | "rankTokens" | "partial" | "semanticOnly" | "semanticRank">;
 
 function toCandidate(row: SearchRow, flags: Flags = {}): SearchRow & Candidate {
   return {
@@ -141,6 +148,53 @@ async function resolveCandidate(run: Run, cands: ParsedQuery["placeCandidates"],
     if (!best || i < best.i || (i === best.i && row.n > best.row.n)) best = { row, i };
   }
   return best ? { row: best.row, rest: cands[best.i]!.rest } : null;
+}
+
+/**
+ * Possible city names at the end of a query with no other place signal: the last one or two words,
+ * when something real comes before them and the last word isn't common ("church", "baptist").
+ */
+export function implicitCandidates(tokens: string[]): string[] {
+  if (tokens.length < 2) return [];
+  const last = tokens[tokens.length - 1]!;
+  if (last.length < 3 || STOPWORDS.has(last) || COMMON_TOKENS.has(last) || GENERIC.has(last) || /\d/.test(last)) return [];
+  const out: string[] = [];
+  for (const n of [2, 1]) {
+    const rest = tokens.slice(0, tokens.length - n);
+    if (rest.some((t) => !STOPWORDS.has(t))) out.push(tokens.slice(-n).join(" "));
+  }
+  return out;
+}
+
+function implicitStmts(keys: string[]): Stmt[] {
+  if (!keys.length) return [];
+  const all = [...new Set(keys.flatMap(placeKeys))];
+  const words = [...new Set(keys.flatMap((k) => k.split(" ")))];
+  return [
+    { sql: `SELECT key, name, region, country, lat, lng, n FROM places WHERE key IN (${all.map(() => "?").join(",")}) ORDER BY n DESC LIMIT 20`, params: all },
+    { sql: `SELECT token, df FROM vocab WHERE token IN (${words.map(() => "?").join(",")})`, params: words },
+  ];
+}
+
+/**
+ * Accept a trailing city only when it is clearly a place: big enough, not mostly a name word ("hope",
+ * "zion"), and not ambiguous between towns of the same name unless the visitor is near one of them.
+ */
+export function pickImplicit(keys: string[], places: PlaceRow[], dfs: { token: string; df: number }[], near: { lat: number; lng: number } | null, region: string | null, country: string | null): PlaceRow | null {
+  const df = new Map(dfs.map((r) => [r.token, r.df]));
+  for (const key of keys) {
+    const spellings = new Set(placeKeys(key));
+    const rows = places.filter((p) => spellings.has(p.key) && (!region || p.region === region) && (!country || p.country === country)).sort((a, b) => b.n - a.n);
+    const top = rows[0];
+    if (!top || top.n < IMPLICIT_MIN_N) continue;
+    // One word may be a name word ("hope", "zion"); two ("fort lauderdale") almost never are.
+    if (!key.includes(" ") && (df.get(key) ?? 0) > top.n) continue;
+    const close = near ? rows.filter((p) => p.n >= IMPLICIT_MIN_N && km(near.lat, near.lng, p.lat, p.lng) <= IMPLICIT_NEAR_KM).sort((a, b) => km(near.lat, near.lng, a.lat, a.lng) - km(near.lat, near.lng, b.lat, b.lng))[0] : undefined;
+    if (close) return close;
+    if (rows[1] && top.n < IMPLICIT_AMBIGUITY * rows[1].n) continue;
+    return top;
+  }
+  return null;
 }
 
 async function resolvePlace(run: Run, key: string, regionHint: string | null, countryHint: string | null, preferCc: string | null): Promise<PlaceRow | null> {
@@ -262,7 +316,34 @@ export async function search(db: Db, input: SearchInput): Promise<SearchResult> 
   const everywhere = (t: string | null) => [...new Set([...rungs(t, scope), ...(filter || !t ? [] : [t])])].map(searchStmt);
 
   const rungList = rungs(text, scope);
-  addRows(await batch<SearchRow>(run, rungList.map(searchStmt)));
+  // An unmarked trailing city ("first baptist dallas") is looked up in the same round trip. It only
+  // steers ranking: its words stay required, and nothing outside it is pushed down.
+  const implicitKeys = !placeKey && !placeRow && !regionHint && !countryHint && !softRegion ? implicitCandidates(tokens) : [];
+  const extra = implicitStmts(implicitKeys);
+  const first = await batch<SearchRow & PlaceRow & { token: string; df: number }>(run, [...rungList.map(searchStmt), ...extra]);
+  addRows(first.slice(0, rungList.length));
+  const implicitRow = extra.length
+    ? pickImplicit(implicitKeys, first[rungList.length] ?? [], first[rungList.length + 1] ?? [], center, input.region ?? null, input.country ?? null)
+    : null;
+  if (implicitRow) {
+    const was = center;
+    center = { lat: implicitRow.lat, lng: implicitRow.lng };
+    centerKind = "implicit";
+    scope.center = center;
+    scope.city = { key: implicitRow.key, region: implicitRow.region };
+    const near = { ...scope, region: null, country: null };
+    const covered = was && km(was.lat, was.lng, center.lat, center.lng) <= IMPLICIT_COVERED_KM;
+    // When no listing has the city's words ("calvary chapel fort lauderdale"), look for the rest around it.
+    const rest = tokens.slice(0, tokens.length - implicitRow.key.split(" ").length);
+    const restText = found.size < SHORT_RESULTS && rest.length ? allTokens(rest, false) : null;
+    const stmts = [...(covered ? [] : rungs(text, near)), ...(restText ? rungs(restText, near) : [])];
+    if (stmts.length) {
+      const res = await batch<SearchRow>(run, stmts.map(searchStmt));
+      const own = covered ? 0 : rungs(text, near).length;
+      addRows(res.slice(0, own));
+      addRows(res.slice(own), { nearPlace: true, rankTokens: rest });
+    }
+  }
 
   let corrected: string | null = null;
   let degraded = false;
@@ -308,7 +389,8 @@ export async function search(db: Db, input: SearchInput): Promise<SearchResult> 
     if (countryHint) return c.country !== countryHint;
     return false;
   };
-  const rankOpts = { center: rankCenter, centerKind: rankKind, placeKeys: placeRow ? placeKeys(placeRow.key) : [], isOutside, softRegion, settled: Boolean(input.settled) };
+  const cityKey = placeRow?.key ?? implicitRow?.key;
+  const rankOpts = { center: rankCenter, centerKind: rankKind, placeKeys: cityKey ? placeKeys(cityKey) : [], placeRegion: placeRow?.region ?? implicitRow?.region ?? null, isOutside, softRegion, settled: Boolean(input.settled) };
   let ranked = rank([...found.values()], tokens, rankOpts);
 
   let semantic: SearchResult["semantic"] = input.semantic ? "skipped" : "off";

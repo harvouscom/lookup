@@ -5,7 +5,7 @@
 Source: https://lookup.heresmychurch.com/docs/how-search-works
 
 1. **Words, as you type.** A full-text index finds names that start with what's typed: nearby first, then wider, then the whole country. Short forms count too: "1st", "bapt", "meth", "pres", "ch", and abbreviations like "umc", "fbc", "ame", "cogic", "sda" and "lds" match the words they stand for, and the other way round.
-2. **Places.** "church in dallas", "grace, chicago", "first baptist TX" and "first baptist dallas tx" become a place filter. A lowercase state code like "tx" also finds churches in that state, but still works as the start of a word, so "grace co" keeps finding Grace Community. "nyc", "philly", "ft worth" and "n charleston" are understood, and so are postcodes ("grace 75201"). A lowercase "in" is never read as Indiana.
+2. **Places.** "church in dallas", "grace, chicago", "first baptist TX" and "first baptist dallas tx" become a place filter. A lowercase state code like "tx" also finds churches in that state, but still works as the start of a word, so "grace co" keeps finding Grace Community. "nyc", "philly", "ft worth" and "n charleston" are understood, and so are postcodes where listings have them, mostly in Europe ("kirche 80331"; US listings don't carry ZIP codes yet). A lowercase "in" is never read as Indiana.
 3. **Half-typed words and spelling.** When almost nothing matches, every word is tried as the start of a longer one, with "church" optional, so "first bap church dallas" finds First Baptist. Then the closest spelling is tried, so "gracee" finds Grace.
 4. **Meaning, only when words fail.** If no result matches every word, a settled query also asks semantic search (bge-m3 in Cloudflare Vectorize). Those results always rank below real name matches.
 

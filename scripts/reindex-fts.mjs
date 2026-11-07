@@ -41,7 +41,9 @@ const t0 = Date.now();
 await Promise.all(Array.from({ length: Number(concArg) }, async () => {
   while (next < todo.length) {
     const from = todo[next++];
-    rows += (await call(from)).rows;
+    // Await first: `rows += await …` reads rows before the wait and loses the other worker's updates.
+    const body = await call(from);
+    rows += body.rows;
     appendFileSync(checkpoint, `${from}\n`);
     if (++finished % 50 === 0) console.log(`${finished}/${todo.length} ranges, ${rows} rows, ${((Date.now() - t0) / 1000).toFixed(0)}s`);
   }

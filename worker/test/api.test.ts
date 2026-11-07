@@ -33,8 +33,10 @@ describe("search", () => {
     const { body } = await s("church in dallas");
     expect(body.place).toMatchObject({ name: "Dallas", region: "TX" });
     expect(body.results[0].distanceKm).toBeLessThanOrEqual(75);
-    const dallasFirst = body.results.findIndex((r: any) => r.region === "IN");
-    if (dallasFirst >= 0) expect(body.results.slice(0, dallasFirst).every((r: any) => r.city === "Dallas")).toBe(true);
+    // Every Dallas church comes before anything elsewhere, Indiana included.
+    const firstElsewhere = body.results.findIndex((r: any) => r.city !== "Dallas");
+    if (firstElsewhere >= 0) expect(body.results.slice(firstElsewhere).every((r: any) => r.city !== "Dallas")).toBe(true);
+    expect(body.results.findIndex((r: any) => r.region === "IN")).not.toBe(0);
   });
   it("falls back when in-words aren't a place", async () => {
     expect(names((await s("church at the cross")).body)[0]).toBe("Church at the Cross");
