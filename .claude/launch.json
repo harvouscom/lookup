@@ -6,6 +6,18 @@
       "runtimeExecutable": "node_modules/.bin/wrangler",
       "runtimeArgs": ["dev", "--config", "worker/wrangler.jsonc", "--remote", "--port", "8787"],
       "port": 8787
+    },
+    {
+      "name": "site-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8790", "--directory", "site"],
+      "port": 8790
+    },
+    {
+      "name": "video-studio",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "lookup-video", "exec", "remotion", "studio", "--port", "3300", "--no-open"],
+      "port": 3300
     }
   ]
 }

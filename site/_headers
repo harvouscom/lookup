@@ -9,6 +9,8 @@
   Cache-Control: public, max-age=300
 /data/globe.json
   Cache-Control: public, max-age=3600
+/video/*
+  Cache-Control: public, max-age=86400
 /site.css
   Cache-Control: public, max-age=300
 /site.js

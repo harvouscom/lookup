@@ -14,7 +14,9 @@
     "build:shadcn-demo": "npm --prefix examples/shadcn-demo run build",
     "eval": "node eval/run.mjs",
     "build:sdk": "pnpm --filter @heresmychurch/lookup build && node scripts/copy-assets.mjs",
-    "build:registry:lib": "node scripts/build-registry.mjs --lib"
+    "build:registry:lib": "node scripts/build-registry.mjs --lib",
+    "video": "pnpm --filter lookup-video studio",
+    "video:render": "pnpm --filter lookup-video render"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.8.0",

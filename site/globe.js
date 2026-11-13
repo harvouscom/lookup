@@ -1,11 +1,14 @@
 // A particle globe: every speck is churches from the Lookup index, on a pixel-dithered sphere.
 // Plain canvas, no dependencies. Orthographic projection, front hemisphere only.
+//
+// createGlobeRenderer draws one frame from an explicit view and time, so other callers (the product
+// film in video/) can step it frame by frame. createGlobe is the site's live globe built on it.
 
 const RAD = Math.PI / 180;
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // 4×4 ordered (Bayer) dither thresholds, 0..1.
-const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
+export const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 
 function rng(seed) {
   return () => {
@@ -16,11 +19,19 @@ function rng(seed) {
   };
 }
 
-export function createGlobe(canvas, data, opts = {}) {
+// The particle color for a brightness bucket k in 0..1: deep violet for faint specks through lilac
+// to near white for the densest.
+export function bucketColor(k) {
+  const r = Math.round(150 + 105 * k), g = Math.round(110 + 130 * k), bl = Math.round(230 + 25 * k);
+  return `rgba(${r},${g},${bl},${0.35 + 0.65 * k})`;
+}
+
+export function createGlobeRenderer(canvas, data, opts = {}) {
   const ctx = canvas.getContext("2d");
   const pinColor = opts.pinColor ?? "#C084FC";
 
   // Particles: a few per cell, more for denser cells, jittered inside the cell so the grid disappears.
+  // Cells arrive densest first, so particle order is densest first too.
   const cells = data.data.length / 3;
   let max = 1;
   for (let i = 0; i < cells; i++) max = Math.max(max, data.data[i * 3 + 2]);
@@ -41,31 +52,27 @@ export function createGlobe(canvas, data, opts = {}) {
   const n = plat.length;
   const sinLa = Float32Array.from(plat, Math.sin), cosLa = Float32Array.from(plat, Math.cos), lng = Float32Array.from(plng);
 
-  let lat0 = opts.lat ?? 28, lng0 = opts.lng ?? -38;
   let dpr = 1;
-  let pins = [];
-  let selected = null;
-  let anim = null;
-  let dragging = null;
-  let idleUntil = 0;
-  let visible = true;
-  let raf = 0;
-  let drift = 1;
   let shade = null; // pre-rendered dithered sphere
+  let shadeKey = "";
 
   // The globe is much wider than the canvas is tall, so only its top shows, like a planet rising.
-  function geometry() {
+  // scale zooms in, for a closer, flatter horizon where the land reads larger.
+  // top is the room above the limb, so the atmosphere glow can fade out before the canvas edge.
+  function geometry(scale = opts.scale ?? 1, top = opts.top ?? 36) {
     const W = canvas.width, H = canvas.height;
-    // opts.scale zooms in, for a closer, flatter horizon where the land reads larger.
-    // opts.top is the room above the limb, so the atmosphere glow can fade out before the canvas edge.
-    const R = Math.min(W * 0.66, 1300 * dpr) * (opts.scale ?? 1);
-    return { W, H, R, cx: W / 2, cy: R + (opts.top ?? 36) * dpr };
+    const R = Math.min(W * 0.66, 1300 * dpr) * scale;
+    return { W, H, R, cx: W / 2, cy: R + top * dpr };
   }
 
-  function renderShade() {
-    const { W, H, R, cx, cy } = geometry();
+  function renderShade(g) {
+    const { W, H, R, cx, cy } = g;
+    const key = `${W}|${H}|${R}|${cx}|${cy}|${dpr}`;
+    if (key === shadeKey) return;
+    shadeKey = key;
     shade = document.createElement("canvas");
     shade.width = W; shade.height = H;
+    if (!W || !H) return;
     const s = shade.getContext("2d");
     const P = Math.max(2, Math.round(2 * dpr)); // pixel size
     // Light from the upper left and slightly in front.
@@ -85,13 +92,10 @@ export function createGlobe(canvas, data, opts = {}) {
     }
   }
 
-  function resize() {
-    const r = canvas.getBoundingClientRect();
-    dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = Math.round(r.width * dpr);
-    canvas.height = Math.round(r.height * dpr);
-    renderShade();
-    draw();
+  // The caller sizes the canvas; this sets the pixel ratio and rebuilds the shading.
+  function resize(nextDpr = dpr) {
+    dpr = nextDpr;
+    renderShade(geometry());
   }
 
   function project(sinLa_, cosLa_, lo, sinLat0, cosLat0, cosL0, sinL0) {
@@ -104,55 +108,83 @@ export function createGlobe(canvas, data, opts = {}) {
   const BUCKETS = 7;
   const paths = new Array(BUCKETS);
 
-  function draw(t = performance.now()) {
-    const { W, H, R, cx, cy } = geometry();
+  function dot(x, y, r, fill, ring, ringColor = "#0A0618") {
+    ctx.beginPath();
+    ctx.arc(x, y, r + ring, 0, Math.PI * 2);
+    ctx.fillStyle = ringColor;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+
+  /**
+   * Draw one frame.
+   * view: { lat, lng } center. t: ms, for twinkle and the selection pulse. motion: false stills both.
+   * reveal (0..1) draws only the densest share of particles; gain brightens them; glow, shadeAlpha and
+   * limb (0..1, how much of the arc is drawn) fade the sphere's layers; scale and top move the camera.
+   */
+  function draw({ lat, lng: lng0, t = 0, motion = true, pins = [], selected = null, reveal = 1, gain = 1,
+    glow: glowA = 1, shadeAlpha = 1, limb: limbK = 1, scale, top } = {}) {
+    const g = geometry(scale, top);
+    const { W, H, R, cx, cy } = g;
+    renderShade(g);
     ctx.clearRect(0, 0, W, H);
 
     // Atmosphere: a violet glow hugging the limb.
-    const glow = ctx.createRadialGradient(cx, cy, R * 0.97, cx, cy, R * 1.09);
-    glow.addColorStop(0, "rgba(139, 92, 246, 0.0)");
-    glow.addColorStop(0.35, "rgba(167, 139, 250, 0.28)");
-    glow.addColorStop(1, "rgba(76, 29, 149, 0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
+    if (glowA > 0) {
+      const glow = ctx.createRadialGradient(cx, cy, R * 0.97, cx, cy, R * 1.09);
+      glow.addColorStop(0, "rgba(139, 92, 246, 0.0)");
+      glow.addColorStop(0.35, "rgba(167, 139, 250, 0.28)");
+      glow.addColorStop(1, "rgba(76, 29, 149, 0)");
+      ctx.globalAlpha = Math.min(1, glowA);
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+    }
 
-    if (shade) ctx.drawImage(shade, 0, 0);
+    if (shade && shade.width && shade.height && shadeAlpha > 0) {
+      ctx.globalAlpha = Math.min(1, shadeAlpha);
+      ctx.drawImage(shade, 0, 0);
+      ctx.globalAlpha = 1;
+    }
 
     // Limb highlight, brightest where the light hits.
-    const limb = ctx.createLinearGradient(cx - R, 0, cx + R, 0);
-    limb.addColorStop(0, "rgba(196,181,253,0.0)");
-    limb.addColorStop(0.35, "rgba(221,214,254,0.85)");
-    limb.addColorStop(0.65, "rgba(196,181,253,0.35)");
-    limb.addColorStop(1, "rgba(196,181,253,0.0)");
-    ctx.beginPath();
-    ctx.arc(cx, cy, R, Math.PI, Math.PI * 2);
-    ctx.lineWidth = 1.25 * dpr;
-    ctx.strokeStyle = limb;
-    ctx.stroke();
+    if (limbK > 0) {
+      const limb = ctx.createLinearGradient(cx - R, 0, cx + R, 0);
+      limb.addColorStop(0, "rgba(196,181,253,0.0)");
+      limb.addColorStop(0.35, "rgba(221,214,254,0.85)");
+      limb.addColorStop(0.65, "rgba(196,181,253,0.35)");
+      limb.addColorStop(1, "rgba(196,181,253,0.0)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, Math.PI, Math.PI * (1 + Math.min(1, limbK)));
+      ctx.lineWidth = 1.25 * dpr;
+      ctx.strokeStyle = limb;
+      ctx.stroke();
+    }
 
     // Churches as pixel particles, snapped to the pixel grid and batched by brightness.
-    const sinLat0 = Math.sin(lat0 * RAD), cosLat0 = Math.cos(lat0 * RAD);
+    const sinLat0 = Math.sin(lat * RAD), cosLat0 = Math.cos(lat * RAD);
     const cosL0 = Math.cos(lng0 * RAD), sinL0 = Math.sin(lng0 * RAD);
     const P = Math.max(1, Math.round(dpr));
-    const tw = reduceMotion() ? 0 : t * 0.0012;
+    const tw = motion ? t * 0.0012 : 0;
+    const count = reveal >= 1 ? n : Math.max(0, Math.floor(n * reveal));
     for (let b = 0; b < BUCKETS; b++) paths[b] = new Path2D();
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < count; i++) {
       const [x, y, c] = project(sinLa[i], cosLa[i], lng[i], sinLat0, cosLat0, cosL0, sinL0);
       if (c <= 0.03) continue;
       const py = cy - y * R;
       if (py < -4 || py > H + 4) continue;
       const px = cx + x * R;
       const twinkle = tw ? 0.88 + 0.12 * Math.sin(tw + ph[i]) : 1;
-      const v = (0.25 + 0.75 * pw[i]) * (0.3 + 0.7 * c) * twinkle;
-      const b = Math.min(BUCKETS - 1, Math.floor(v * BUCKETS));
+      const v = (0.25 + 0.75 * pw[i]) * (0.3 + 0.7 * c) * twinkle * gain;
+      const b = Math.max(0, Math.min(BUCKETS - 1, Math.floor(v * BUCKETS)));
       const size = (pw[i] > 0.6 ? 2 : 1) * P;
       paths[b].rect(Math.round(px / P) * P, Math.round(py / P) * P, size, size);
     }
     for (let b = 0; b < BUCKETS; b++) {
-      const k = b / (BUCKETS - 1);
-      // Deep violet for faint specks through lilac to near white for the densest.
-      const r = Math.round(150 + 105 * k), g = Math.round(110 + 130 * k), bl = Math.round(230 + 25 * k);
-      ctx.fillStyle = `rgba(${r},${g},${bl},${0.35 + 0.65 * k})`;
+      ctx.fillStyle = bucketColor(b / (BUCKETS - 1));
       ctx.fill(paths[b]);
     }
 
@@ -166,7 +198,7 @@ export function createGlobe(canvas, data, opts = {}) {
       const [x, y, c] = project(Math.sin(selected.lat * RAD), Math.cos(selected.lat * RAD), selected.lng * RAD, sinLat0, cosLat0, cosL0, sinL0);
       if (c > 0) {
         const px = cx + x * R, py = cy - y * R;
-        if (!reduceMotion()) {
+        if (motion) {
           const phase = ((t - selected.at) % 1600) / 1600;
           ctx.beginPath();
           ctx.arc(px, py, (8 + phase * 24) * dpr, 0, Math.PI * 2);
@@ -179,24 +211,54 @@ export function createGlobe(canvas, data, opts = {}) {
     }
   }
 
-  // Where a point sits on screen right now, in CSS pixels, so HTML labels can follow the globe.
-  function screen(la, lo) {
-    const { R, cx, cy } = geometry();
-    const sinLat0 = Math.sin(lat0 * RAD), cosLat0 = Math.cos(lat0 * RAD);
+  // Where a point sits on screen for a view, in CSS pixels, so HTML labels can follow the globe.
+  function screen(la, lo, { lat, lng: lng0, scale, top }) {
+    const { R, cx, cy } = geometry(scale, top);
+    const sinLat0 = Math.sin(lat * RAD), cosLat0 = Math.cos(lat * RAD);
     const [x, y, c] = project(Math.sin(la * RAD), Math.cos(la * RAD), lo * RAD, sinLat0, cosLat0, Math.cos(lng0 * RAD), Math.sin(lng0 * RAD));
-    return { x: (cx + x * R) / dpr, y: (cy - y * R) / dpr, visible: c > 0.05 };
+    return { x: (cx + x * R) / dpr, y: (cy - y * R) / dpr, visible: c > 0.05, depth: c };
   }
 
-  function dot(x, y, r, fill, ring, ringColor = "#0A0618") {
-    ctx.beginPath();
-    ctx.arc(x, y, r + ring, 0, Math.PI * 2);
-    ctx.fillStyle = ringColor;
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = fill;
-    ctx.fill();
+  return {
+    particles: { n, sinLa, cosLa, lng, pw, ph },
+    geometry,
+    resize,
+    draw,
+    screen,
+  };
+}
+
+export function createGlobe(canvas, data, opts = {}) {
+  const r = createGlobeRenderer(canvas, data, opts);
+
+  let lat0 = opts.lat ?? 28, lng0 = opts.lng ?? -38;
+  let pins = [];
+  let selected = null;
+  let anim = null;
+  let dragging = null;
+  let idleUntil = 0;
+  let visible = true;
+  let raf = 0;
+  let drift = 1;
+
+  function draw(t = performance.now()) {
+    r.draw({ lat: lat0, lng: lng0, t, motion: !reduceMotion(), pins, selected });
   }
+
+  function resize() {
+    const b = canvas.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(b.width * dpr);
+    canvas.height = Math.round(b.height * dpr);
+    r.resize(dpr);
+    draw();
+  }
+
+  // Where a point sits on screen right now, in CSS pixels, so HTML labels can follow the globe.
+  const screen = (la, lo) => {
+    const { x, y, visible } = r.screen(la, lo, { lat: lat0, lng: lng0 });
+    return { x, y, visible };
+  };
 
   function frame(t) {
     raf = 0;
@@ -232,7 +294,7 @@ export function createGlobe(canvas, data, opts = {}) {
   wake();
 
   return {
-    particles: n,
+    particles: r.particles.n,
     screen,
     /** The current view center, for layers that turn with the globe. */
     view: () => ({ lat: lat0, lng: lng0 }),

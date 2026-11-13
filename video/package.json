@@ -1,0 +1,29 @@
+{
+  "name": "lookup-video",
+  "private": true,
+  "type": "module",
+  "description": "Lookup's product film: an 88-second Remotion composition in the site hero's visual language.",
+  "scripts": {
+    "studio": "remotion studio",
+    "score": "node scripts/score.ts",
+    "highlight": "node scripts/highlight.mjs",
+    "still": "remotion still LookupFilm",
+    "render": "node scripts/render.mjs",
+    "typecheck": "tsc --noEmit",
+    "stills": "node scripts/stills.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.539",
+    "@remotion/fonts": "4.0.539",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.539",
+    "@remotion/bundler": "4.0.539",
+    "@remotion/renderer": "4.0.539"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "shiki": "3.4.2",
+    "typescript": "^5.6.0"
+  }
+}

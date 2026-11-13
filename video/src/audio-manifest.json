@@ -1,0 +1,61 @@
+{
+  "clips": [
+    {
+      "file": "audio/pad.wav",
+      "at": 0,
+      "gain": 0.8
+    },
+    {
+      "file": "audio/ui.wav",
+      "at": 0,
+      "gain": 0.85
+    },
+    {
+      "file": "sfx/swell.mp3",
+      "at": 0,
+      "gain": 0.22
+    },
+    {
+      "file": "sfx/rim-shimmer.mp3",
+      "at": 2.6692307692307597,
+      "gain": 0.32
+    },
+    {
+      "file": "sfx/whoosh-fly.mp3",
+      "at": 9.633109233698919,
+      "gain": 0.35
+    },
+    {
+      "file": "sfx/pixel-scatter.mp3",
+      "at": 1.0653846153846116,
+      "gain": 0.55
+    },
+    {
+      "file": "sfx/pixel-scatter.mp3",
+      "at": 6.4341763786275035,
+      "gain": 0.45
+    },
+    {
+      "file": "sfx/pixel-scatter.mp3",
+      "at": 14.873066091118126,
+      "gain": 0.4
+    },
+    {
+      "file": "sfx/soft-impact.mp3",
+      "at": 39.47825268785118,
+      "gain": 0.8
+    },
+    {
+      "file": "sfx/whoosh-pullback.mp3",
+      "at": 40.93558282567386,
+      "gain": 0.27
+    },
+    {
+      "file": "sfx/closing-shimmer.mp3",
+      "at": 52.23922569594623,
+      "gain": 0.24,
+      "fadeOut": 1.2,
+      "dur": 4.6
+    }
+  ]
+}
