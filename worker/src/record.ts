@@ -9,6 +9,8 @@ export interface ChurchRow {
   region: string; country: string; lat: number; lng: number; phone: string | null; email: string | null; website: string | null;
   denomination: string | null; service_times: string | null; languages: string | null; ministries: string | null;
   pastor_name: string | null; last_verified: number | null; completeness: number;
+  /** 1 when the church has verified its listed inbox on Here's My Church. Absent before the m4 migration. */
+  claimed?: number | null;
 }
 
 const list = (v: string | null): string[] => {
@@ -52,6 +54,8 @@ export function toRecord(r: ChurchRow) {
     missing,
     completeness: r.completeness,
     freshness: { lastVerified: r.last_verified },
+    // The church has claimed its listing (verified its listed inbox). Others' changes go to the church first.
+    claimed: r.claimed === 1,
     // The church's page, where people can fix anything Lookup doesn't take. Add ?suggest=1 to open the form.
     links: { heresMyChurch: r.short_id ? `${HMC_SITE}/${r.country}/${r.region}/${encodeURIComponent(r.short_id)}` : null },
     // Values that aren't facts about the listing. A host must never fill `city` from nearestPlace.
@@ -60,26 +64,42 @@ export function toRecord(r: ChurchRow) {
 }
 
 /**
- * What a person can update through Lookup, and how it's reviewed. "live" goes live on one vote;
- * "moderated" waits for a Here's My Church moderator. Email and pastor name are always moderated,
- * since a host form can hold someone's personal details. `address` is street, city and postal code
- * sent together. The report* fields flag a listing as closed, a duplicate or moved, and never go
- * live without a moderator. `name` needs NAME_CONTRIBUTIONS before contributions accept it.
+ * What a person can update through Lookup, and how Here's My Church checks it. `address` is street,
+ * city and postal code sent together; `name` needs NAME_CONTRIBUTIONS before contributions accept it.
+ *
+ * On a claimed listing (`claimed: true` on the record), everyone else's changes go to the church
+ * first, and the answer says reviewBy: "church". Otherwise:
+ * - A blank field goes live on one vote, with an automatic spam check afterwards. Email and pastor
+ *   name sent from Lookup are the exception: they're always held, since a host form can hold
+ *   someone's personal details.
+ * - Replacing a filled value is held and checked automatically. Phone and service times are approved
+ *   when they appear on the church's website, when two or more independent people send the same
+ *   value, or after three quiet days. Denomination, languages and ministries (additions only) follow
+ *   agreement, the name rules or three quiet days.
+ * - Name, website, address, email and pastor name need evidence (the church's website, a small name
+ *   fix, an address within 150 m of the pin) or else a Here's My Church reviewer.
+ * - Closed and duplicate reports can hide a listing, reversibly, and only on strong evidence. Moves
+ *   always go to a reviewer.
+ *
+ * `checks` says that: "automatic" fields are decided by the checks above; "automatic-then-reviewer"
+ * fields go to a person whenever the checks can't decide; "reviewer" (moves) always goes to one. `review` is kept as it was for hosts that
+ * read it: "live" for fields that can change without a person, "moderated" for the others. It no
+ * longer means a moderator sees every change.
  */
 export const CONTRIBUTABLE_FIELDS = {
-  name: { countries: "all", review: "moderated" },
-  serviceTimes: { countries: "all", review: "live" },
-  denomination: { countries: "all", review: "live" },
-  languages: { countries: "all", review: "live" },
-  ministries: { countries: "all", review: "live" },
-  phone: { countries: "all", review: "live" },
-  website: { countries: "all", review: "moderated" },
-  address: { countries: "all", review: "moderated" },
-  email: { countries: "all", review: "moderated" },
-  pastorName: { countries: "all", review: "moderated" },
-  reportClosed: { countries: "all", review: "moderated" },
-  reportDuplicate: { countries: "all", review: "moderated" },
-  reportRelocated: { countries: "all", review: "moderated" },
+  name: { countries: "all", review: "moderated", checks: "automatic-then-reviewer" },
+  serviceTimes: { countries: "all", review: "live", checks: "automatic" },
+  denomination: { countries: "all", review: "live", checks: "automatic" },
+  languages: { countries: "all", review: "live", checks: "automatic" },
+  ministries: { countries: "all", review: "live", checks: "automatic" },
+  phone: { countries: "all", review: "live", checks: "automatic" },
+  website: { countries: "all", review: "moderated", checks: "automatic-then-reviewer" },
+  address: { countries: "all", review: "moderated", checks: "automatic-then-reviewer" },
+  email: { countries: "all", review: "moderated", checks: "automatic-then-reviewer" },
+  pastorName: { countries: "all", review: "moderated", checks: "automatic-then-reviewer" },
+  reportClosed: { countries: "all", review: "moderated", checks: "automatic-then-reviewer" },
+  reportDuplicate: { countries: "all", review: "moderated", checks: "automatic-then-reviewer" },
+  reportRelocated: { countries: "all", review: "moderated", checks: "reviewer" },
 } as const;
 
 export const RECORD_FIELDS = ["name", "street", "city", "region", "regionName", "postalCode", "country", "countryName", "latitude", "longitude", "phone", "email", "website", "denomination", "serviceTimes", "languages", "ministries", "pastorName"];

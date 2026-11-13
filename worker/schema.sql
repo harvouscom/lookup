@@ -22,7 +22,8 @@ CREATE TABLE church (
   last_verified INTEGER,
   completeness INTEGER NOT NULL,
   doc_hash TEXT NOT NULL,
-  embed_hash TEXT NOT NULL
+  embed_hash TEXT NOT NULL,
+  claimed INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX church_region ON church(region);
 CREATE VIRTUAL TABLE church_fts USING fts5(name, loc, geo, prefix='1 2 3 4 5 6 7 8', tokenize='unicode61 remove_diacritics 2');

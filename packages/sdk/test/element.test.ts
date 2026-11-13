@@ -553,7 +553,8 @@ describe("consent", () => {
     expect([...boxes].map((b) => b.checked)).toEqual([true, true]);
     expect(panel.textContent).toContain("https://grace.example");
     expect(panel.textContent).toContain("https://new.example");
-    expect(panel.textContent).toContain("A moderator reviews it");
+    // A replacement is checked automatically; filling a blank field goes live.
+    expect([...panel.querySelectorAll("ul .b")].map((b) => b.textContent)).toEqual(["Checked automatically", "Goes live"]);
     const share = panel.querySelector<HTMLButtonElement>(".row .bt")!;
     expect(share.textContent).toBe("Share 2 fixes");
     expect(posts).toHaveLength(0);
@@ -566,6 +567,16 @@ describe("consent", () => {
     panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
     await flush(10);
     expect(posts[0]!.body.changes).toEqual([{ field: "denomination", value: "Methodist" }]);
+  });
+  it("says the church reviews changes to a claimed listing, and that they were sent to the church", async () => {
+    recordExtra = { claimed: true };
+    const { input, panel } = mountConsent("", { churchId: "R-1", results: [{ field: "denomination", status: "in_review", reviewBy: "church" }] });
+    await pick(input);
+    edit("d", "Baptist");
+    expect(panel.querySelector("ul .b")!.textContent).toBe("The church reviews this");
+    panel.querySelector<HTMLButtonElement>(".row .bt")!.click();
+    await flush(10);
+    expect(panel.querySelector("ul .b")!.textContent).toBe("Sent to the church");
   });
   it("asks Still correct only of a listing nobody confirmed this year", async () => {
     recordExtra = { freshness: { lastVerified: Date.now() - 30 * 864e5 } };

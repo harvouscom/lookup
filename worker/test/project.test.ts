@@ -114,6 +114,15 @@ describe("project", () => {
     expect(renamed.embedHash).not.toBe(a.embedHash);
     expect(project(base, "TX", info).docHash).toBe(a.docHash);
   });
+  it("carries claimed, hashing it only when true so unclaimed rows keep their hashes", () => {
+    const a = project(base, "TX", info);
+    const claimed = project({ ...base, claimed: true }, "TX", info);
+    expect(a.claimed).toBe(false);
+    expect(claimed.claimed).toBe(true);
+    expect(claimed.docHash).not.toBe(a.docHash);
+    expect(claimed.embedHash).toBe(a.embedHash);
+    expect(project({ ...base, claimed: false }, "TX", info).docHash).toBe(a.docHash);
+  });
 });
 
 describe("geo", () => {

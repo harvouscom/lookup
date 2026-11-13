@@ -39,7 +39,7 @@ The response has `results`, plus `hasMore` when more churches ranked past `limit
 
 ## GET /v1/churches/:id
 
-The autofill record. Every key in `fields` is always present, with `null` or `[]` when empty, plus `missing`, `completeness`, `hints`, `freshness.lastVerified` (when someone last confirmed it, in milliseconds, or `null`) and `links.heresMyChurch` (the church's page; add `?suggest=1` to open its fix form). Records are cached for a minute, and a change that goes live through Lookup refreshes it at once.
+The autofill record. Every key in `fields` is always present, with `null` or `[]` when empty, plus `missing`, `completeness`, `hints`, `freshness.lastVerified` (when someone last confirmed it, in milliseconds, or `null`), `links.heresMyChurch` (the church's page; add `?suggest=1` to open its fix form) and `claimed` (`true` when the church has claimed its listing on Here's My Church, so others' changes go to the church first). Records are cached for a minute, and a change that goes live through Lookup refreshes it at once.
 
 ```bash
 curl https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145
@@ -47,7 +47,7 @@ curl https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145
 
 ## GET /v1/meta
 
-Field names, what can be contributed and how it's reviewed (`contributableFields`), whether adding churches is on (`addEnabled`), completeness weights, counts and attribution.
+Field names, what can be contributed and how it's checked (`contributableFields`, each with `countries`, `review` and `checks`), whether adding churches is on (`addEnabled`), completeness weights, counts and attribution.
 
 ## POST /v1/churches/:id/contributions
 
@@ -55,12 +55,14 @@ Send corrections as `{ client, changes: [{ field, value }] }`. Fields are `servi
 
 | Status | Meaning |
 |---|---|
-| `live` | Applied now. These fields go live on one vote. |
-| `in_review` | Waits for a Here's My Church moderator. |
+| `live` | Applied now, such as a blank field filled in. |
+| `in_review` | Held. Here's My Church checks it automatically, and a reviewer decides what the checks can't. With `reviewBy: "church"`, the church reviews it first, since it has claimed its listing. |
 | `not_applied` | Not changed: the listed value was already the same, or Here's My Church kept it. |
 | `rejected` | Not accepted, with a `message` saying why. |
 | `try_again` | A temporary problem, such as maintenance or a rate limit. Nothing was refused. |
 | `coming_soon` | A field Lookup will accept soon. Name is coming soon. |
+
+`reviewBy` is only present when Here's My Church says who reviews a held change, and so far it's only ever `"church"`. The statuses themselves don't change, so code that reads only `status` keeps working. [Data and review](/docs/data#sharing-fixes-back) has the rules for each field.
 
 ```bash
 curl -X POST https://lookup.heresmychurch.com/v1/churches/CA-ON-56994145/contributions \

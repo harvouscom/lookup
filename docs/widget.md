@@ -150,7 +150,7 @@ document.querySelector("church-lookup").fieldMap = { website: "#site-url", phone
 
 ## Sharing fixes
 
-After a fill, changing a field Lookup filled shows the changes below the church field, checked, with **Share N fixes**. Street, city and postal code show as one Address row. "Still correct?" appears only for listings nobody confirmed in the last year. See [Data and review](/docs/data#sharing-fixes-back) for what's accepted where.
+After a fill, changing a field Lookup filled shows the changes below the church field, checked, with **Share N fixes**. Street, city and postal code show as one Address row. Each row says "Goes live" (a blank field), "Checked automatically" (a replacement) or, for a listing the church has claimed, "The church reviews this". "Still correct?" appears only for listings nobody confirmed in the last year. See [Data and review](/docs/data#sharing-fixes-back) for what's accepted where.
 
 ### Share on submit
 

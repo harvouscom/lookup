@@ -1,8 +1,9 @@
 // @heresmychurch/lookup/core: the headless engine behind <church-lookup>, for building your own UI
 // (the shadcn registry components use it). No rendering and no side effects on import: nothing is
 // registered, and timers only run while a search is pending.
-import { createLookup, type ChurchRecord, type Lookup, type LookupError, type Meta, type NewChurch, type SearchResult } from "./client.ts";
+import { createLookup, type ChurchRecord, type FieldStatus, type Lookup, type LookupError, type Meta, type NewChurch, type SearchResult } from "./client.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
+import type { Strings } from "./strings.ts";
 
 export * from "./client.ts";
 export { setNativeValue, type FieldTarget };
@@ -365,6 +366,24 @@ export function mergeAddress<T extends ConsentRow>(rows: T[]): (T & { parts?: Re
   const join = (k: "was" | "value") => parts.map((r) => r[k].trim()).filter(Boolean).join(", ");
   const address = { ...parts[0]!, field: "address", was: join("was"), value: join("value"), parts: Object.fromEntries(parts.map((r) => [r.field, r.value.trim()])) };
   return rows.flatMap((r) => (r === parts[0] ? [address] : parts.includes(r) ? [] : [r]));
+}
+
+/** Lookup always holds these, even into a blank field: a host form can hold someone's personal details. */
+const ALWAYS_HELD = ["email", "pastorName"];
+
+/**
+ * What a consent row's badge says before sending: coming soon, the church reviews it (a claimed
+ * listing), goes live (a blank field), or checked automatically (a replacement).
+ */
+export function consentBadge(t: Strings, r: { field: string; was: string }, soon: boolean, claimed?: boolean): { text: string; live: boolean } {
+  const live = !soon && !claimed && !r.was.trim() && !ALWAYS_HELD.includes(r.field);
+  return { text: soon ? t.soon : claimed ? t.churchReviews : live ? t.goesLive : t.checked, live };
+}
+
+/** A sent field's outcome, as the badge shows it. */
+export function resultText(t: Strings, r: { status: FieldStatus; message?: string; reviewBy?: string }): string {
+  if (r.status === "rejected" && r.message) return `${t.st.rejected}: ${r.message}`;
+  return r.status === "in_review" && r.reviewBy === "church" ? t.sentToChurch : t.st[r.status];
 }
 
 /** The change to send for a consent row: an address goes as its parts. */
