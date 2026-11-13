@@ -16,7 +16,8 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "jsx": "react-jsx"
   },
   "files": [
     "src/index.ts",
@@ -24,6 +25,7 @@
     "src/fields.ts",
     "src/element.ts",
     "src/service-times.ts",
+    "src/react.ts",
     "src/strings-es.ts",
     "src/strings-fr.ts",
     "src/strings-de.ts",

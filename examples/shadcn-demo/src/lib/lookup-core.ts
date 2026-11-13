@@ -1,6 +1,18 @@
-// Lookup by Here's My Church, headless core v0.3.0. Generated from @heresmychurch/lookup
+// Lookup by Here's My Church, headless core v0.4.0. Generated from @heresmychurch/lookup
 // (packages/sdk/src) by scripts/build-registry.mjs. MIT. https://lookup.heresmychurch.com/docs
 /* eslint-disable */
+
+// ── dev.ts ──
+// Setup hints for developers. Each prints once, and only on a local development host (localhost,
+// 127.0.0.1, *.localhost, *.test), so production consoles and servers stay quiet.
+const said: Record<string, 1> = {};
+
+export function devWarn(message: string): void {
+  const host = typeof location == "object" ? location.hostname : "";
+  if (said[message] || !/^(localhost|127\.0\.0\.1|\[::1\])$|\.(localhost|test)$/.test(host)) return;
+  said[message] = 1;
+  console.warn("Lookup: " + message);
+}
 
 // ── client.ts ──
 // @heresmychurch/lookup core client. No dependencies.
@@ -56,13 +68,58 @@ export interface SearchResponse {
   attribution: string;
 }
 
+/** One weekly service. */
+export interface ServiceSlot {
+  /** 0 is Sunday, 6 is Saturday. */
+  dayOfWeek: number;
+  /** 24-hour "HH:MM", such as "09:30". */
+  startTime: string;
+}
+
+export interface ServiceTimes {
+  /** The listed text, such as "Sun 9:00 AM; Wed 7:00 PM", or null when there is none. */
+  raw: string | null;
+  /** The services read from `raw`. Empty when it couldn't be read; `raw` still holds the text. */
+  slots: ServiceSlot[];
+  /** Whether every part of `raw` was read into `slots`. */
+  parsed: boolean;
+}
+
+/** A church's details. Every key is always present, with null or [] when the directory has nothing. */
+export interface ChurchFields {
+  name: string;
+  street: string | null;
+  city: string | null;
+  /** A region code, such as "TX" or "ON". */
+  region: string;
+  /** The region's name, such as "Texas". */
+  regionName: string;
+  postalCode: string | null;
+  /** An ISO country code, such as "US". */
+  country: string;
+  countryName: string;
+  latitude: number;
+  longitude: number;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  denomination: string | null;
+  serviceTimes: ServiceTimes;
+  languages: string[];
+  ministries: string[];
+  pastorName: string | null;
+}
+
+/** A field name in a church record, as data-hmc-field takes. */
+export type ChurchField = keyof ChurchFields | "id";
+
 export interface ChurchRecord {
   id: string;
-  /** Only with { follow: false }: this listing merged into another. Load that ID instead. */
+  /** Only with { follow: false }: this listing merged into another. Load that ID instead; nothing else is set. */
   movedTo?: string;
   /** The ID you asked for, when it merged into this church. Store this record's `id` instead. */
   movedFrom?: string;
-  fields: Record<string, unknown> & { name: string; serviceTimes: { raw: string | null } };
+  fields: ChurchFields;
   missing: string[];
   completeness: number;
   /** When someone last confirmed the listing (ms since 1970), or null if never. */
@@ -102,7 +159,7 @@ export class LookupError extends Error {
   status: number;
   /** Seconds to wait before trying again, on a 429 or 503. */
   retryAfter?: number;
-  /** A stable reason: invalid, not_found, rate_limited, overloaded, unavailable, … */
+  /** A stable reason: invalid, not_found, rate_limited, overloaded, unavailable, timeout, … */
   code?: string;
   constructor(status: number, message: string, retryAfter?: number, code?: string) {
     super(message);
@@ -118,17 +175,35 @@ export interface LookupOptions {
   /** Your tool's name, such as "my-chms". Self-declared; shown to reviewers as declared. */
   client?: string;
   fetch?: typeof fetch;
+  /** Give up on a request after this many milliseconds, with a LookupError whose code is "timeout". Defaults to 15000; 0 waits forever. */
+  timeout?: number;
 }
 
 export function createLookup(opts: LookupOptions = {}) {
   const base = (opts.baseUrl ?? "https://lookup.heresmychurch.com").replace(/\/+$/, "") + "/v1";
   const f = opts.fetch ?? fetch.bind(globalThis);
+  const timeout = opts.timeout ?? 15000;
+  if (!opts.client) devWarn('set client="my-app" so Here\'s My Church knows which tool is asking. Use "lookup-demo" while testing.');
 
   async function get<T>(path: string, signal?: AbortSignal, init?: RequestInit): Promise<T> {
-    const res = await f(base + path, { signal, ...init });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined, body.code);
-    return body;
+    // One signal for the caller's abort and the timeout. A caller's abort still rejects with AbortError.
+    const ctl = new AbortController();
+    const stop = () => ctl.abort();
+    const timer = timeout > 0 ? setTimeout(stop, timeout) : 0;
+    if (signal?.aborted) stop();
+    signal?.addEventListener("abort", stop);
+    try {
+      const res = await f(base + path, { ...init, signal: ctl.signal });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new LookupError(res.status, body.error ?? res.statusText, Number(res.headers.get("retry-after")) || undefined, body.code);
+      return body;
+    } catch (e) {
+      // Aborted, but not by the caller: the timeout fired.
+      throw ctl.signal.aborted && !signal?.aborted ? new LookupError(0, "Timed out", undefined, "timeout") : e;
+    } finally {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", stop);
+    }
   }
 
   const post = <T>(path: string, body: unknown, keepalive?: boolean) =>
@@ -370,7 +445,7 @@ export const MAX_RESULTS = 50;
 
 /** A record field as the text a form field should hold, or null when the directory has nothing. */
 export function fieldValue(record: ChurchRecord, field: string): string | null {
-  const v = field === "id" ? record.id : record.fields[field];
+  const v = field === "id" ? record.id : (record.fields as unknown as Record<string, unknown>)[field];
   if (v == null) return null;
   if (Array.isArray(v)) return v.length ? v.join(", ") : null;
   if (typeof v === "object") return (v as { raw?: string | null }).raw ?? null;
