@@ -4,6 +4,7 @@
 import { createLookup, type AddResult, type ChurchRecord, type FieldStatus, type Lookup, type LookupError, type Meta, type NewChurch, type SearchResult } from "./client.ts";
 import { addUrl, applyFill, changeFor, consentDiff, contributable, createLookupController, fieldValue, findTargets, isStale, mergeAddress, newChurchFrom, planFill, suggestUrl, type ControllerState, type FillChange } from "./core.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
+import { devWarn } from "./dev.ts";
 import { matchField } from "./fields.ts";
 import { LANGS, registry, stringsFor, type Strings } from "./strings.ts";
 
@@ -177,7 +178,8 @@ export class ChurchLookup extends Base {
   private loadLang(): void {
     const lang = this.uiLang;
     if (!LANGS.includes(lang) || registry()[lang]) return;
-    import(/* @vite-ignore */ new URL(`./strings-${lang}.js`, import.meta.url).href).catch(() => { /* stay in English */ });
+    // import.meta.url is missing in the CommonJS build (Jest): stay in English unless a language file is imported.
+    try { import(/* @vite-ignore */ new URL(`./strings-${lang}.js`, import.meta.url).href).catch(() => { /* stay in English */ }); } catch { /* stay in English */ }
   }
 
   disconnectedCallback(): void {
@@ -488,7 +490,9 @@ export class ChurchLookup extends Base {
   /** Fill the form, unless fill="off": then church-fill still carries the record, with no changes. */
   private fillFrom(record: ChurchRecord): void {
     const off = this.getAttribute("fill") === "off";
-    const { changes, empty } = off ? { changes: [], empty: [] } : planFill(record, this.targets(), { overwrite: this.hasAttribute("overwrite") });
+    const targets = off ? null : this.targets();
+    if (targets && !targets.size) devWarn('no fields to fill. Add data-hmc-field="city" (and so on) to inputs, or name them like church_city.');
+    const { changes, empty } = targets ? planFill(record, targets, { overwrite: this.hasAttribute("overwrite") }) : { changes: [], empty: [] };
     if (!this.dispatchEvent(new CustomEvent("church-fill", { detail: { record, changes }, cancelable: true, bubbles: true, composed: true })) || off) return;
     applyFill(changes);
     this.say(this.t.filled(changes.length, empty));

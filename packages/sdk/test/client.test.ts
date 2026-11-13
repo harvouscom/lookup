@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createLookup, LookupError } from "../src/client.ts";
 
 const fake = (body: unknown, status = 200, headers: Record<string, string> = {}) => {
@@ -58,5 +58,44 @@ describe("client", () => {
     expect(sent[1]!.init.keepalive).toBe(true);
     await lookup.contribute("R-1", [{ field: "phone", value: "1" }]);
     expect(sent[2]!.init.keepalive).toBeUndefined();
+  });
+
+  // A fetch that answers only when aborted, the way a hung request behaves.
+  const hang = (() => (_: string, init?: RequestInit) => new Promise((_r, reject) => {
+    init?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")));
+  })) as unknown as () => typeof globalThis.fetch;
+  it("times out with a LookupError", async () => {
+    const err = await createLookup({ fetch: hang(), timeout: 20 }).search("grace").catch((e) => e);
+    expect(err).toBeInstanceOf(LookupError);
+    expect(err).toMatchObject({ status: 0, code: "timeout" });
+  });
+  it("still rejects with AbortError when the caller aborts", async () => {
+    const ctl = new AbortController();
+    const p = createLookup({ fetch: hang(), timeout: 5000 }).search("grace", { signal: ctl.signal }).catch((e) => e);
+    ctl.abort();
+    expect(await p).toMatchObject({ name: "AbortError" });
+  });
+});
+
+describe("setup hints", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it("warns once on a dev host when client is missing", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubGlobal("location", { hostname: "localhost" });
+    vi.resetModules();
+    const { createLookup: fresh } = await import("../src/client.ts");
+    fresh(); fresh(); fresh({ client: "my-app" });
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0]![0])).toMatch(/client="my-app"/);
+    warn.mockRestore();
+  });
+  it("stays quiet in production", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubGlobal("location", { hostname: "www.example.org" });
+    vi.resetModules();
+    const { createLookup: fresh } = await import("../src/client.ts");
+    fresh();
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 });

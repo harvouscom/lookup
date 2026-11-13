@@ -10,7 +10,7 @@ Wrap a service-times field in `<church-service-times>` to edit it as rows of day
 <church-service-times>
   <textarea name="times" data-hmc-field="serviceTimes"></textarea>
 </church-service-times>
-<script type="module" src="https://lookup.heresmychurch.com/service-times.js"></script>
+<script type="module" src="https://lookup.heresmychurch.com/sdk/0.4.0/service-times.js"></script>
 ```
 
 When `<church-lookup>` fills a `serviceTimes` field inside `<church-service-times>`, the rows update with it.

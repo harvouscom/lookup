@@ -1,5 +1,6 @@
 "use client"
 
+// Generated from packages/sdk/src/use-church-lookup.ts by scripts/build-registry.mjs. MIT.
 // useChurchLookup: Lookup's search engine as a React hook, for building your own church picker.
 // The debounce, settled search, "Show more", stale-result handling and record loading all live in
 // @/lib/lookup-core, the same engine the <church-lookup> element uses.

@@ -1,8 +1,10 @@
 // Types for <church-lookup> in any setup: the DOM tag and its events, and JSX for React <= 18,
 // Preact and Solid through the global JSX namespace. React 19 and Vue: also import the matching
 // "@heresmychurch/lookup/react" or "@heresmychurch/lookup/vue" types.
-import type { ChurchRecord, NewChurch, SearchResult } from "./client.ts";
+import type { ChurchRecord, Lookup, NewChurch, SearchResult } from "./client.ts";
+import type { FieldTarget } from "./dom.ts";
 import type { ChurchErrorDetail, ChurchLookup, FillChange } from "./element.ts";
+import type { Strings } from "./strings.ts";
 
 export interface ChurchLookupEventMap {
   /** `more` is true when the results came from "Show more". */
@@ -64,10 +66,31 @@ export interface ChurchLookupAttributes {
   ref?: unknown;
 }
 
+/**
+ * Event handlers as props, such as onchurch-select. React 19 and Preact add an `on<event>` prop on a
+ * custom element as a listener for that event, so `onchurch-fill={(e) => e.detail.record}` is typed.
+ */
+export type ChurchLookupEventProps = {
+  [K in keyof ChurchLookupEventMap as `on${K}`]?: (event: ChurchLookupEventMap[K]) => void;
+};
+
+/**
+ * Properties that take objects. React 19 and Preact set these on the element instead of as attributes
+ * when the element is already defined, so import "@heresmychurch/lookup/element" before rendering.
+ */
+export interface ChurchLookupProperties {
+  /** Fill fields the matcher wouldn't find: record field to an element or a CSS selector. */
+  fieldMap?: Record<string, FieldTarget | string>;
+  /** Text to change, in any language. */
+  strings?: Partial<Strings>;
+  /** Bring your own client, such as one with a custom fetch or timeout. */
+  lookup?: Lookup | null;
+}
+
 declare global {
   interface HTMLElementTagNameMap { "church-lookup": ChurchLookup }
   interface HTMLElementEventMap extends ChurchLookupEventMap {}
   namespace JSX {
-    interface IntrinsicElements { "church-lookup": ChurchLookupAttributes & Record<string, unknown> }
+    interface IntrinsicElements { "church-lookup": ChurchLookupAttributes & ChurchLookupEventProps & Record<string, unknown> }
   }
 }
