@@ -1,7 +1,8 @@
 // Run after `node scripts/build.mjs`, which `pnpm test` does. Checks the published types work for an
 // app: every export has a declaration, none import ".ts" files an app can't resolve, and an app finds
 // them under each moduleResolution TypeScript offers, including the older "node" (node10).
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -11,6 +12,13 @@ import { afterAll, describe, expect, it } from "vitest";
 const root = process.cwd();
 const pkg = JSON.parse(readFileSync(`${root}/package.json`, "utf8"));
 const tsc = createRequire(import.meta.url).resolve("typescript/bin/tsc");
+// Async, so a slow tsc never blocks the test worker long enough for Vitest's RPC to time out.
+const run = promisify(execFile);
+/** tsc's errors for a project, or "" when it type-checks. */
+async function tscErrors(project: string, cwd: string): Promise<string> {
+  try { await run(process.execPath, [tsc, "-p", project], { cwd }); return ""; }
+  catch (e) { return String((e as { stdout?: string }).stdout || e); }
+}
 
 // A throwaway app with the package in node_modules the way an install puts it: package.json and dist.
 const app = mkdtempSync(join(tmpdir(), "lookup-types-"));
@@ -31,12 +39,11 @@ writeFileSync(join(app, "node_modules/vue/package.json"), JSON.stringify({ name:
 writeFileSync(join(app, "node_modules/vue/index.d.ts"), "export type DefineComponent<P> = { new (): { $props: P } };\nexport interface GlobalComponents {}\n");
 afterAll(() => rmSync(app, { recursive: true, force: true }));
 
-function typecheck(moduleResolution: string, module: string, type: "module" | "commonjs", files = ["consumer.ts"]) {
+async function typecheck(moduleResolution: string, module: string, type: "module" | "commonjs", files = ["consumer.ts"]) {
   writeFileSync(join(app, "package.json"), JSON.stringify({ type }));
   const compilerOptions = { target: "ES2022", module, moduleResolution, lib: ["ES2022", "DOM", "DOM.Iterable"], types: [], strict: true, noEmit: true, skipLibCheck: false, jsx: "react-jsx" };
   writeFileSync(join(app, "tsconfig.json"), JSON.stringify({ compilerOptions, files }));
-  try { execFileSync(process.execPath, [tsc, "-p", "tsconfig.json"], { cwd: app, stdio: "pipe" }); return ""; }
-  catch (e) { return String((e as { stdout?: Buffer }).stdout ?? e); }
+  return tscErrors("tsconfig.json", app);
 }
 
 describe("published types", () => {
@@ -61,21 +68,21 @@ describe("published types", () => {
       expect(readFileSync(`${root}/dist/${f}`, "utf8"), f).not.toMatch(/(from|import\()\s*["']\.\/[^"']*\.ts["']/);
     }
   });
-  it("type-checks in an app with the original settings (self-reference)", () => {
-    expect(() => execFileSync(process.execPath, [tsc, "-p", "test/types/tsconfig.json"], { cwd: root, stdio: "pipe" })).not.toThrow();
+  it("type-checks in an app with the original settings (self-reference)", async () => {
+    expect(await tscErrors("test/types/tsconfig.json", root)).toBe("");
   }, 60_000);
   it.each([
     ["bundler", "esnext", "module"],
     ["node16", "node16", "module"],
     ["nodenext", "nodenext", "module"],
     ["node10", "commonjs", "commonjs"],
-  ] as const)("type-checks in an app with moduleResolution %s", (mr, m, type) => {
-    expect(typecheck(mr, m, type)).toBe("");
+  ] as const)("type-checks in an app with moduleResolution %s", async (mr, m, type) => {
+    expect(await typecheck(mr, m, type)).toBe("");
   }, 60_000);
-  it("types React 19 props, events and the hook", () => {
-    expect(typecheck("bundler", "esnext", "module", ["consumer-react.tsx"])).toBe("");
+  it("types React 19 props, events and the hook", async () => {
+    expect(await typecheck("bundler", "esnext", "module", ["consumer-react.tsx"])).toBe("");
   }, 60_000);
-  it("types Vue template events", () => {
-    expect(typecheck("bundler", "esnext", "module", ["consumer-vue.ts"])).toBe("");
+  it("types Vue template events", async () => {
+    expect(await typecheck("bundler", "esnext", "module", ["consumer-vue.ts"])).toBe("");
   }, 60_000);
 });

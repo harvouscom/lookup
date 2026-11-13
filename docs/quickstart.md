@@ -70,8 +70,8 @@ const { results } = await lookup.search("grace comm");
 const church = await lookup.getChurch(results[0].id);
 ```
 ```bash title="npm"
-# Coming soon. The package isn't published yet.
 npm install @heresmychurch/lookup
+# then, once in your app: import "@heresmychurch/lookup/element";
 ```
 :::
 
