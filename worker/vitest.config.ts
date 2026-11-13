@@ -11,6 +11,10 @@ export default defineWorkersConfig({
           compatibilityDate: "2026-10-01",
           compatibilityFlags: ["nodejs_compat"],
           d1Databases: ["DB"],
+          // The Cache API is a no-op here. The Worker writes to it in waitUntil, and that write can
+          // outlive a test and break isolated storage's cleanup (seen on Linux CI as a stray
+          // .sqlite-shm file). No test depends on a cache hit.
+          cache: false,
         },
       },
     },
