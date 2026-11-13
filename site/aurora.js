@@ -2,8 +2,8 @@
 // small WebGL shader at half resolution. It drifts with the globe's turn, pauses off-screen, and
 // renders one still frame for reduced motion. Without WebGL the header's own gradient shows.
 
-const VERT = `attribute vec2 p; void main() { gl_Position = vec4(p, 0.0, 1.0); }`;
-const FRAG = `
+export const AURORA_VERT = `attribute vec2 p; void main() { gl_Position = vec4(p, 0.0, 1.0); }`;
+export const AURORA_FRAG = `
 precision mediump float;
 uniform vec2 res;
 uniform float t;
@@ -40,16 +40,18 @@ void main() {
   gl_FragColor = vec4(col, max(col.r, max(col.g, col.b)));
 }`;
 
-export function createAurora(canvas, { view, horizon }) {
-  const gl = canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false, alpha: true });
-  if (!gl) { canvas.hidden = true; return { setRunning() {} }; }
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Compiles the shader on a WebGL canvas and draws one frame from explicit inputs, so other callers
+// (the product film in video/) can step it. Returns null without WebGL.
+export function createAuroraRenderer(canvas, { preserve = false } = {}) {
+  // preserve keeps the last frame readable, for callers that copy it out (frame capture).
+  const gl = canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false, alpha: true, preserveDrawingBuffer: preserve });
+  if (!gl) return null;
   const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
   const prog = gl.createProgram();
-  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
-  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, AURORA_VERT));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, AURORA_FRAG));
   gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.hidden = true; return { setRunning() {} }; }
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
   gl.useProgram(prog);
   const buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -58,24 +60,36 @@ export function createAurora(canvas, { view, horizon }) {
   gl.enableVertexAttribArray(loc);
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   const u = { res: gl.getUniformLocation(prog, "res"), t: gl.getUniformLocation(prog, "t"), shift: gl.getUniformLocation(prog, "shift"), floorY: gl.getUniformLocation(prog, "floorY") };
+  return {
+    /** t in seconds; shift follows the globe (lng × 0.006); floorY is where it fades out, 0..1 from the top. */
+    draw({ t, shift, floorY }) {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(u.res, canvas.width, canvas.height);
+      gl.uniform1f(u.t, t);
+      gl.uniform1f(u.shift, shift);
+      gl.uniform1f(u.floorY, floorY);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    },
+  };
+}
+
+export function createAurora(canvas, { view, horizon }) {
+  const r = createAuroraRenderer(canvas);
+  if (!r) { canvas.hidden = true; return { setRunning() {} }; }
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   let running = false, last = 0, floorY = 0.7;
   const t0 = performance.now();
   function resize() {
-    const r = canvas.getBoundingClientRect();
+    const b = canvas.getBoundingClientRect();
     // Half resolution: the glow is soft, so it costs a quarter of the pixels.
-    canvas.width = Math.max(1, Math.round(r.width * 0.5));
-    canvas.height = Math.max(1, Math.round(r.height * 0.5));
-    floorY = Math.min(1, (horizon() + 60) / Math.max(1, r.height));
+    canvas.width = Math.max(1, Math.round(b.width * 0.5));
+    canvas.height = Math.max(1, Math.round(b.height * 0.5));
+    floorY = Math.min(1, (horizon() + 60) / Math.max(1, b.height));
     draw(performance.now());
   }
   function draw(now) {
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.uniform2f(u.res, canvas.width, canvas.height);
-    gl.uniform1f(u.t, reduce ? 12 : (now - t0) / 1000);
-    gl.uniform1f(u.shift, view().lng * 0.006);
-    gl.uniform1f(u.floorY, floorY);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    r.draw({ t: reduce ? 12 : (now - t0) / 1000, shift: view().lng * 0.006, floorY });
   }
   function frame(now) {
     if (!running) return;

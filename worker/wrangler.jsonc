@@ -6,7 +6,9 @@
   "observability": { "enabled": false },
   "workers_dev": true,
   // /element.js, /lookup.js and /examples come from here; everything else runs the Worker.
-  "assets": { "directory": "../site", "binding": "ASSETS" },
+  // /video/* runs the Worker first: the homepage video streams from R2 (MEDIA) with byte ranges.
+  "assets": { "directory": "../site", "binding": "ASSETS", "run_worker_first": ["/video/*"] },
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "lookup-media" }],
   "routes": [{ "pattern": "lookup.heresmychurch.com", "custom_domain": true }],
   "d1_databases": [{ "binding": "DB", "database_name": "hmc-lookup", "database_id": "8728a664-c1df-4003-89a7-679693ac9adb" }],
   "version_metadata": { "binding": "CF_VERSION_METADATA" },

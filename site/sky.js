@@ -1,9 +1,11 @@
 // The header's night sky: faint seeded stars that turn with the globe, plus
 // the odd shooting star travelling the way the globe is spinning. Stays still for reduced motion.
+//
+// createSkyRenderer draws one frame from explicit inputs, so other callers (the product film in
+// video/) can step it frame by frame. createSky is the site's live sky built on it.
 
-export function createSky(canvas, { view, horizon }) {
+export function createSkyRenderer(canvas) {
   const ctx = canvas.getContext("2d");
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let seed = 11;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
@@ -12,16 +14,12 @@ export function createSky(canvas, { view, horizon }) {
     lng: rnd() * 360, y: Math.pow(rnd(), 1.15), r: rnd() < 0.07 ? 1.5 : rnd() < 0.35 ? 1 : 0.65,
     a: 0.12 + rnd() * 0.4, tw: rnd() * Math.PI * 2,
   }));
-  let W = 0, H = 0, dpr = 1, skyH = 0, running = false, last = 0, prevLng = null, spin = -1, nextShot = 0;
-  const shots = [];
+  let W = 0, H = 0, dpr = 1;
 
-  function resize() {
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    const r = canvas.getBoundingClientRect();
-    W = r.width; H = r.height;
+  /** Size in CSS pixels; the canvas backing store is that times dpr. */
+  function size(w, h, d) {
+    W = w; H = h; dpr = d;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-    skyH = Math.min(H, horizon() + 40);
-    draw(performance.now());
   }
 
   // About 110 degrees of sky across the header; it turns at half the globe's rate.
@@ -30,33 +28,59 @@ export function createSky(canvas, { view, horizon }) {
     let d = ((lng + v.lng * 0.5) % 360 + 540) % 360 - 180;
     return W / 2 + d * scale();
   };
-  const yOf = (y, v) => y * skyH + (v.lat + 16) * 0.6;
+  const yOf = (y, v, skyH) => y * skyH + (v.lat + 16) * 0.6;
 
-  function draw(t) {
-    const v = view();
+  /**
+   * view: the globe's { lat, lng }. skyH: the horizon line in CSS pixels. motion: false stills the
+   * twinkle. shots: shooting stars { t0, life, x, y, vx, vy } in ms and CSS pixels. alpha fades it all.
+   */
+  function draw({ t, view: v, skyH, motion = true, shots = [], alpha = 1 }) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     for (const s of stars) {
       const x = xOf(s.lng, v);
       if (x < -4 || x > W + 4) continue;
-      const y = yOf(s.y, v);
+      const y = yOf(s.y, v, skyH);
       const fade = Math.min(1, Math.max(0, (skyH - y) / 80));
-      const tw = reduce ? 1 : 0.72 + 0.28 * Math.sin(t / 900 + s.tw);
-      ctx.fillStyle = `rgba(226,220,255,${s.a * tw * fade})`;
+      const tw = motion ? 0.72 + 0.28 * Math.sin(t / 900 + s.tw) : 1;
+      ctx.fillStyle = `rgba(226,220,255,${s.a * tw * fade * alpha})`;
       ctx.fillRect(Math.round(x), Math.round(y), s.r, s.r);
     }
     for (const s of shots) {
       const k = (t - s.t0) / s.life;
+      if (k < 0 || k > 1) continue;
       const hx = s.x + s.vx * k, hy = s.y + s.vy * k;
       const tx = hx - s.vx * 0.22, ty = hy - s.vy * 0.22;
       const g = ctx.createLinearGradient(tx, ty, hx, hy);
       const a = Math.sin(Math.PI * Math.min(1, k));
       g.addColorStop(0, "rgba(196,181,253,0)");
-      g.addColorStop(1, `rgba(255,255,255,${0.9 * a})`);
+      g.addColorStop(1, `rgba(255,255,255,${0.9 * a * alpha})`);
       ctx.strokeStyle = g;
       ctx.lineWidth = 1.4;
       ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke();
     }
+  }
+
+  return { size, draw, rnd, get W() { return W; }, get H() { return H; } };
+}
+
+export function createSky(canvas, { view, horizon }) {
+  const r = createSkyRenderer(canvas);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Shooting stars draw from the same seeded sequence, after the stars.
+  const rnd = r.rnd;
+  let skyH = 0, running = false, last = 0, prevLng = null, spin = -1, nextShot = 0;
+  const shots = [];
+
+  function resize() {
+    const b = canvas.getBoundingClientRect();
+    r.size(b.width, b.height, Math.min(devicePixelRatio || 1, 2));
+    skyH = Math.min(b.height, horizon() + 40);
+    draw(performance.now());
+  }
+
+  function draw(t) {
+    r.draw({ t, view: view(), skyH, motion: !reduce, shots });
   }
 
   function frame(t) {
@@ -67,7 +91,7 @@ export function createSky(canvas, { view, horizon }) {
     if (t > nextShot) {
       // Shooting stars cross the upper sky, heading the way the globe turns.
       const dir = spin > 0 ? 1 : -1;
-      shots.push({ t0: t, life: 900 + rnd() * 500, x: W * (0.15 + rnd() * 0.7), y: skyH * (0.05 + rnd() * 0.35),
+      shots.push({ t0: t, life: 900 + rnd() * 500, x: r.W * (0.15 + rnd() * 0.7), y: skyH * (0.05 + rnd() * 0.35),
         vx: dir * (260 + rnd() * 180), vy: 90 + rnd() * 70 });
       nextShot = t + 3500 + rnd() * 5500;
     }

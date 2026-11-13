@@ -4,6 +4,7 @@ import { ask } from "./ask.ts";
 import { addChurch, confirm, contribute, contributableFields } from "./contribute.ts";
 import { COMPLETENESS_WEIGHTS, RECORD_FIELDS, toRecord, type ChurchRow } from "./record.ts";
 import { COUNTRIES, REGIONS } from "./regions.generated.ts";
+import { serveRange } from "./range.ts";
 import { search } from "./search.ts";
 import { EMBED_COLUMNS, upsertRows, type EmbedRow } from "./embed.ts";
 import { tick } from "./sync.ts";
@@ -19,6 +20,8 @@ export interface Env {
   RL_CONTRIB?: RateLimit;
   RL_ASK?: RateLimit;
   ASSETS?: Fetcher;
+  /** R2 bucket lookup-media: the homepage video. */
+  MEDIA?: R2Bucket;
   CF_VERSION_METADATA?: WorkerVersionMetadata;
   LOOKUP_INTERNAL_KEY?: string;
   /** Enables the /internal admin routes. Unset means they 404. */
@@ -242,6 +245,28 @@ export default {
 
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    // The homepage video, with byte ranges so it can seek (wrangler.jsonc routes /video/* here first).
+    if (url.pathname.startsWith("/video/") && (request.method === "GET" || request.method === "HEAD")) {
+      // MP4s live in R2 (bucket lookup-media), which handles Range natively; the poster and thumbnail stay in site/.
+      if (url.pathname.endsWith(".mp4") && env.MEDIA) {
+        const obj = await env.MEDIA.get(url.pathname.slice(1), { range: request.headers, onlyIf: request.headers });
+        if (!obj) return new Response("Not found", { status: 404 });
+        const headers = new Headers();
+        obj.writeHttpMetadata(headers);
+        headers.set("etag", obj.httpEtag);
+        headers.set("accept-ranges", "bytes");
+        if (!("body" in obj)) return new Response(null, { status: 304, headers });
+        const r = obj.range as { offset?: number; length?: number } | undefined;
+        if (request.headers.has("range") && r && r.offset !== undefined && r.length !== undefined) {
+          headers.set("content-range", `bytes ${r.offset}-${r.offset + r.length - 1}/${obj.size}`);
+          headers.set("content-length", String(r.length));
+          return new Response(request.method === "HEAD" ? null : obj.body, { status: 206, headers });
+        }
+        headers.set("content-length", String(obj.size));
+        return new Response(request.method === "HEAD" ? null : obj.body, { status: 200, headers });
+      }
+      if (env.ASSETS) return serveRange(request, env.ASSETS);
+    }
     if (url.pathname.startsWith("/internal/")) {
       try { return await handleAdmin(request, env, url.pathname.replace(/\/+$/, "")); }
       catch (e) { return fail(500, String((e as Error).message ?? e).slice(0, 300)); }

@@ -554,3 +554,66 @@ markScrolled();
   const deep = location.hash.match(/^#example\/([a-z]+)(?:\/([a-z]+))?$/);
   if (deep) open(deep[1], $(`.ex-card[data-ex="${deep[1]}"]`), deep[2]);
 })();
+
+// ── The video: the hero's thumbnail opens a lightbox with the same Plyr player and settings as harvous.com.
+// Plyr (self-hosted in /vendor/plyr) loads on first open, so a visit that never plays never downloads it. ──
+(function videoLightbox() {
+  const trigger = $("#video-open"), lb = $("#video-lb"), video = $("#video-video");
+  if (!trigger || !lb || !video) return;
+  const closeBtn = $(".video-lb-close", lb);
+  // Harvous's src/lib/plyr-options.ts.
+  const OPTIONS = {
+    controls: ["play-large", "play", "progress", "current-time", "duration", "mute", "volume", "settings", "fullscreen"],
+    settings: ["speed"],
+    speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
+    hideControls: true,
+    keyboard: { focused: true, global: false },
+    tooltips: { controls: true, seek: true },
+    iconUrl: "/vendor/plyr/plyr.svg",
+    blankVideo: "",
+  };
+  let player = null, loading = null, previousFocus = null;
+
+  const loadPlyr = () => loading ??= (() => {
+    const css = document.createElement("link");
+    css.rel = "stylesheet"; css.href = "/vendor/plyr/plyr.css";
+    document.head.append(css);
+    return import("/vendor/plyr/plyr.min.mjs").then((m) => m.default);
+  })();
+
+  const focusables = () => [...lb.querySelectorAll('button:not([disabled]), [href], input, select, [tabindex]:not([tabindex="-1"])')]
+    .filter((el) => el.offsetParent !== null);
+
+  async function open() {
+    previousFocus = document.activeElement;
+    lb.hidden = false;
+    document.body.style.overflow = "hidden";
+    closeBtn.focus();
+    try {
+      const Plyr = await loadPlyr();
+      player ??= new Plyr(video, OPTIONS);
+    } catch { video.controls = true; }
+    // Plyr only returns a promise once it's ready; before that it queues the play.
+    const played = player ? player.play() : video.play();
+    if (played && typeof played.catch === "function") played.catch(() => {});
+  }
+
+  function close() {
+    lb.hidden = true;
+    document.body.style.overflow = "";
+    if (player) player.pause(); else video.pause();
+    previousFocus?.focus?.();
+    previousFocus = null;
+  }
+
+  trigger.addEventListener("click", open);
+  $$("[data-video-close]", lb).forEach((el) => el.addEventListener("click", close));
+  lb.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key !== "Tab") return;
+    const f = focusables();
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  });
+})();

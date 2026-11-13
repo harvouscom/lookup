@@ -50,6 +50,10 @@
     <div class="try">
       <church-lookup id="hero-search" name="church" contribute="off" label="Find a church" placeholder="Search for a church" form="result-form" overwrite limit="6"></church-lookup>
     </div>
+    <button type="button" class="watch" id="video-open" aria-label="This is Lookup: watch the 57 second video. Opens a video player" aria-haspopup="dialog">
+      <span class="watch-thumb" aria-hidden="true"><img src="/video/thumb.jpg" alt="" width="80" height="45"><span class="watch-ic"><svg viewBox="0 0 16 16" width="9" height="9"><path d="M4.5 2.8v10.4c0 .6.7 1 1.2.7l8.2-5.2c.5-.3.5-1 0-1.3L5.7 2.1c-.5-.3-1.2.1-1.2.7z" fill="currentColor"/></svg></span></span>
+      <span class="watch-label">This is Lookup</span><span class="watch-t">0:57</span>
+    </button>
   </div>
   <div class="horizon" aria-hidden="true">
     <span class="orbit o1"></span><span class="orbit o2"></span>
@@ -281,6 +285,14 @@ pnpm dlx shadcn@latest add <span class="s">https://lookup.heresmychurch.com/r/ch
     <iframe id="exm-frame" title="Example app" loading="lazy"></iframe>
   </div>
 </dialog>
+<!-- The video, in a lightbox with the Plyr player Harvous uses (loaded on first open). -->
+<div class="video-lb" id="video-lb" role="dialog" aria-modal="true" aria-label="This is Lookup" hidden>
+  <div class="video-lb-backdrop" data-video-close aria-hidden="true"></div>
+  <div class="video-lb-panel">
+    <button type="button" class="video-lb-close" data-video-close aria-label="Close video"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke-linecap="round"/></svg></button>
+    <video class="video-lb-video" id="video-video" playsinline preload="none" poster="/video/poster.jpg"><source src="/video/lookup.mp4" type="video/mp4"></video>
+  </div>
+</div>
 <script type="module" src="/element.js"></script>
 <script type="module" src="/service-times.js"></script>
 <script type="module" src="/site.js"></script>
