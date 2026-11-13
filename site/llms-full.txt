@@ -116,8 +116,8 @@ const church = await lookup.getChurch(results[0].id);
 npm:
 
 ```bash
-# Coming soon. The package isn't published yet.
 npm install @heresmychurch/lookup
+# then, once in your app: import "@heresmychurch/lookup/element";
 ```
 
 ## 3. Try it
@@ -358,7 +358,7 @@ Add a church picker to this React + shadcn/ui app using Lookup by Here's My Chur
 Check: type "grac", pick a church, the tagged fields fill and handleSubmit receives church_id.
 ```
 
-Not on shadcn/ui? Use the element with `onchurch-select` props in React 19 (see [the widget](/docs/widget#in-your-form)), or build your own picker with `useChurchLookup` from `@heresmychurch/lookup/react` once the package is on npm.
+Not on shadcn/ui? Use the element with `onchurch-select` props in React 19 (see [the widget](/docs/widget#in-your-form)), or build your own picker with `useChurchLookup` from `@heresmychurch/lookup/react` (`npm install @heresmychurch/lookup`).
 
 ## Install
 

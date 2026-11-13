@@ -78,8 +78,8 @@ const church = await lookup.getChurch(results[0].id);
 npm:
 
 ```bash
-# Coming soon. The package isn't published yet.
 npm install @heresmychurch/lookup
+# then, once in your app: import "@heresmychurch/lookup/element";
 ```
 
 ## 3. Try it
