@@ -20,7 +20,7 @@ export const MAX_RESULTS = 50;
 
 /** A record field as the text a form field should hold, or null when the directory has nothing. */
 export function fieldValue(record: ChurchRecord, field: string): string | null {
-  const v = field === "id" ? record.id : record.fields[field];
+  const v = field === "id" ? record.id : (record.fields as unknown as Record<string, unknown>)[field];
   if (v == null) return null;
   if (Array.isArray(v)) return v.length ? v.join(", ") : null;
   if (typeof v === "object") return (v as { raw?: string | null }).raw ?? null;

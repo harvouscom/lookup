@@ -1,6 +1,6 @@
 // Type-checked by types.test.ts the way an app would see the package: through its exports, with no
 // allowImportingTsExtensions and full library checking.
-import { createLookup, LookupError, type SearchResponse } from "@heresmychurch/lookup";
+import { createLookup, LookupError, type ChurchField, type ChurchRecord, type SearchResponse } from "@heresmychurch/lookup";
 import { createLookupController, findTargets, type ControllerState } from "@heresmychurch/lookup/core";
 import { matchField } from "@heresmychurch/lookup/fields";
 import "@heresmychurch/lookup/element";
@@ -20,3 +20,14 @@ el.addEventListener("church-select", (e) => e.detail.result.id);
 el.addEventListener("church-fill", (e) => e.detail.record.fields.name);
 const err = new LookupError(429, "slow down", 60);
 void [res, err.retryAfter, el.value];
+
+// Record fields are typed, so an app reads them without casts.
+declare const rec: ChurchRecord;
+const city: string | null = rec.fields.city;
+const lat: number = rec.fields.latitude;
+const langs: string[] = rec.fields.languages;
+const day: number | undefined = rec.fields.serviceTimes.slots[0]?.dayOfWeek;
+const field: ChurchField = "pastorName";
+// @ts-expect-error not a record field
+rec.fields.nope;
+void [city, lat, langs, day, field];

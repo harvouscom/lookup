@@ -31,6 +31,8 @@ Add a church picker to this React + shadcn/ui app using Lookup by Here's My Chur
 Check: type "grac", pick a church, the tagged fields fill and handleSubmit receives church_id.
 :::
 
+Not on shadcn/ui? Use the element with `onchurch-select` props in React 19 (see [the widget](/docs/widget#in-your-form)), or build your own picker with `useChurchLookup` from `@heresmychurch/lookup/react` (`npm install @heresmychurch/lookup`).
+
 ## Install
 
 ```bash

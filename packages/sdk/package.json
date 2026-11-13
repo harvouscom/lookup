@@ -1,56 +1,169 @@
 {
   "name": "@heresmychurch/lookup",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Church typeahead and autofill from the Here's My Church directory: a small client and a <church-lookup> element.",
+  "keywords": [
+    "church",
+    "churches",
+    "autocomplete",
+    "typeahead",
+    "autofill",
+    "address",
+    "web-component",
+    "custom-element",
+    "form",
+    "heres-my-church"
+  ],
+  "homepage": "https://lookup.heresmychurch.com/docs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harvouscom/lookup.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/harvouscom/lookup/issues"
+  },
   "license": "MIT",
   "type": "module",
   "sideEffects": [
     "./dist/element.js",
+    "./dist/element.cjs",
     "./dist/service-times.js",
-    "./dist/strings-*.js"
+    "./dist/service-times.cjs",
+    "./dist/strings-*.js",
+    "./dist/strings-*.cjs"
   ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./core": {
-      "types": "./dist/core.d.ts",
-      "default": "./dist/core.js"
+      "import": {
+        "types": "./dist/core.d.ts",
+        "default": "./dist/core.js"
+      },
+      "require": {
+        "types": "./dist/core.d.cts",
+        "default": "./dist/core.cjs"
+      }
     },
     "./fields": {
-      "types": "./dist/fields.d.ts",
-      "default": "./dist/fields.js"
+      "import": {
+        "types": "./dist/fields.d.ts",
+        "default": "./dist/fields.js"
+      },
+      "require": {
+        "types": "./dist/fields.d.cts",
+        "default": "./dist/fields.cjs"
+      }
     },
     "./element": {
-      "types": "./dist/element.d.ts",
-      "default": "./dist/element.js"
+      "import": {
+        "types": "./dist/element.d.ts",
+        "default": "./dist/element.js"
+      },
+      "require": {
+        "types": "./dist/element.d.cts",
+        "default": "./dist/element.cjs"
+      }
     },
     "./service-times": {
-      "types": "./dist/service-times.d.ts",
-      "default": "./dist/service-times.js"
+      "import": {
+        "types": "./dist/service-times.d.ts",
+        "default": "./dist/service-times.js"
+      },
+      "require": {
+        "types": "./dist/service-times.d.cts",
+        "default": "./dist/service-times.cjs"
+      }
     },
     "./react": {
-      "types": "./dist/react.d.ts"
+      "import": {
+        "types": "./dist/react.d.ts",
+        "default": "./dist/react.js"
+      },
+      "require": {
+        "types": "./dist/react.d.cts",
+        "default": "./dist/react.cjs"
+      }
     },
     "./vue": {
       "types": "./dist/vue.d.ts"
     },
     "./strings/*": {
-      "types": "./dist/strings-*.d.ts",
-      "default": "./dist/strings-*.js"
+      "import": {
+        "types": "./dist/strings-*.d.ts",
+        "default": "./dist/strings-*.js"
+      },
+      "require": {
+        "types": "./dist/strings-*.d.cts",
+        "default": "./dist/strings-*.cjs"
+      }
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "core": [
+        "./dist/core.d.ts"
+      ],
+      "fields": [
+        "./dist/fields.d.ts"
+      ],
+      "element": [
+        "./dist/element.d.ts"
+      ],
+      "service-times": [
+        "./dist/service-times.d.ts"
+      ],
+      "react": [
+        "./dist/react.d.ts"
+      ],
+      "vue": [
+        "./dist/vue.d.ts"
+      ],
+      "strings/*": [
+        "./dist/strings-*.d.ts"
+      ]
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node scripts/build.mjs && vitest run"
+    "test": "node scripts/build.mjs && vitest run",
+    "prepublishOnly": "pnpm test"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@types/react": "^19.2.2",
     "esbuild": "^0.25.0",
     "happy-dom": "^18.0.0",
+    "react": "^19.2.0",
     "vitest": "~3.2.0"
   }
 }

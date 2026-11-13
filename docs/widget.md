@@ -75,7 +75,7 @@ It also asks for smarter results when people pause. Change the options below to 
 
 ## In your form
 
-It's a real form field. Give it a `name` and the chosen church's ID submits with your form, so you can store the ID and look the church up again later. React and Vue get types for the tag and its events.
+It's a real form field. Give it a `name` and the chosen church's ID submits with your form, so you can store the ID and look the church up again later. React and Vue get types for the tag and its events. React 19 adds `onchurch-select` and other `onchurch-*` props as event listeners; React 18 needs them added in an effect.
 
 :::tabs Form example
 ```html title="html form"
@@ -86,10 +86,25 @@ It's a real form field. Give it a `name` and the chosen church's ID submits with
 </form>
 <!-- Posts church_id=CA-ON-56994145&city=Thorold -->
 ```
-```tsx title="react"
+```tsx title="react 19"
 "use client"; // Next.js: load the element in a client component.
 import "@heresmychurch/lookup/element";
-import type {} from "@heresmychurch/lookup/react";
+import type {} from "@heresmychurch/lookup/react"; // types the props and onchurch-* events
+
+function ChurchField({ onChange }) {
+  return (
+    <church-lookup
+      name="church_id"
+      lang="es"
+      onchurch-select={(e) => onChange(e.detail.result.id)}
+      onchurch-clear={() => onChange("")}
+    />
+  );
+}
+```
+```tsx title="react 18"
+"use client"; // Next.js: load the element in a client component.
+import "@heresmychurch/lookup/element";
 
 function ChurchField({ onChange }) {
   const ref = useRef(null);
@@ -106,6 +121,16 @@ function ChurchField({ onChange }) {
   }, [onChange]);
   return <church-lookup ref={ref} name="church_id" lang="es" />;
 }
+```
+```vue title="vue"
+<script setup lang="ts">
+import "@heresmychurch/lookup/element";
+import type {} from "@heresmychurch/lookup/vue";
+</script>
+
+<template>
+  <church-lookup name="church_id" @church-select="(e) => (churchId = e.detail.result.id)" @church-clear="churchId = ''" />
+</template>
 ```
 :::
 

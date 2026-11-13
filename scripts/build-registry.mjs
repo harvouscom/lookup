@@ -2,6 +2,8 @@
 // 1. registry/lib/lookup-core.ts: the SDK's headless core (client, fill, fields, consent, strings) as
 //    one file, so `shadcn add` gives people the code itself. Generated; edit packages/sdk/src instead.
 //    registry/lib/lookup-strings.ts: the other languages, registered when imported.
+//    registry/hooks/use-church-lookup.ts: the SDK's useChurchLookup (packages/sdk/src/use-church-lookup.ts),
+//    importing the core above. Generated too.
 // 2. examples/shadcn-demo/src: verbatim copies of the registry files, so the demo runs what ships.
 // 3. site/r/*.json: `shadcn build` over registry.json.
 //
@@ -25,7 +27,7 @@ function libSource() {
   return `// Lookup by Here's My Church, headless core v${version}. Generated from @heresmychurch/lookup
 // (packages/sdk/src) by scripts/build-registry.mjs. MIT. https://lookup.heresmychurch.com/docs
 /* eslint-disable */
-${["client.ts", "dom.ts", "strings.ts", "fields.ts", "core.ts"].map((f) => `\n// ── ${f} ──\n${strip(src(f))}`).join("")}`;
+${["dev.ts", "client.ts", "dom.ts", "strings.ts", "fields.ts", "core.ts"].map((f) => `\n// ── ${f} ──\n${strip(src(f))}`).join("")}`;
 }
 
 /** Every language file, each in its own block so their helpers don't collide. */
@@ -43,14 +45,27 @@ import { registerStrings, type Strings } from "@/lib/lookup-core"
 ${body}`;
 }
 
+/** The hook, pointed at the registry's copy of the core. */
+function hookSource() {
+  const code = src("use-church-lookup.ts");
+  const out = code
+    .replace('from "./core.ts"', 'from "@/lib/lookup-core"')
+    .replace("// the headless core, the same engine", "// @/lib/lookup-core, the same engine")
+    .replace(/^(\/\/ useChurchLookup:)/m, "// Generated from packages/sdk/src/use-church-lookup.ts by scripts/build-registry.mjs. MIT.\n$1");
+  if (out.includes("./core.ts")) throw new Error("use-church-lookup.ts: core import not rewritten");
+  return out;
+}
+
 /** Each generated file and what it should hold. The demo gets the registry files as they are. */
 function outputs() {
   const lib = libSource();
   const strings = stringsSource();
-  const files = new Map([["registry/lib/lookup-core.ts", lib], ["registry/lib/lookup-strings.ts", strings]]);
-  for (const f of ["components/church-lookup.tsx", "components/church-consent.tsx", "hooks/use-church-lookup.ts"]) {
+  const hook = hookSource();
+  const files = new Map([["registry/lib/lookup-core.ts", lib], ["registry/lib/lookup-strings.ts", strings], ["registry/hooks/use-church-lookup.ts", hook]]);
+  for (const f of ["components/church-lookup.tsx", "components/church-consent.tsx"]) {
     files.set(`examples/shadcn-demo/src/${f}`, readFileSync(`registry/${f}`, "utf8"));
   }
+  files.set("examples/shadcn-demo/src/hooks/use-church-lookup.ts", hook);
   files.set("examples/shadcn-demo/src/lib/lookup-core.ts", lib);
   files.set("examples/shadcn-demo/src/lib/lookup-strings.ts", strings);
   return files;
