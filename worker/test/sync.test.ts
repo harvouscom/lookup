@@ -1,6 +1,7 @@
 import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
-import { pickRegions, tick } from "../src/sync.ts";
+import { toRecord, type ChurchRow } from "../src/record.ts";
+import { pickRegions, tick, writeChurch } from "../src/sync.ts";
 import { seed } from "./seed.ts";
 import schema from "../schema.sql?raw";
 
@@ -89,6 +90,25 @@ describe("tick", () => {
     const again = await tick(fakeEnv({ TX: exportTx }), ["TX"]);
     expect(again.regions[0], JSON.stringify(again.regions[0])).toMatchObject({ inserted: 0, updated: 0, deleted: 0, embedQueued: 0 });
     expect(upserts.flat()).toEqual([]);
+  });
+  it("carries claimed from the export into D1 and the record, and clears it when it's gone", async () => {
+    const exportTx = [
+      tx("R-0", "Grace Community Church", { website: "https://grace.example", address: "1 Main, 75201", postcode: "75201", serviceTimes: "Sun 10:30 AM" }),
+      tx("R-2", "First Baptist Church of Dallas"), tx("R-4", "Saint Mary's Catholic Church"), tx("R-7", "Church at the Cross", { claimed: true }),
+    ];
+    await tick(fakeEnv({ TX: exportTx }), ["TX"]);
+    const row = (id: string) => env.DB.prepare("SELECT * FROM church WHERE id = ?").bind(id).first<ChurchRow>();
+    expect((await row("R-7"))!.claimed).toBe(1);
+    expect(toRecord((await row("R-7"))!).claimed).toBe(true);
+    expect(toRecord((await row("R-0"))!).claimed).toBe(false);
+    // Unclaimed: the field is simply absent from the export.
+    exportTx[3] = tx("R-7", "Church at the Cross");
+    const again = await tick(fakeEnv({ TX: exportTx }), ["TX"]);
+    expect(again.regions[0]).toMatchObject({ updated: 1, embedQueued: 0 });
+    expect(toRecord((await row("R-7"))!).claimed).toBe(false);
+    // A church written back after a contribution carries it too.
+    await writeChurch(env, tx("R-2", "First Baptist Church of Dallas", { claimed: true }) as never, "TX");
+    expect(toRecord((await row("R-2"))!).claimed).toBe(true);
   });
   it("skips deletes when a region shrinks by more than half", async () => {
     const out = await tick(fakeEnv({ TX: [tx("R-0", "Grace Community Church")] }), ["TX"]);

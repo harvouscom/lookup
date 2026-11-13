@@ -1,13 +1,16 @@
 // Contributions and confirmations: people's corrections flow back to Here's My Church through its
 // internal Lookup routes. Every field gets its own status so the widget can say exactly what happened:
-//   live         applied now (fields that go live on one vote)
-//   in_review    waits for a Here's My Church moderator
+//   live         applied now (a blank field filled, or a change Here's My Church's checks approved at once)
+//   in_review    held: checked automatically, or by the church when it has claimed its listing, with a
+//                Here's My Church reviewer for whatever the checks can't decide
 //   not_applied  accepted, but the stored value didn't change (consensus kept the old one)
 //   rejected     Here's My Church refused it (a 4xx), with its reason
 //   try_again    a temporary problem (maintenance, rate limit, outage): nothing was lost or refused
 //   coming_soon  a field Lookup will accept once Here's My Church does (name, until it deploys)
 // A change that goes live comes back with the updated church, which is written straight into D1 so
 // search and the record show it before the next sync. Adding a church works the same way.
+// A held result can carry reviewBy: "church" when the church itself reviews it (a claimed listing).
+// That's purely additive: the status is still in_review.
 import type { ExportChurch } from "./project.ts";
 import { tokenize } from "./project.ts";
 import { CONTRIBUTABLE_FIELDS } from "./record.ts";
@@ -31,7 +34,9 @@ export interface ContributeEnv {
 }
 
 export type FieldStatus = "live" | "in_review" | "not_applied" | "rejected" | "try_again" | "coming_soon";
-export interface FieldResult { field: string; status: FieldStatus; message?: string }
+/** Who reviews a held change, when Here's My Church says. Only "church" so far: a claimed listing. */
+export type ReviewBy = "church";
+export interface FieldResult { field: string; status: FieldStatus; message?: string; reviewBy?: ReviewBy }
 
 const HMC = "https://api.heresmychurch.com/internal/lookup";
 const CLIENT_RE = /^[a-z0-9][a-z0-9-]{1,39}$/;
@@ -56,7 +61,7 @@ export const nameOpen = (env: ContributeEnv) => env.NAME_CONTRIBUTIONS === "true
 
 /** The contributable-field table for /v1/meta, with name marked coming soon until it's accepted. */
 export function contributableFields(env: ContributeEnv) {
-  const out: Record<string, { countries: "all" | readonly string[]; review: string; status?: "coming_soon" }> = {};
+  const out: Record<string, { countries: "all" | readonly string[]; review: string; checks: string; status?: "coming_soon" }> = {};
   for (const [k, v] of Object.entries(CONTRIBUTABLE_FIELDS)) out[k] = k === "name" && !nameOpen(env) ? { ...v, status: "coming_soon" } : { ...v };
   return out;
 }
@@ -87,12 +92,15 @@ async function errorText(res: Response): Promise<string> {
   try { const b = (await res.json()) as { error?: string }; return b.error ?? `HTTP ${res.status}`; } catch { return `HTTP ${res.status}`; }
 }
 
-/** Map one Here's My Church response to a field status. 503 and 429 are never "rejected". */
-export async function statusFrom(res: Response): Promise<{ status: FieldStatus; message?: string; church?: ExportChurch }> {
+/**
+ * Map one Here's My Church response to a field status. 503 and 429 are never "rejected".
+ * `reviewBy` passes through when Here's My Church names who reviews a held change ("church").
+ */
+export async function statusFrom(res: Response): Promise<{ status: FieldStatus; message?: string; reviewBy?: ReviewBy; church?: ExportChurch }> {
   if (res.ok) {
-    const b = (await res.json().catch(() => ({}))) as { applied?: boolean; needsModeration?: boolean; church?: ExportChurch };
+    const b = (await res.json().catch(() => ({}))) as { applied?: boolean; needsModeration?: boolean; reviewBy?: unknown; church?: ExportChurch };
     const status: FieldStatus = b.needsModeration ? "in_review" : b.applied ? "live" : "not_applied";
-    return { status, ...(status === "live" && isExport(b.church) ? { church: b.church } : {}) };
+    return { status, ...(b.reviewBy === "church" ? { reviewBy: "church" as const } : {}), ...(status === "live" && isExport(b.church) ? { church: b.church } : {}) };
   }
   if (res.status === 503 || res.status === 429 || res.status >= 500) {
     return { status: "try_again", message: res.status === 429 ? "Too many changes right now. Try again later." : "Here's My Church is busy for a moment. Try again shortly." };
@@ -237,7 +245,8 @@ export async function contribute(env: ContributeEnv, id: string, ip: string, inp
     if (p.result) continue;
     const review = CONTRIBUTABLE_FIELDS[p.hmcField].review;
     // The demo client is checked like any other but never reaches Here's My Church.
-    if (sandbox) { p.result = { status: review === "moderated" ? "in_review" : "live" }; continue; }
+    // On a claimed listing everything goes to the church first, as Here's My Church would hold it.
+    if (sandbox) { p.result = row.claimed ? { status: "in_review", reviewBy: "church" } : { status: review === "moderated" ? "in_review" : "live" }; continue; }
     try {
       const res = await postHmc(env, "/suggestions", { client, ipHash: hash, churchId: id, field: p.hmcField, value: p.value }, wait);
       const { church, ...status } = await statusFrom(res);

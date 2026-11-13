@@ -24,7 +24,7 @@ Church tools keep asking people for the same details. Lookup fills them in from 
 
 1. **Search as you type.** Prefixes, typos and places like "church in dallas" all work, nearby churches first.
 2. **Fill your form.** Pick a church and the empty fields you tagged with `data-hmc-field` fill in. Anything already typed is left alone.
-3. **Share fixes back.** When someone corrects a detail Lookup filled, they can share it back to Here's My Church, one checked box at a time.
+3. **Share fixes back.** When someone corrects a detail Lookup filled, they can share it back to Here's My Church, one checked box at a time. A church that has claimed its listing reviews changes to it first. Otherwise Here's My Church checks them automatically, for example against the church's own website, where AI locates a quote and code confirms it, and a person reviews whatever the checks can't decide.
 
 Because every pick comes from the same open directory, each app that uses Lookup helps keep church data accurate.
 

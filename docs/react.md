@@ -116,7 +116,7 @@ pnpm dlx shadcn@latest add https://lookup.heresmychurch.com/r/church-consent.jso
 <ChurchConsent record={record} values={form.watch()} labels={{ phone: "Phone" }} client="my-app" />
 ```
 
-It shows only fields Here's My Church accepts for that church's country. Changed fields start checked, `street`, `city` and `postalCode` show as one Address row, each says whether it goes live or waits for a moderator, and nothing is sent until the person chooses Share. A checked `data-hmc-share` checkbox in the submitted form sends them too, without blocking the submit. When nothing changed, it asks "Still correct?" of listings nobody confirmed this year. It also offers **Report a problem** and a link to fix anything else on Here's My Church.
+It shows only fields Here's My Church accepts for that church's country. Changed fields start checked, `street`, `city` and `postalCode` show as one Address row, each says whether it goes live, is checked automatically or goes to the church first (a claimed listing), and nothing is sent until the person chooses Share. A checked `data-hmc-share` checkbox in the submitted form sends them too, without blocking the submit. When nothing changed, it asks "Still correct?" of listings nobody confirmed this year. It also offers **Report a problem** and a link to fix anything else on Here's My Church.
 
 ## Your own UI
 

@@ -12,17 +12,24 @@ Its map counts every listing, about 655,000. Lookup leaves out about 68,000 that
 
 ## Sharing fixes back
 
-When someone changes a detail Lookup filled, the widget offers to share it. Changed fields start checked, each says whether it goes live or waits for a moderator, and nothing is sent until they choose **Share** (or submit your form with a checked [`data-hmc-share`](/docs/widget#share-on-submit) box). Your form's own submit is never blocked.
+When someone changes a detail Lookup filled, the widget offers to share it. Changed fields start checked, each says what will happen to it ("Goes live", "Checked automatically" or "The church reviews this"), and nothing is sent until they choose **Share** (or submit your form with a checked [`data-hmc-share`](/docs/widget#share-on-submit) box). Your form's own submit is never blocked.
 
-| Field | Where | Review |
+**Claimed listings come first.** When a church has claimed its listing on Here's My Church (verified its listed inbox), everyone else's changes go to the church to review. The record says `claimed: true`, and each held change comes back with `reviewBy: "church"`.
+
+**Filling a blank field** goes live on one vote, with an automatic spam check afterwards. Email and pastor name are the exception: from Lookup they're always held, since a host's form can hold someone's personal details.
+
+**Replacing a value that's already listed**, or reporting a problem, is held and checked automatically by Here's My Church:
+
+| Field | Approved when | Otherwise |
 |---|---|---|
-| Service times, denomination, languages, ministries | Everywhere | Live on one vote |
-| Phone | Everywhere | Live on one vote |
-| Website | Everywhere | Waits for a moderator |
-| Address (street, city and postal code, sent together) | Everywhere | Waits for a moderator |
-| Email, pastor name | Everywhere | Always waits for a moderator, since a host's form can hold someone's personal details |
-| Closed, duplicate or moved reports | Everywhere | Waits for a moderator |
-| Name | Coming soon | Will wait for a moderator |
+| Phone, service times | It appears on the church's own website, two or more people independently send the same value, or after three quiet days | A Here's My Church reviewer decides |
+| Denomination, languages, ministries (additions only) | People agree, it passes the naming rules, or after three quiet days | A Here's My Church reviewer decides |
+| Name, website, address (street, city and postal code, sent together) | There's evidence: the church's own website, a small spelling fix to a name, an address within 150 m of the map pin | A Here's My Church reviewer decides |
+| Email, pastor name | There's evidence, such as the church's own website | A Here's My Church reviewer decides |
+| Closed or duplicate reports | Strong evidence. The listing is hidden, not deleted, so it can come back | A Here's My Church reviewer decides |
+| Moved reports | Never automatically | A Here's My Church reviewer decides |
+
+Name corrections are coming soon through Lookup. The checks never let AI approve anything: where they read the church's website, an AI model only points to the sentence that should hold the value, and code confirms that the quote is really on the page and contains the value. `/v1/meta` lists each field with `checks`: `"automatic"`, `"automatic-then-reviewer"` or `"reviewer"`.
 
 A change that goes live shows in Lookup's search and records within seconds, without waiting for the next sync.
 

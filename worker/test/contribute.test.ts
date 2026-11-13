@@ -86,6 +86,27 @@ describe("contributions", () => {
     expect((still.body as any).results[0].status).toBe("try_again");
     expect(b.calls).toHaveLength(2);
   });
+  it("keeps a maintenance 503 as try again, even with a claimed-listing answer around it", async () => {
+    const { fetcher } = hmcStub(maintenance(), maintenance(), Response.json({ success: true, applied: false, needsModeration: true, reviewBy: "church" }));
+    const out = await contribute(makeEnv(fetcher), "R-0", "ip", { client: "acme", changes: [{ field: "denomination", value: "Anglican" }, { field: "ministries", value: "Choir" }] }, noWait);
+    const results = (out.body as any).results;
+    expect(results.map((r: any) => r.status)).toEqual(["try_again", "in_review"]);
+    expect(results[0].reviewBy).toBeUndefined();
+    expect(results[0].message).toContain("busy");
+  });
+  it("passes reviewBy through when the church reviews a held change", async () => {
+    const { fetcher } = hmcStub(
+      Response.json({ success: true, applied: false, needsModeration: true, reviewBy: "church" }),
+      Response.json({ success: true, applied: false, needsModeration: true }),
+      Response.json({ success: true, applied: false, needsModeration: true, reviewBy: "someone-else" }),
+    );
+    const out = await contribute(makeEnv(fetcher), "R-0", "ip", { client: "acme", changes: [{ field: "denomination", value: "Anglican" }, { field: "website", value: "https://w.example" }, { field: "ministries", value: "Choir" }] }, noWait);
+    expect((out.body as any).results).toEqual([
+      { field: "denomination", status: "in_review", reviewBy: "church" },
+      { field: "website", status: "in_review" },
+      { field: "ministries", status: "in_review" },
+    ]);
+  });
   it("treats rate limits and outages as try again", async () => {
     const { fetcher } = hmcStub(Response.json({ error: "Too many" }, { status: 429 }), new Response("boom", { status: 502 }));
     const out = await contribute(makeEnv(fetcher), "R-0", "ip", { client: "acme", changes: [{ field: "denomination", value: "A" }, { field: "ministries", value: "Youth" }] }, noWait);
@@ -174,6 +195,12 @@ describe("contributions", () => {
     expect((out.body as any).sandbox).toBe(true);
     expect((out.body as any).results.map((r: any) => r.status)).toEqual(["live", "in_review", "coming_soon"]);
     expect(calls).toHaveLength(0);
+  });
+  it("sandboxes a claimed listing as the church's to review", async () => {
+    await env.DB.prepare("UPDATE church SET claimed = 1 WHERE id = 'R-1'").run();
+    const out = await contribute(makeEnv(), "R-1", "ip", { client: "lookup-demo", changes: [{ field: "denomination", value: "Baptist" }] }, noWait);
+    expect((out.body as any).results).toEqual([{ field: "denomination", status: "in_review", reviewBy: "church" }]);
+    await env.DB.prepare("UPDATE church SET claimed = 0 WHERE id = 'R-1'").run();
   });
 });
 

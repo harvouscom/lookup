@@ -34,5 +34,5 @@ A formula, not AI, orders results.
 | Semantic search | One AI model, bge-m3 on Cloudflare Workers AI and Vectorize, runs only when no name matches every word. On the held-out test it moved "in top 5" from 85% to 87% and "no results" from 1% to 0%. |
 | Ask AI in these docs | An instruct model on Workers AI answers questions using only these docs, and links the pages it used. Questions aren't stored. |
 | Ranking | A formula, not AI. |
-| Church details | AI never writes or changes them. Every fill comes from Here's My Church, and every shared fix goes through its review rules. |
+| Church details | AI never writes or approves them. Every fill comes from Here's My Church, and every shared fix goes through its rules: the church first when it has claimed its listing, then automatic checks. When a check reads the church's own website, an AI model on Workers AI only points to the sentence that should hold the value; code confirms that quote is on the page and matches. What the checks can't decide goes to a person. |
 | Searches | Lookup doesn't log them. |

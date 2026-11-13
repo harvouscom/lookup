@@ -199,6 +199,7 @@ describe("churches", () => {
     expect(body.missing).toContain("phone");
     expect(body.missing).not.toContain("website");
     expect(body.fields.regionName).toBe("Texas");
+    expect(body.claimed).toBe(false);
   });
   it("reports moved ids", async () => expect((await get("/v1/churches/OLD-1")).body.movedTo).toBe("R-0"));
   it("404s unknown ids", async () => {
@@ -212,10 +213,12 @@ describe("meta and routing", () => {
   it("serves meta", async () => {
     const { body } = await get("/v1/meta");
     expect(body.completenessWeights.serviceTimes).toBe(25);
-    expect(body.contributableFields.email).toEqual({ countries: "all", review: "moderated" });
+    expect(body.contributableFields.email).toEqual({ countries: "all", review: "moderated", checks: "automatic-then-reviewer" });
     expect(body.contributableFields.pastorName.review).toBe("moderated");
     expect(body.contributableFields.phone.countries).toBe("all");
-    expect(body.contributableFields.address).toEqual({ countries: "all", review: "moderated" });
+    expect(body.contributableFields.address).toEqual({ countries: "all", review: "moderated", checks: "automatic-then-reviewer" });
+    expect(body.contributableFields.phone.checks).toBe("automatic");
+    expect(body.contributableFields.reportRelocated.checks).toBe("reviewer");
     expect(body.contributableFields.reportClosed.review).toBe("moderated");
     expect(body.addEnabled).toBe(false);
     expect(body.contributableFields.name.review).toBe("moderated");

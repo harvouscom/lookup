@@ -31,7 +31,14 @@ export interface Strings {
   share: string;
   notNow: string;
   goesLive: string;
+  /** No longer shown: replacements say `checked`. Kept so existing overrides still type-check. */
   reviewed: string;
+  /** A replacement, which Here's My Church checks automatically. */
+  checked: string;
+  /** Any change on a listing the church has claimed. */
+  churchReviews: string;
+  /** After sending, a change held for the church to review. */
+  sentToChurch: string;
   soon: string;
   st: { live: string; in_review: string; not_applied: string; rejected: string; try_again: string; coming_soon: string };
   shared: (n: number) => string;
@@ -94,6 +101,9 @@ export const EN: Strings = {
     notNow: "Not now",
     goesLive: "Goes live",
     reviewed: "A moderator reviews it",
+    checked: "Checked automatically",
+    churchReviews: "The church reviews this",
+    sentToChurch: "Sent to the church",
     soon: "Coming soon",
     st: { live: "Live now", in_review: "Sent for review", not_applied: "Not changed: Here's My Church kept the listed value", rejected: "Not accepted", try_again: "Couldn't send. Try again shortly.", coming_soon: "Coming soon" },
     shared: (n) => `Shared ${n} ${n === 1 ? "change" : "changes"}.`,

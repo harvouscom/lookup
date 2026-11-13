@@ -73,10 +73,10 @@ async function nearestPlaces(db: D1Database, rows: ExportChurch[]): Promise<Map<
 const list = (v: string[]) => (v.length ? JSON.stringify(v) : null);
 
 function churchStmt(db: D1Database, rid: number, d: ProjectedChurch): D1PreparedStatement {
-  return db.prepare(`INSERT OR REPLACE INTO church (rowid,id,short_id,name,street,city,near,postal_code,region,country,lat,lng,phone,email,website,denomination,service_times,languages,ministries,pastor_name,last_verified,completeness,doc_hash,embed_hash)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(
+  return db.prepare(`INSERT OR REPLACE INTO church (rowid,id,short_id,name,street,city,near,postal_code,region,country,lat,lng,phone,email,website,denomination,service_times,languages,ministries,pastor_name,last_verified,completeness,doc_hash,embed_hash,claimed)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(
     rid, d.id, d.shortId, d.name, d.street, d.city, d.near, d.postalCode, d.region, d.country, d.lat, d.lng, d.phone, d.email,
-    d.website, d.denomination, d.serviceTimes, list(d.languages), list(d.ministries), d.pastorName, d.lastVerified, d.completeness, d.docHash, d.embedHash);
+    d.website, d.denomination, d.serviceTimes, list(d.languages), list(d.ministries), d.pastorName, d.lastVerified, d.completeness, d.docHash, d.embedHash, d.claimed ? 1 : 0);
 }
 
 /** The church row and its FTS row, replaced together. */

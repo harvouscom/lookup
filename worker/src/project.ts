@@ -24,6 +24,8 @@ export interface ExportChurch {
   listingStatus?: string;
   relocatedTo?: string;
   relocatedFrom?: string;
+  /** Present and true when the church has verified its listed inbox. Absent otherwise. */
+  claimed?: boolean;
 }
 
 export interface RegionInfo {
@@ -52,6 +54,7 @@ export interface ProjectedChurch {
   ministries: string[];
   pastorName: string | null;
   lastVerified: number | null;
+  claimed: boolean;
   completeness: number;
   loc: string;
   geo: string;
@@ -291,12 +294,15 @@ export function project(c: ExportChurch, region: string, info: RegionInfo, near:
     pastorName: clean(c.pastorName),
     lastVerified: Number.isFinite(c.lastVerified) ? (c.lastVerified as number) : null,
   };
+  const claimed = c.claimed === true;
   return {
     ...base,
+    claimed,
     completeness: completeness(base),
     loc: locText(base, info),
     geo: geoText(c.lat, c.lng, c.country, region),
-    docHash: hash64(JSON.stringify(base)),
+    // Only a claimed row hashes the flag, so unclaimed rows keep the hashes they had before it existed.
+    docHash: hash64(JSON.stringify(claimed ? { ...base, claimed } : base)),
     embedHash: hash64(embedText(base, info)),
   };
 }

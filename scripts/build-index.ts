@@ -110,8 +110,8 @@ function writeInserts(prefix: string, head: string, values: Iterable<string>, ro
 writeFileSync(`${outDir}/000-schema.sql`, readFileSync(new URL("../worker/schema.sql", import.meta.url), "utf8"));
 const counts: Record<string, number> = {};
 counts.church = writeInserts("100-church",
-  "INSERT INTO church (rowid,id,short_id,name,street,city,near,postal_code,region,country,lat,lng,phone,email,website,denomination,service_times,languages,ministries,pastor_name,last_verified,completeness,doc_hash,embed_hash) VALUES",
-  docs.map((d, i) => `(${i + 1},${q(d.id)},${q(d.shortId)},${q(d.name)},${q(d.street)},${q(d.city)},${q(d.near)},${q(d.postalCode)},${q(d.region)},${q(d.country)},${n(d.lat)},${n(d.lng)},${q(d.phone)},${q(d.email)},${q(d.website)},${q(d.denomination)},${q(d.serviceTimes)},${list(d.languages)},${list(d.ministries)},${q(d.pastorName)},${n(d.lastVerified)},${d.completeness},${q(d.docHash)},${q(d.embedHash)})`));
+  "INSERT INTO church (rowid,id,short_id,name,street,city,near,postal_code,region,country,lat,lng,phone,email,website,denomination,service_times,languages,ministries,pastor_name,last_verified,completeness,doc_hash,embed_hash,claimed) VALUES",
+  docs.map((d, i) => `(${i + 1},${q(d.id)},${q(d.shortId)},${q(d.name)},${q(d.street)},${q(d.city)},${q(d.near)},${q(d.postalCode)},${q(d.region)},${q(d.country)},${n(d.lat)},${n(d.lng)},${q(d.phone)},${q(d.email)},${q(d.website)},${q(d.denomination)},${q(d.serviceTimes)},${list(d.languages)},${list(d.ministries)},${q(d.pastorName)},${n(d.lastVerified)},${d.completeness},${q(d.docHash)},${q(d.embedHash)},${d.claimed ? 1 : 0})`));
 counts.church_fts = writeInserts("200-fts", "INSERT INTO church_fts (rowid,name,loc,geo) VALUES",
   docs.map((d, i) => `(${i + 1},${q(tokenize(d.name).join(" "))},${q(tokenize(d.loc).join(" "))},${q(d.geo)})`));
 const places = [...placeMap.values()].sort((a, b) => b.n - a.n);

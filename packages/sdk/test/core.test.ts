@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { addUrl, changeFor, isStale, mergeAddress, newChurchFrom, suggestUrl, STALE_MS } from "../src/core.ts";
-import { consentDiff, contributable, createLookup, createLookupController, fieldValue, fillTargets, findTargets, planFill, type ControllerState } from "../src/core.ts";
+import { consentBadge, consentDiff, contributable, EN, resultText, createLookup, createLookupController, fieldValue, fillTargets, findTargets, planFill, type ControllerState } from "../src/core.ts";
 
 const result = (id: string, name: string) => ({ id, name, label: name, locationLabel: "Dallas, Texas", street: null, city: "Dallas", nearestPlace: null, region: "TX", regionName: "Texas", country: "US", countryName: "United States", latitude: 1, longitude: 2, denomination: null, completeness: 50, distanceKm: null, band: 1, source: "lexical" as const });
 const record = {
@@ -366,6 +366,20 @@ describe("consent", () => {
     expect(changeFor(merged[1]!)).toEqual({ field: "address", value: { city: "Irving", street: "1 Main" } });
     expect(changeFor(merged[0]!)).toEqual({ field: "phone", value: "2" });
     expect(mergeAddress([{ field: "phone", was: "", value: "" }])).toHaveLength(1);
+  });
+  it("badges a blank field as going live, a replacement as checked, and a claimed listing as the church's", () => {
+    expect(consentBadge(EN, { field: "phone", was: "" }, false)).toEqual({ text: "Goes live", live: true });
+    expect(consentBadge(EN, { field: "phone", was: "555" }, false)).toEqual({ text: "Checked automatically", live: false });
+    // Email and pastor name are always held, even into a blank field.
+    expect(consentBadge(EN, { field: "email", was: "" }, false).text).toBe("Checked automatically");
+    expect(consentBadge(EN, { field: "phone", was: "" }, false, true)).toEqual({ text: "The church reviews this", live: false });
+    expect(consentBadge(EN, { field: "name", was: "A" }, true, true).text).toBe("Coming soon");
+  });
+  it("says a change held for the church was sent to the church", () => {
+    expect(resultText(EN, { status: "in_review", reviewBy: "church" })).toBe("Sent to the church");
+    expect(resultText(EN, { status: "in_review" })).toBe("Sent for review");
+    expect(resultText(EN, { status: "rejected", message: "Too long" })).toBe("Not accepted: Too long");
+    expect(resultText(EN, { status: "try_again", reviewBy: "church" })).toBe(EN.st.try_again);
   });
 });
 

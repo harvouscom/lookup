@@ -2,7 +2,7 @@
 // form-associated element: with a `name`, the chosen church's ID submits like any input.
 /// <reference path="./jsx.d.ts" preserve="true" />
 import { createLookup, type AddResult, type ChurchRecord, type FieldStatus, type Lookup, type LookupError, type Meta, type NewChurch, type SearchResult } from "./client.ts";
-import { addUrl, applyFill, changeFor, consentDiff, contributable, createLookupController, fieldValue, findTargets, isStale, mergeAddress, newChurchFrom, planFill, suggestUrl, type ControllerState, type FillChange } from "./core.ts";
+import { addUrl, applyFill, changeFor, consentBadge, consentDiff, contributable, createLookupController, fieldValue, findTargets, isStale, mergeAddress, newChurchFrom, planFill, resultText, suggestUrl, type ControllerState, type FillChange } from "./core.ts";
 import { setNativeValue, type FieldTarget } from "./dom.ts";
 import { devWarn } from "./dev.ts";
 import { matchField } from "./fields.ts";
@@ -77,7 +77,7 @@ const Base = (typeof HTMLElement === "undefined" ? class {} : HTMLElement) as ty
 /** `detail` of church-error: what failed (a search, or loading a church) and why. */
 export interface ChurchErrorDetail { query?: string; id?: string; status?: number; code?: string; retryAfter?: number; error: unknown }
 
-interface WatchRow { field: string; el: FieldTarget; label: string; was: string; review: "live" | "moderated"; soon: boolean }
+interface WatchRow { field: string; el: FieldTarget; label: string; was: string; soon: boolean }
 type Row = WatchRow & { value: string; parts?: Record<string, string> };
 interface Snapshot {
   id: string; record: ChurchRecord; rows: WatchRow[]; sent: Map<string, string>; dismissed: string; confirmed: boolean;
@@ -524,7 +524,7 @@ export class ChurchLookup extends Base {
       const rule = contributable(meta, field, country);
       if (!rule) continue;
       const label = (el.labels?.[0]?.textContent ?? el.getAttribute("aria-label") ?? field).trim();
-      rows.push({ field, el, label, was: (fieldValue(record, field) ?? "").trim(), review: rule.review, soon: rule.status === "coming_soon" });
+      rows.push({ field, el, label, was: (fieldValue(record, field) ?? "").trim(), soon: rule.status === "coming_soon" });
     }
     const reports = (["reportClosed", "reportDuplicate", "reportRelocated"] as const).filter((f) => contributable(meta, f, country));
     const render = () => this.renderPanel();
@@ -572,7 +572,7 @@ export class ChurchLookup extends Base {
     return ex;
   }
 
-  private renderPanel(result?: Map<string, { status: FieldStatus; message?: string }>, sandbox?: boolean): void {
+  private renderPanel(result?: Map<string, { status: FieldStatus; message?: string; reviewBy?: string }>, sandbox?: boolean): void {
     const s = this.snap;
     const p = this.panel;
     if (!s) { p.hidden = true; return; }
@@ -625,8 +625,9 @@ export class ChurchLookup extends Base {
       li.querySelector("s")!.textContent = r.was || "—";
       li.querySelector("ins")!.textContent = res && !changed.includes(r) ? (s.sent.get(r.field) ?? r.value.trim()) : r.value.trim();
       const b = li.querySelector<HTMLElement>(".b")!;
-      b.textContent = res ? (res.message && res.status === "rejected" ? `${t.st.rejected}: ${res.message}` : t.st[res.status]) : r.soon ? t.soon : r.review === "moderated" ? t.reviewed : t.goesLive;
-      b.classList.toggle("m", r.soon || r.review === "moderated" || (Boolean(res) && res!.status !== "live"));
+      const badge = consentBadge(t, r, r.soon, s.record.claimed);
+      b.textContent = res ? resultText(t, res) : badge.text;
+      b.classList.toggle("m", res ? res.status !== "live" : !badge.live);
       ul.append(li);
     });
     count();
@@ -652,7 +653,7 @@ export class ChurchLookup extends Base {
     if (!this.dispatchEvent(new CustomEvent("church-contribute", { detail: { churchId: s.id, changes }, cancelable: true, bubbles: true, composed: true }))) return;
     const btn = this.panel.querySelector<HTMLButtonElement>(".row .bt");
     if (btn && !report) { btn.disabled = true; btn.textContent = this.t.sending; }
-    let out: { sandbox?: boolean; results: { field: string; status: FieldStatus; message?: string }[] };
+    let out: { sandbox?: boolean; results: { field: string; status: FieldStatus; message?: string; reviewBy?: string }[] };
     try { out = await this.client().contribute(s.id, changes); }
     catch { out = { results: changes.map((c) => ({ field: c.field, status: "try_again" as const })) }; }
     if (this.snap !== s) return;
@@ -669,7 +670,7 @@ export class ChurchLookup extends Base {
     for (const c of changes) if (result.get(c.field)?.status !== "try_again") s.sent.set(c.field, rows.find((r) => r.field === c.field)?.value.trim() ?? String(c.value));
     this.renderPanel(result, out.sandbox);
     const done = out.results.filter((r) => r.status === "live" || r.status === "in_review").length;
-    this.say(`${t.shared(done)} ${out.results.map((r) => `${r.field}: ${t.st[r.status]}`).join(". ")}.`);
+    this.say(`${t.shared(done)} ${out.results.map((r) => `${r.field}: ${resultText(t, r)}`).join(". ")}.`);
   }
 
   private sendShare(): Promise<void> {

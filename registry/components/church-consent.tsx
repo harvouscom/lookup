@@ -1,8 +1,9 @@
 "use client"
 
 // ChurchConsent: after a ChurchLookup fill, offer to share the person's corrections back to Here's My
-// Church. Changed fields start checked, each says whether it goes live or waits for a moderator, and
-// nothing is sent until they choose Share (or submit the form with a checked data-hmc-share box).
+// Church. Changed fields start checked, each says whether it goes live, is checked automatically or
+// goes to the church first (a claimed listing), and nothing is sent until they choose Share (or
+// submit the form with a checked data-hmc-share box).
 // When nothing changed, it asks "Still correct?" of listings nobody confirmed this year. It also
 // offers "Report a problem" and a link to fix anything else on Here's My Church.
 import * as React from "react"
@@ -13,12 +14,14 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import {
   changeFor,
+  consentBadge,
   consentDiff,
   contributable,
   createLookup,
   fieldValue,
   isStale,
   mergeAddress,
+  resultText,
   stringsFor,
   suggestUrl,
   type ChurchRecord,
@@ -42,7 +45,7 @@ export interface ChurchConsentProps {
   client?: string
   baseUrl?: string
   lookup?: Lookup
-  onShared?: (results: { field: string; status: FieldStatus; message?: string }[], sandbox: boolean) => void
+  onShared?: (results: { field: string; status: FieldStatus; message?: string; reviewBy?: "church" }[], sandbox: boolean) => void
   /** Text language, such as "es". Defaults to the page's. Load other languages with @/lib/lookup-strings. */
   lang?: string
   /** Override any text. */
@@ -50,7 +53,7 @@ export interface ChurchConsentProps {
   className?: string
 }
 
-type Result = { status: FieldStatus; message?: string }
+type Result = { status: FieldStatus; message?: string; reviewBy?: "church" }
 const REPORTS = ["reportClosed", "reportDuplicate", "reportRelocated"] as const
 
 export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lookup: own, onShared, lang, strings, className }: ChurchConsentProps) {
@@ -152,7 +155,7 @@ export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lo
     if (!picked.length) return
     const changes = picked.map(changeFor)
     setBusy(true)
-    let out: { sandbox?: boolean; results: { field: string; status: FieldStatus; message?: string }[] }
+    let out: { sandbox?: boolean; results: { field: string; status: FieldStatus; message?: string; reviewBy?: "church" }[] }
     try {
       out = await lookup.contribute(record!.id, changes)
     } catch {
@@ -215,9 +218,8 @@ export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lo
           const soon = r.rule.status === "coming_soon"
           const id = `${uid}-${r.field}`
           const label = r.parts ? t.address : r.label
-          const badge = res
-            ? res.status === "rejected" && res.message ? `${t.st.rejected}: ${res.message}` : t.st[res.status]
-            : soon ? t.soon : r.rule.review === "moderated" ? t.reviewed : t.goesLive
+          const before = consentBadge(t, r, soon, record.claimed)
+          const badge = res ? resultText(t, res) : before.text
           return (
             <li key={r.field} className="bg-background flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-3 py-2">
               <Checkbox
@@ -230,7 +232,7 @@ export function ChurchConsent({ record, values, labels = {}, client, baseUrl, lo
               <span className="text-muted-foreground min-w-0 flex-1 truncate">
                 <s>{r.was || "—"}</s> <span aria-hidden="true">→</span> <ins className="text-foreground no-underline">{sent.get(r.field) ?? r.value.trim()}</ins>
               </span>
-              <Badge variant={!res && !soon && r.rule.review === "live" ? "secondary" : "outline"}>{badge}</Badge>
+              <Badge variant={!res && before.live ? "secondary" : "outline"}>{badge}</Badge>
             </li>
           )
         })}

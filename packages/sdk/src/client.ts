@@ -111,6 +111,8 @@ export interface ChurchRecord {
   hints: { nearestPlace: string | null };
   /** The church's page on Here's My Church, where people can fix anything else. Add ?suggest=1 to open the form. */
   links?: { heresMyChurch: string | null };
+  /** The church has claimed its listing on Here's My Church. Others' changes go to the church first. */
+  claimed?: boolean;
   attribution: string;
 }
 
@@ -119,7 +121,8 @@ export type FieldStatus = "live" | "in_review" | "not_applied" | "rejected" | "t
 export interface ContributionResult {
   churchId: string;
   sandbox?: boolean;
-  results: { field: string; status: FieldStatus; message?: string }[];
+  /** reviewBy "church": the change is held for the church itself to review (a claimed listing). */
+  results: { field: string; status: FieldStatus; message?: string; reviewBy?: "church" }[];
 }
 /** A church to add: record field names. Name, city and region (a code or name) are required. */
 export interface NewChurch {
@@ -132,7 +135,8 @@ export interface AddResult { status: "live" | "similar" | "rejected" | "try_agai
 export interface ConfirmResult { churchId: string; sandbox?: boolean; status: "confirmed" | FieldStatus; message?: string; lastVerified?: number }
 export interface Meta {
   fields: string[];
-  contributableFields: Record<string, { countries: "all" | string[]; review: "live" | "moderated"; status?: "coming_soon" }>;
+  /** `checks`: "automatic" fields are decided by Here's My Church's checks; "automatic-then-reviewer" ones go to a person when the checks can't decide; "reviewer" always does. */
+  contributableFields: Record<string, { countries: "all" | string[]; review: "live" | "moderated"; checks?: "automatic" | "automatic-then-reviewer" | "reviewer"; status?: "coming_soon" }>;
   completenessWeights: Record<string, number>;
   /** Whether addChurch() takes new churches right now. */
   addEnabled?: boolean;

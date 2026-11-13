@@ -127,6 +127,8 @@ export interface ChurchRecord {
   hints: { nearestPlace: string | null };
   /** The church's page on Here's My Church, where people can fix anything else. Add ?suggest=1 to open the form. */
   links?: { heresMyChurch: string | null };
+  /** The church has claimed its listing on Here's My Church. Others' changes go to the church first. */
+  claimed?: boolean;
   attribution: string;
 }
 
@@ -135,7 +137,8 @@ export type FieldStatus = "live" | "in_review" | "not_applied" | "rejected" | "t
 export interface ContributionResult {
   churchId: string;
   sandbox?: boolean;
-  results: { field: string; status: FieldStatus; message?: string }[];
+  /** reviewBy "church": the change is held for the church itself to review (a claimed listing). */
+  results: { field: string; status: FieldStatus; message?: string; reviewBy?: "church" }[];
 }
 /** A church to add: record field names. Name, city and region (a code or name) are required. */
 export interface NewChurch {
@@ -148,7 +151,8 @@ export interface AddResult { status: "live" | "similar" | "rejected" | "try_agai
 export interface ConfirmResult { churchId: string; sandbox?: boolean; status: "confirmed" | FieldStatus; message?: string; lastVerified?: number }
 export interface Meta {
   fields: string[];
-  contributableFields: Record<string, { countries: "all" | string[]; review: "live" | "moderated"; status?: "coming_soon" }>;
+  /** `checks`: "automatic" fields are decided by Here's My Church's checks; "automatic-then-reviewer" ones go to a person when the checks can't decide; "reviewer" always does. */
+  contributableFields: Record<string, { countries: "all" | string[]; review: "live" | "moderated"; checks?: "automatic" | "automatic-then-reviewer" | "reviewer"; status?: "coming_soon" }>;
   completenessWeights: Record<string, number>;
   /** Whether addChurch() takes new churches right now. */
   addEnabled?: boolean;
@@ -291,7 +295,14 @@ export interface Strings {
   share: string;
   notNow: string;
   goesLive: string;
+  /** No longer shown: replacements say `checked`. Kept so existing overrides still type-check. */
   reviewed: string;
+  /** A replacement, which Here's My Church checks automatically. */
+  checked: string;
+  /** Any change on a listing the church has claimed. */
+  churchReviews: string;
+  /** After sending, a change held for the church to review. */
+  sentToChurch: string;
   soon: string;
   st: { live: string; in_review: string; not_applied: string; rejected: string; try_again: string; coming_soon: string };
   shared: (n: number) => string;
@@ -354,6 +365,9 @@ export const EN: Strings = {
     notNow: "Not now",
     goesLive: "Goes live",
     reviewed: "A moderator reviews it",
+    checked: "Checked automatically",
+    churchReviews: "The church reviews this",
+    sentToChurch: "Sent to the church",
     soon: "Coming soon",
     st: { live: "Live now", in_review: "Sent for review", not_applied: "Not changed: Here's My Church kept the listed value", rejected: "Not accepted", try_again: "Couldn't send. Try again shortly.", coming_soon: "Coming soon" },
     shared: (n) => `Shared ${n} ${n === 1 ? "change" : "changes"}.`,
@@ -790,6 +804,24 @@ export function mergeAddress<T extends ConsentRow>(rows: T[]): (T & { parts?: Re
   const join = (k: "was" | "value") => parts.map((r) => r[k].trim()).filter(Boolean).join(", ");
   const address = { ...parts[0]!, field: "address", was: join("was"), value: join("value"), parts: Object.fromEntries(parts.map((r) => [r.field, r.value.trim()])) };
   return rows.flatMap((r) => (r === parts[0] ? [address] : parts.includes(r) ? [] : [r]));
+}
+
+/** Lookup always holds these, even into a blank field: a host form can hold someone's personal details. */
+const ALWAYS_HELD = ["email", "pastorName"];
+
+/**
+ * What a consent row's badge says before sending: coming soon, the church reviews it (a claimed
+ * listing), goes live (a blank field), or checked automatically (a replacement).
+ */
+export function consentBadge(t: Strings, r: { field: string; was: string }, soon: boolean, claimed?: boolean): { text: string; live: boolean } {
+  const live = !soon && !claimed && !r.was.trim() && !ALWAYS_HELD.includes(r.field);
+  return { text: soon ? t.soon : claimed ? t.churchReviews : live ? t.goesLive : t.checked, live };
+}
+
+/** A sent field's outcome, as the badge shows it. */
+export function resultText(t: Strings, r: { status: FieldStatus; message?: string; reviewBy?: string }): string {
+  if (r.status === "rejected" && r.message) return `${t.st.rejected}: ${r.message}`;
+  return r.status === "in_review" && r.reviewBy === "church" ? t.sentToChurch : t.st[r.status];
 }
 
 /** The change to send for a consent row: an address goes as its parts. */

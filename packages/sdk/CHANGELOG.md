@@ -2,6 +2,12 @@
 
 All notable changes to `@heresmychurch/lookup`. Versions follow [semver](https://semver.org); while the version is 0.x, a minor release can change behavior, so pin the exact version you test against.
 
+## Unreleased
+
+- Consent badges follow Here's My Church's checks: filling a blank field says "Goes live", replacing a value says "Checked automatically", and every change on a listing the church has claimed says "The church reviews this". After sending, a change held for the church says "Sent to the church". New strings `checked`, `churchReviews` and `sentToChurch`, in every language; `reviewed` is no longer shown but stays in `Strings`.
+- Types: `ChurchRecord.claimed`, `reviewBy?: "church"` on contribution results, and `checks` on `Meta.contributableFields`. All optional, so older API responses still type-check.
+- Core: `consentBadge` and `resultText`, the badge wording the widget and the shadcn `ChurchConsent` share.
+
 ## 0.4.0
 
 - React: `useChurchLookup` ships in `@heresmychurch/lookup/react`, so React apps without shadcn/ui get the headless core as a hook. React is an optional peer dependency, needed only for that entry.
