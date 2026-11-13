@@ -1206,9 +1206,10 @@ p, li { text-wrap: pretty; }
 @media (max-width: 640px) { .watch { margin-top: 18px; } .watch-thumb { width: 64px; height: 36px; } }
 @media (prefers-reduced-motion: reduce) { .watch, .watch-thumb img, .video-lb-close { transition: none; } .video-lb-backdrop, .video-lb-panel { animation: none; } }
 
-/* Scrolled, the floating nav tucks in narrower than the page, and its contents move in with the card. */
-.nav { transition: padding .45s cubic-bezier(.33,1,.68,1); }
-.nav.scrolled { padding-left: max(24px, calc((100% - 880px) / 2 + 16px)); padding-right: max(24px, calc((100% - 880px) / 2 + 16px)); }
-.nav.scrolled::before { inset: 6px max(8px, calc((100% - 880px) / 2)); }
-@media (max-width: 640px) { .nav.scrolled { padding-left: 14px; padding-right: 14px; } .nav.scrolled::before { inset: 5px 6px; } }
+/* Scrolled, the floating nav tucks in to just fit its contents (brand left, actions right, a calm gap between),
+   and its contents move in with the card. */
+.nav { --nav-card: 640px; transition: padding .45s cubic-bezier(.33,1,.68,1); }
+.nav.scrolled { padding-left: max(24px, calc((100% - var(--nav-card)) / 2 + 16px)); padding-right: max(24px, calc((100% - var(--nav-card)) / 2 + 12px)); }
+.nav.scrolled::before { inset: 6px max(8px, calc((100% - var(--nav-card)) / 2)); }
+@media (max-width: 680px) { .nav.scrolled { padding-left: 14px; padding-right: 14px; } .nav.scrolled::before { inset: 5px 6px; } }
 @media (prefers-reduced-motion: reduce) { .nav { transition: none; } }
