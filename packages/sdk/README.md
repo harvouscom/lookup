@@ -2,7 +2,15 @@
 
 Church typeahead and autofill from [Here's My Church](https://heresmychurch.com). MIT, no dependencies.
 
-Not published to npm yet. Until it is, load the element from the API:
+```bash
+npm install @heresmychurch/lookup
+```
+
+```js
+import "@heresmychurch/lookup/element";
+```
+
+Or load the element with no build step:
 
 ```html
 <church-lookup label="Your church"></church-lookup>
