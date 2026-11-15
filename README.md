@@ -1,6 +1,7 @@
 # Lookup
 
-**Official submission for the [AI for Church Hackathon 2026](https://aiforchurch.com/hackathon)** — Open Track.
+**Official submission for the [AI for Church Hackathon 2026](https://aiforchurch.com/hackathon)** — Open Track.  
+Started October 30, 2026 · Completed November 14, 2026.
 
 The autofill for your church info: a church typeahead and autofill API, SDK, and widget built on the [Here's My Church](https://heresmychurch.com) open directory of 587,842 churches across 19 countries.
 
@@ -55,16 +56,18 @@ Live API example: `https://lookup.heresmychurch.com/v1/search?q=grace%20comm`
 |---|---|
 | `worker/` | Lookup API (Cloudflare Worker) |
 | `packages/sdk/` | Client, `<church-lookup>` element, React registry |
-| `site/` | Landing page, docs, and demo forms |
 | `scripts/` | Index build and measurement tools |
 | `eval/` | Baselines, golden set, and results |
 | `docs/` | Markdown source for the docs site |
+| `site/` | Landing page, docs, and demo forms |
 
 Evaluation details and design decisions live in `eval/results/`.
 
 ## Hackathon notes
 
 - **Track:** Open Track
+- **Build window:** October 30 – November 27, 2026
+- **Completed:** November 14, 2026
 - **Live demo:** https://lookup.heresmychurch.com/
 - **Repo:** https://github.com/harvouscom/lookup
 - Built as a new project during the official build window.
