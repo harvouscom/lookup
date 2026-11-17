@@ -116,7 +116,7 @@ hero.addEventListener("church-fill", (e) => {
   if (e.detail.changes.length) trackEvent("Demo Autofill Completed");
   showFill(e.detail.changes, false, e.detail.record);
 });
-$(".nav-cta")?.addEventListener("click", () => trackEvent("Get Started Clicked"));
+$('#nav a[href="/docs/quickstart"]')?.addEventListener("click", () => trackEvent("Get Started Clicked"));
 
 function beginPick(r, quiet = false) {
   globe?.setPins([]);
