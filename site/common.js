@@ -1,5 +1,7 @@
 // Shared by the homepage and the docs: theme, copy buttons, tabs, and the interactive demos
 // (widget options, theming slider, API playground). Each part checks its markup is on the page.
+import { trackEvent } from "/analytics.js";
+
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -118,6 +120,7 @@ $$(".copy").forEach((btn) => btn.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(pre.textContent);
     btn.textContent = cap ? "Copied" : "copied";
+    trackEvent("Code Snippet Copied");
   } catch {
     btn.textContent = cap ? "Select to copy" : "select to copy";
   }
@@ -128,8 +131,11 @@ $$(".copy").forEach((btn) => btn.addEventListener("click", async () => {
 $$("[data-copy-text]").forEach((btn) => btn.addEventListener("click", async () => {
   const label = btn.dataset.label ??= btn.textContent;
   const cap = label[0] === label[0].toUpperCase();
-  try { await navigator.clipboard.writeText(btn.dataset.copyText); btn.textContent = cap ? "Copied" : "copied"; }
-  catch { btn.textContent = cap ? "Couldn’t copy" : "couldn’t copy"; }
+  try {
+    await navigator.clipboard.writeText(btn.dataset.copyText);
+    btn.textContent = cap ? "Copied" : "copied";
+    trackEvent("Agent Prompt Copied");
+  } catch { btn.textContent = cap ? "Couldn’t copy" : "couldn’t copy"; }
   setTimeout(() => (btn.textContent = label), 1600);
 }));
 
@@ -172,6 +178,7 @@ const showUrl = () => { $("#play-url").innerHTML = `<b>GET</b> https://lookup.he
 showUrl();
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+  trackEvent("API Playground Run");
   const status = $("#play-status"), out = $("#play-out code");
   status.textContent = "sending…";
   const t0 = performance.now();

@@ -3,6 +3,7 @@
 import { createGlobe } from "/globe.js";
 import { createSky } from "/sky.js";
 import { createAurora } from "/aurora.js";
+import { trackEvent } from "/analytics.js";
 import "/common.js";
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -96,13 +97,26 @@ function placeTags(screen) {
 
 hero.addEventListener("church-results", (e) => {
   const { query, results } = e.detail;
+  trackEvent("Demo Search Used");
+  if (results.length) trackEvent("Demo Search Found Results");
   globe?.setPins(results.map((r) => ({ lat: r.latitude, lng: r.longitude })));
   showTags(results.slice(0, 4).map((r) => ({ lat: r.latitude, lng: r.longitude, text: r.name })));
   hud.textContent = `"${query}" → ${results.length} ${results.length === 1 ? "church" : "churches"}`;
   logEvent("church-results", `${results.length} for "${query}"`, true);
 });
-hero.addEventListener("church-select", (e) => beginPick(e.detail.result));
-hero.addEventListener("church-fill", (e) => showFill(e.detail.changes, false, e.detail.record));
+hero.addEventListener("church-error", (e) => {
+  if (e.detail.query) trackEvent("Demo Search Used");
+  trackEvent("Demo Lookup Error");
+});
+hero.addEventListener("church-select", (e) => {
+  trackEvent("Demo Church Selected");
+  beginPick(e.detail.result);
+});
+hero.addEventListener("church-fill", (e) => {
+  if (e.detail.changes.length) trackEvent("Demo Autofill Completed");
+  showFill(e.detail.changes, false, e.detail.record);
+});
+$(".nav-cta")?.addEventListener("click", () => trackEvent("Get Started Clicked"));
 
 function beginPick(r, quiet = false) {
   globe?.setPins([]);
@@ -540,7 +554,10 @@ markScrolled();
     pushed = false;
     opener?.focus?.();
   });
-  $$(".ex-card").forEach((b) => b.addEventListener("click", () => open(b.dataset.ex, b)));
+  $$(".ex-card").forEach((b) => b.addEventListener("click", () => {
+    open(b.dataset.ex, b);
+    trackEvent("Example Opened");
+  }));
   $("#exm-prev").addEventListener("click", () => show(at - 1));
   $("#exm-next").addEventListener("click", () => show(at + 1));
   $("#exm-close").addEventListener("click", close);

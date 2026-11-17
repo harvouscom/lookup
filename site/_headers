@@ -31,6 +31,8 @@
   Cache-Control: public, max-age=300
 /common.js
   Cache-Control: public, max-age=300
+/analytics.js
+  Cache-Control: public, max-age=300
 /docs.css
   Cache-Control: public, max-age=300
 /docs.js
