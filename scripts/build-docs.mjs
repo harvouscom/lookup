@@ -155,6 +155,7 @@ function layout(pg, article, rail) {
 <script>
   try { var t = localStorage.getItem("lookup-docs-theme"); if (t === "dark" || (!t && matchMedia("(prefers-color-scheme: dark)").matches)) document.documentElement.dataset.theme = "dark"; } catch (e) {}
 </script>
+<script src="https://cdn.usefathom.com/script.js" data-site="HTDVJZUN" data-included-domains="lookup.heresmychurch.com" defer></script>
 </head>
 <body class="dx-body" data-page="${pg.page}">
 <a class="skip" href="#content">Skip to content</a>
